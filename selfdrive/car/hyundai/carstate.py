@@ -184,7 +184,7 @@ class CarState(CarStateBase):
       elif cp.vl["CLU15"]["CF_Clu_InhibitR"] == 1:
         ret.gearShifter = GearShifter.reverse
       else:
-        ret.gearShifter = GearShifter.unknown
+        ret.gearShifter = GearShifter.drive
     # Gear Selecton via TCU12
     elif self.CP.carFingerprint in FEATURES["use_tcu_gears"]:
       gear = cp.vl["TCU12"]["CUR_GR"]
