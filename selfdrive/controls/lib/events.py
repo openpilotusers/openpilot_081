@@ -262,30 +262,6 @@ EVENTS: Dict[int, Dict[str, Union[Alert, Callable[[Any, messaging.SubMaster, boo
       Priority.LOWER, VisualAlert.none, AudibleAlert.none, .2, 0., 1.5),
   },
 
-  'laneSpeedAlert': {
-    ET.PERMANENT: Alert(
-      "",
-      "",
-      AlertStatus.normal, AlertSize.mid,
-      Priority.LOW, VisualAlert.none, AudibleAlert.chimeWarning1, .4, 0., .1),
-  },
-
-  'laneSpeedAlertSilent': {
-    ET.PERMANENT: Alert(
-      "",
-      "",
-      AlertStatus.normal, AlertSize.mid,
-      Priority.LOW, VisualAlert.none, AudibleAlert.none, .2, 0., .1),
-  },
-
-  'laneSpeedKeeping': {
-    ET.PERMANENT: Alert(
-      "유지중 ",
-      "",
-      AlertStatus.normal, AlertSize.mid,
-      Priority.LOW, VisualAlert.none, AudibleAlert.none, .2, 0., .1),
-  },
-
   "trafficSlow": {
     ET.WARNING: Alert(
       "교통 서행",

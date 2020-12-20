@@ -83,7 +83,7 @@ class DynamicFollow:
     self._setup_changing_variables()
 
   def _setup_collector(self):
-    self.sm_collector = SubMaster(['liveTracks', 'laneSpeed'])
+    self.sm_collector = SubMaster(['liveTracks'])
     self.log_auto_df = self.op_params.get('log_auto_df')
     if not isinstance(self.log_auto_df, bool):
       self.log_auto_df = False
@@ -143,13 +143,6 @@ class DynamicFollow:
                                   self.lead_data.a_lead,
                                   self.lead_data.v_lead,
                                   self.lead_data.x_lead,
-                                  list(self.sm_collector['laneSpeed'].leftLaneSpeeds),
-                                  list(self.sm_collector['laneSpeed'].middleLaneSpeeds),
-                                  list(self.sm_collector['laneSpeed'].rightLaneSpeeds),
-
-                                  list(self.sm_collector['laneSpeed'].leftLaneDistances),
-                                  list(self.sm_collector['laneSpeed'].middleLaneDistances),
-                                  list(self.sm_collector['laneSpeed'].rightLaneDistances),
                                   self.user_profile,
                                   sec_since_boot()])
 
