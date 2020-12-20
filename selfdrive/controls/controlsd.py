@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 import os
+import requests
+import threading
 from cereal import car, log
 from common.numpy_fast import clip
 from common.realtime import sec_since_boot, config_realtime_process, Priority, Ratekeeper, DT_CTRL
@@ -44,6 +46,15 @@ LaneChangeDirection = log.PathPlan.LaneChangeDirection
 EventName = car.CarEvent.EventName
 
 
+def log_fingerprint(candidate, timeout=15):
+  try:
+    requests.get('https://sentry.io', timeout=timeout)
+    client.captureMessage("fingerprinted {}".format(candidate), level='info')
+    return
+  except:
+    pass
+
+
 class Controls:
   def __init__(self, sm=None, pm=None, can_sock=None):
     config_realtime_process(3, Priority.CTRL_HIGH)
@@ -76,7 +87,8 @@ class Controls:
     print("Waiting for CAN messages...")
     get_one_can(self.can_sock)
 
-    self.CI, self.CP = get_car(self.can_sock, self.pm.sock['sendcan'])
+    self.CI, self.CP, candidate = get_car(self.can_sock, self.pm.sock['sendcan'])
+    threading.Thread(target=log_fingerprint, args=[candidate]).start()
 
     # read params
     params = Params()
@@ -109,7 +121,7 @@ class Controls:
     self.AM = AlertManager()
     self.events = Events()
 
-    self.LoC = LongControl(self.CP, self.CI.compute_gb)
+    self.LoC = LongControl(self.CP, self.CI.compute_gb, candidate)
     self.VM = VehicleModel(self.CP)
 
     self.lateral_control_method = 0
