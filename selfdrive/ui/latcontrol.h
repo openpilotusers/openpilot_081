@@ -129,7 +129,7 @@ static void draw_control_button3(UIState *s, int touch_x, int touch_y) {
     int btn_yc = btn_y + (btn_h/2);
     nvgBeginPath(s->vg);
     nvgRoundedRect(s->vg, btn_x3, btn_y, btn_w, btn_h, 100);
-    if (s->limit_set_speed == 1) {
+    if (s->limit_set_speed_curv == 1) {
       nvgStrokeColor(s->vg, nvgRGBA(55,104,200,255));
       nvgStrokeWidth(s->vg, 6);
       nvgStroke(s->vg);
@@ -156,7 +156,7 @@ static void draw_control_button4(UIState *s, int touch_x, int touch_y) {
     int btn_yc = btn_y + (btn_h/2);
     nvgBeginPath(s->vg);
     nvgRoundedRect(s->vg, btn_x4, btn_y, btn_w, btn_h, 100);
-    if (s->limit_set_speed == 1) {
+    if (s->limit_set_speed_camera == 1) {
       nvgStrokeColor(s->vg, nvgRGBA(184,80,70,255));
       nvgStrokeWidth(s->vg, 6);
       nvgStroke(s->vg);
