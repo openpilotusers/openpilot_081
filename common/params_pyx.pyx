@@ -127,9 +127,9 @@ keys = {
   b"OpkrCruiseGapSet": [TxType.PERSISTENT],
   b"OpkrLatMode": [TxType.PERSISTENT],
   b"OpkrAccMode": [TxType.PERSISTENT],
-  b"OpkrSlowOnCurve": [TxType.PERSISTENT],
   b"OpkrSpeedLimitOffset": [TxType.PERSISTENT],
   b"LimitSetSpeedCamera": [TxType.PERSISTENT],
+  b"LimitSetSpeedCurv": [TxType.PERSISTENT],
 }
 
 def ensure_bytes(v):
