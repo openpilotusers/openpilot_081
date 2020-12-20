@@ -268,8 +268,8 @@ class Controls:
     self.AM.SA_set_enabled(self.enabled)
     # alert priority is defined by code location, keeping is highest, then lane speed alert, then auto-df alert
     if self.sm['modelLongButton'].enabled != self.last_model_long:
-      extra_text_1 = 'ºñÈ°¼ºÈ­!' if self.last_model_long else 'È°¼ºÈ­!'
-      extra_text_2 = '' if self.last_model_long else ', ¸ğµ¨ÀÌ ¿¹±âÄ¡ ¾Ê°Ô ÀÛµ¿ÇÒ ¼ö ÀÖÀ½'
+      extra_text_1 = 'ë¹„í™œì„±í™”!' if self.last_model_long else 'í™œì„±í™”!'
+      extra_text_2 = '' if self.last_model_long else ', ëª¨ë¸ì´ ì˜ˆê¸°ì¹˜ ì•Šê²Œ ì‘ë™í•  ìˆ˜ ìˆìŒ'
       self.AM.SA_add('modelLongAlert', extra_text_1=extra_text_1, extra_text_2=extra_text_2)
       return
 
@@ -283,7 +283,7 @@ class Controls:
           self.AM.SA_add(df_alert, extra_text_1=df_out.model_profile_text + ' (auto)')
           return
       else:
-        self.AM.SA_add(df_alert, extra_text_1=df_out.user_profile_text, extra_text_2='µ¿ÀûÂ÷°£°Å¸®Á¶Àı: {} ÇÁ·ÎÆÄÀÏ È°¼ºÈ­µÊ'.format(df_out.user_profile_text))
+        self.AM.SA_add(df_alert, extra_text_1=df_out.user_profile_text, extra_text_2='ë™ì ì°¨ê°„ê±°ë¦¬ì¡°ì ˆ: {} í”„ë¡œíŒŒì¼ í™œì„±í™”ë¨'.format(df_out.user_profile_text))
         return
   def data_sample(self):
     """Receive data from sockets and update carState"""
