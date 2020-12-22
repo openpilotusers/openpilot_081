@@ -58,6 +58,7 @@ class PathPlanner():
     self.setup_mpc()
     self.solution_invalid_cnt = 0
     self.lane_change_enabled = Params().get('LaneChangeEnabled') == b'1'
+    self.live_sr = Params().get('OpkrLiveSteerRatio') == b'1'
 
     if int(Params().get('OpkrAutoLaneChangeDelay')) == 0:
       self.lane_change_auto_delay = 0.0
@@ -84,6 +85,11 @@ class PathPlanner():
     self.lane_change_adjust = [0.12, 0.19, 0.9, 1.4]
     self.lane_change_adjust_vel = [8.3, 16, 22, 30]
     self.lane_change_adjust_new = 0.0
+
+    self.angle_differ_range = [0, 45]
+    self.steerRatio_range = [CP.steerRatio, 17.5] # 가변 SR값 범위 설정
+    self.new_steerRatio = CP.steerRatio
+    self.new_steerRatio_prev = CP.steerRatio
 
     self.steer_actuator_delay_range = [0.1, CP.steerActuatorDelay]
     self.steer_actuator_delay_vel = [3, 13]
@@ -115,7 +121,9 @@ class PathPlanner():
     active = sm['controlsState'].active
 
     angle_offset = sm['liveParameters'].angleOffset
-    
+
+    anglesteer_current = sm['controlsState'].angleSteers
+    anglesteer_desire = sm['controlsState'].angleSteersDes    
     v_cruise_kph = sm['controlsState'].vCruise
     stand_still = sm['carState'].standStill    
     lateral_control_method = sm['controlsState'].lateralControlMethod
@@ -133,9 +141,27 @@ class PathPlanner():
 
     self.new_steer_actuator_delay = interp(v_ego, self.steer_actuator_delay_vel, self.steer_actuator_delay_range)
 
+    # 가변 SR
+    if not self.live_sr:
+      self.angle_diff = abs(anglesteer_desire) - abs(anglesteer_current)
+      if abs(output_scale) >= 1 and v_ego > 8:
+        self.new_steerRatio_prev = interp(self.angle_diff, self.angle_differ_range, self.steerRatio_range)
+        if self.new_steerRatio_prev > self.new_steerRatio:
+          self.new_steerRatio = self.new_steerRatio_prev
+        else:
+        self.mpc_frame += 1
+        if self.mpc_frame % 10 == 0:
+          self.new_steerRatio -= 0.1
+          if self.new_steerRatio <= CP.steerRatio:
+            self.new_steerRatio = CP.steerRatio
+          self.mpc_frame = 0
     # Update vehicle model
     x = max(sm['liveParameters'].stiffnessFactor, 0.1)
-    sr = max(sm['liveParameters'].steerRatio, 0.1)
+    
+    if self.live_sr:
+      sr = max(sm['liveParameters'].steerRatio, 0.1) #Live SR
+    else:
+      sr = max(self.new_steerRatio, 0.1) #가변 SR
     VM.update_params(x, sr)
 
     curvature_factor = VM.curvature_factor(v_ego)

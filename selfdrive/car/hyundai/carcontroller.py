@@ -158,6 +158,9 @@ class CarController():
     self.steerDeltaUp = int(self.params.get('SteerDeltaUpAdj'))
     self.steerDeltaDown = int(self.params.get('SteerDeltaDownAdj'))
 
+    self.variable_steer_max = int(self.params.get('OpkrVariableSteerMax')) == b'1'
+    self.variable_steer_delta = int(self.params.get('OpkrVariableSteerDelta')) == b'1'
+
     if CP.lateralTuning.which() == 'pid':
       self.str_log2 = 'T={:0.2f}/{:0.3f}/{:0.5f}'.format(CP.lateralTuning.pid.kpV[1], CP.lateralTuning.pid.kiV[1], CP.lateralTuning.pid.kf)
     elif CP.lateralTuning.which() == 'indi':
@@ -207,9 +210,11 @@ class CarController():
     self.vCruiseSet = path_plan.vCruiseSet
 
     if CS.out.vEgo > 8:
-      self.steerMax = interp(abs(self.model_speed), self.model_speed_range, self.steerMax_range)
-      self.steerDeltaUp = interp(abs(self.model_speed), self.model_speed_range, self.steerDeltaUp_range)
-      self.steerDeltaDown = interp(abs(self.model_speed), self.model_speed_range, self.steerDeltaDown_range)
+      if self.variable_steer_max:
+        self.steerMax = interp(abs(self.model_speed), self.model_speed_range, self.steerMax_range)
+      if self.variable_steer_delta:
+        self.steerDeltaUp = interp(abs(self.model_speed), self.model_speed_range, self.steerDeltaUp_range)
+        self.steerDeltaDown = interp(abs(self.model_speed), self.model_speed_range, self.steerDeltaDown_range)
 
     param.STEER_MAX = min(SteerLimitParams.STEER_MAX, self.steerMax) # variable steermax
     param.STEER_DELTA_UP = max(int(self.params.get('SteerDeltaUpAdj')), self.steerDeltaUp) # variable deltaUp
