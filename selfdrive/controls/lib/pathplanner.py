@@ -87,7 +87,7 @@ class PathPlanner():
     self.lane_change_adjust_new = 0.0
 
     self.angle_differ_range = [0, 45]
-    self.steerRatio_range = [CP.steerRatio, 17.5] # °¡º¯ SR°ª ¹üÀ§ ¼³Á¤
+    self.steerRatio_range = [CP.steerRatio, 17.5] # ê°€ë³€ SRê°’ ë²”ìœ„ ì„¤ì •
     self.new_steerRatio = CP.steerRatio
     self.new_steerRatio_prev = CP.steerRatio
 
@@ -141,7 +141,7 @@ class PathPlanner():
 
     self.new_steer_actuator_delay = interp(v_ego, self.steer_actuator_delay_vel, self.steer_actuator_delay_range)
 
-    # °¡º¯ SR
+    # ê°€ë³€ SR
     if not self.live_sr:
       self.angle_diff = abs(anglesteer_desire) - abs(anglesteer_current)
       if abs(output_scale) >= 1 and v_ego > 8:
@@ -161,7 +161,7 @@ class PathPlanner():
     if self.live_sr:
       sr = max(sm['liveParameters'].steerRatio, 0.1) #Live SR
     else:
-      sr = max(self.new_steerRatio, 0.1) #°¡º¯ SR
+      sr = max(self.new_steerRatio, 0.1) #ê°€ë³€ SR
     VM.update_params(x, sr)
 
     curvature_factor = VM.curvature_factor(v_ego)
