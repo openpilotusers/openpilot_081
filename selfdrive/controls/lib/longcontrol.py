@@ -11,7 +11,7 @@ import common.CTime1000 as tm
 
 LongCtrlState = log.ControlsState.LongControlState
 
-STOPPING_EGO_SPEED = 0.5
+STOPPING_EGO_SPEED = 0.3
 STOPPING_TARGET_SPEED_OFFSET = 0.01
 STARTING_TARGET_SPEED = 0.5
 BRAKE_THRESHOLD_TO_PID = 0.2
@@ -22,10 +22,10 @@ RATE = 100.0
 
 
 def long_control_state_trans(active, long_control_state, v_ego, v_target, v_pid,
-                             output_gb, brake_pressed, cruise_standstill, gas_pressed, min_speed_can):
+                             output_gb, brake_pressed, cruise_standstill, stop, gas_pressed, min_speed_can):
   """Update longitudinal control state machine"""
   stopping_target_speed = min_speed_can + STOPPING_TARGET_SPEED_OFFSET
-  stopping_condition = (v_ego < 2.0 and cruise_standstill) or \
+  stopping_condition = stop or (v_ego < 2.0 and cruise_standstill) or \
                        (v_ego < STOPPING_EGO_SPEED and \
                         ((v_pid < stopping_target_speed and v_target < stopping_target_speed) or
                         brake_pressed))
@@ -94,9 +94,19 @@ class LongControl():
 
     # Update state machine
     output_gb = self.last_output_gb
+    if radarState is None:
+      dRel = 200
+      vRel = 0
+    else:
+      dRel = radarState.leadOne.dRel
+      vRel = radarState.leadOne.vRel
+    if hasLead:
+      stop = True if (dRel < 4.0 and radarState.leadOne.status) else False
+    else:
+      stop = False
     self.long_control_state = long_control_state_trans(active, self.long_control_state, CS.vEgo,
                                                        v_target_future, self.v_pid, output_gb,
-                                                       CS.brakePressed, CS.cruiseState.standstill, CS.gasPressed, CP.minSpeedCan)
+                                                       CS.brakePressed, CS.cruiseState.standstill, stop, CS.gasPressed, CP.minSpeedCan)
 
     v_ego_pid = max(CS.vEgo, CP.minSpeedCan)  # Without this we get jumps, CAN bus reports 0 when speed < 0.3
     if self.long_control_state == LongCtrlState.off or (CS.brakePressed or CS.gasPressed):
@@ -141,22 +151,40 @@ class LongControl():
 
       output_gb = self.pid.update(self.v_pid, v_ego_pid, speed=v_ego_pid, deadzone=deadzone, feedforward=a_target, freeze_integrator=prevent_overshoot)
 
+      if hasLead and radarState.leadOne.status and 3 < dRel <= 35 and output_gb < 0 and vRel < 0 and (CS.vEgo*CV.MS_TO_KPH) < 60:
+        vd_r = (CS.vEgo*CV.MS_TO_KPH)/dRel
+        multiplier = abs(self.v_pid/v_target_future)
+        if vd_r >= 1.4:
+          output_gb *= multiplier
+          output_gb = clip(output_gb, -brake_max, gas_max)
+      elif hasLead and radarState.leadOne.status and 7 < dRel < 17 and abs(vRel*3.6) > 4 and output_gb > 0 and (CS.vEgo * CV.MS_TO_KPH) < 25:
+        output_gb *= 1.3
+        output_gb = clip(output_gb, -brake_max, gas_max)
+      elif hasLead and radarState.leadOne.status and 7 < dRel < 100 and output_gb < 0:
+        output_gb *= 1.2
+
       if prevent_overshoot:
         output_gb = min(output_gb, 0.0)
 
     # Intention is to stop, switch to a different brake control until we stop
     elif self.long_control_state == LongCtrlState.stopping:
       # Keep applying brakes until the car is stopped
+      factor = 1
+      if hasLead:
+        factor = interp(dRel,[2.0,3.0,4.0,5.0,6.0,7.0,8.0], [5,3,1,0.7,0.5,0.3,0.0])
       if not CS.standstill or output_gb > -BRAKE_STOPPING_TARGET:
-        output_gb -= CP.stoppingBrakeRate / RATE
+        output_gb -= STOPPING_BRAKE_RATE / RATE * factor
       output_gb = clip(output_gb, -brake_max, gas_max)
 
       self.reset(CS.vEgo)
 
     # Intention is to move again, release brake fast before handing control to PID
     elif self.long_control_state == LongCtrlState.starting:
+      factor = 1
+      if hasLead:
+        factor = interp(dRel,[0.0,2.0,3.0,4.0,5.0], [0.0,0.5,0.75,1.0,1000.0])
       if output_gb < -0.2:
-        output_gb += CP.startingBrakeRate / RATE
+        output_gb += STARTING_BRAKE_RATE / RATE * factor
       self.reset(CS.vEgo)
 
     self.last_output_gb = output_gb
@@ -175,7 +203,7 @@ class LongControl():
     else:
       self.long_stat = "---"
 
-    str_log3 = 'LS={:s}  GS={:01.2f}/{:01.2f}  BK={:01.2f}/{:01.2f}  GB={:+04.2f}  TG=P:{:05.2f}/V:{:05.2f}/A:{:+04.2f}  GS={}  BK={}'.format(self.long_stat, final_gas, gas_max, abs(final_brake), abs(brake_max), output_gb, self.v_pid, v_target, a_target, CS.gasPressed, CS.brakePressed)
+    str_log3 = 'LS={:s}  GS={:01.2f}/{:01.2f}  BK={:01.2f}/{:01.2f}  GB={:+04.2f}  TG=P:{:05.2f}/V:{:05.2f}/F:{:05.2f}/A:{:+04.2f}  GS={}'.format(self.long_stat, final_gas, gas_max, abs(final_brake), abs(brake_max), output_gb, self.v_pid, v_target, a_target, v_target_future, CS.gasPressed)
     trace1.printf2('{}'.format(str_log3))
 
     return final_gas, final_brake

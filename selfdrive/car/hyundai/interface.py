@@ -19,7 +19,7 @@ class CarInterface(CarInterfaceBase):
 
   @staticmethod
   def compute_gb(accel, speed):
-    return float(accel) / 3.0
+    return float(accel) / 1.0
 
   @staticmethod
   def get_params(candidate, fingerprint=gen_empty_fingerprint(), car_fw=[]):  # pylint: disable=dangerous-default-value
@@ -145,25 +145,22 @@ class CarInterface(CarInterfaceBase):
       ret.lateralTuning.lqr.dcGain = DcGain
 
 
-    ret.longitudinalTuning.kpBP = [0., 10., 40.]
-    ret.longitudinalTuning.kpV = [1.2, 0.6, 0.2]
-    ret.longitudinalTuning.kiBP = [0., 10., 30., 40.]
-    ret.longitudinalTuning.kiV = [0.05, 0.02, 0.01, 0.005]
-    ret.longitudinalTuning.deadzoneBP = [0., 40]
-    ret.longitudinalTuning.deadzoneV = [0., 0.02]
+    ret.longitudinalTuning.kpBP = [0., 1., 10., 35.]
+    ret.longitudinalTuning.kpV = [0.8, 0.7, 0.6, 0.55]
+    ret.longitudinalTuning.kiBP = [0., 1., 15., 35.]
+    ret.longitudinalTuning.kiV = [0.4, 0.3, 0.2, 0.1]
     #ret.longitudinalTuning.kfBP = [0., 5.]
     #ret.longitudinalTuning.kfV = [1., 1.]
-
+    ret.longitudinalTuning.deadzoneBP = [0.0, 0.5]
+    ret.longitudinalTuning.deadzoneV = [0.00, 0.00]
   
-    ret.gasMaxBP = [0., 10., 40.]
-    ret.gasMaxV = [0.5, 0.5, 0.5]
-    ret.brakeMaxBP = [0., 20.]
-    ret.brakeMaxV = [1., 0.8]
+    ret.gasMaxBP = [0., 1., 1.1, 15., 40.]
+    ret.gasMaxV = [2., 2., 2., 2., 2.]
+    ret.brakeMaxBP = [0., 5.]
+    ret.brakeMaxV = [4.0, 4.0]
 
     ret.steerMaxV = [LqrSteerMaxV]
     ret.steerMaxBP = [0.]
-
-    
 
 
     # these cars require a special panda safety mode due to missing counters and checksums in the messages
