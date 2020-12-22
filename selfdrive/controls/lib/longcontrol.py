@@ -154,9 +154,12 @@ class LongControl():
       if hasLead and radarState.leadOne.status and 3 < dRel <= 35 and output_gb < 0 and vRel < 0 and (CS.vEgo*CV.MS_TO_KPH) <= 65:
         vd_r = (CS.vEgo*CV.MS_TO_KPH)/dRel
         multiplier = max(abs(self.v_pid/v_target_future), 1)
-        if vd_r >= 1.4:
+        multiplier = min(multiplier, 3)
+        if vd_r >= 1.5:
           output_gb *= multiplier
           output_gb = clip(output_gb, -brake_max, gas_max)
+        else:
+          output_gb *= 1.2
       elif hasLead and radarState.leadOne.status and 7 < dRel < 17 and abs(vRel*3.6) > 4 and output_gb > 0 and (CS.vEgo * CV.MS_TO_KPH) < 25:
         output_gb *= 1.3
         output_gb = clip(output_gb, -brake_max, gas_max)
