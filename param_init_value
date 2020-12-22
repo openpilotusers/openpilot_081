@@ -52,3 +52,6 @@ OpkrMaxAngleLimit:90
 OpkrAutoResumeOption:1
 OpkrAngleOffsetSelect:0
 OpkrSpeedLimitOffset:0
+OpkrLiveSteerRatio:0
+OpkrVariableSteerMax:1
+OpkrVariableSteerDelta:0
