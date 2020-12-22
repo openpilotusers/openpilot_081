@@ -148,7 +148,7 @@ class PathPlanner():
         self.new_steerRatio_prev = interp(self.angle_diff, self.angle_differ_range, self.steerRatio_range)
         if self.new_steerRatio_prev > self.new_steerRatio:
           self.new_steerRatio = self.new_steerRatio_prev
-        else:
+      else:
         self.mpc_frame += 1
         if self.mpc_frame % 10 == 0:
           self.new_steerRatio -= 0.1
