@@ -25,7 +25,7 @@ def long_control_state_trans(active, long_control_state, v_ego, v_target, v_pid,
                              output_gb, brake_pressed, cruise_standstill, stop, gas_pressed, min_speed_can):
   """Update longitudinal control state machine"""
   stopping_target_speed = min_speed_can + STOPPING_TARGET_SPEED_OFFSET
-  stopping_condition = stop or (v_ego < 2.0 and cruise_standstill) or \
+  stopping_condition = stop or (v_ego < 0.3 and cruise_standstill) or \
                        (v_ego < STOPPING_EGO_SPEED and \
                         ((v_pid < stopping_target_speed and v_target < stopping_target_speed) or
                         brake_pressed))
@@ -176,7 +176,7 @@ class LongControl():
       if hasLead:
         factor = interp(dRel,[2.0,3.0,4.0,5.0,6.0,7.0,8.0], [5,3,1,0.7,0.5,0.3,0.0])
       if not CS.standstill or output_gb > -BRAKE_STOPPING_TARGET:
-        output_gb -= STOPPING_BRAKE_RATE / RATE * factor
+        output_gb -= CP.stoppingBrakeRate / RATE * factor
       output_gb = clip(output_gb, -brake_max, gas_max)
 
       self.reset(CS.vEgo)
@@ -187,7 +187,7 @@ class LongControl():
       if hasLead:
         factor = interp(dRel,[0.0,2.0,3.0,4.0,5.0], [0.0,0.5,0.75,1.0,1000.0])
       if output_gb < -0.2:
-        output_gb += STARTING_BRAKE_RATE / RATE * factor
+        output_gb += CP.startingBrakeRate / RATE * factor
       self.reset(CS.vEgo)
 
     self.last_output_gb = output_gb
