@@ -130,6 +130,9 @@ keys = {
   b"OpkrSpeedLimitOffset": [TxType.PERSISTENT],
   b"LimitSetSpeedCamera": [TxType.PERSISTENT],
   b"LimitSetSpeedCurv": [TxType.PERSISTENT],
+  b"OpkrLiveSteerRatio": [TxType.PERSISTENT],
+  b"OpkrVariableSteerMax": [TxType.PERSISTENT],
+  b"OpkrVariableSteerDelta": [TxType.PERSISTENT],
 }
 
 def ensure_bytes(v):

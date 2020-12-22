@@ -637,6 +637,9 @@ def main():
     ("OpkrAccMode", "1"),
     ("LimitSetSpeedCamera", "0"),
     ("LimitSetSpeedCurv", "0"),
+    ("OpkrLiveSteerRatio", "0"),
+    ("OpkrVariableSteerMax", "1"),
+    ("OpkrVariableSteerDelta", "0"),
   ]
 
   # set unset params

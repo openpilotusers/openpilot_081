@@ -120,20 +120,17 @@ class CarController():
 
     self.timer1 = tm.CTime1000("time")
     
-    self.angle_differ_range = [0, 45]
-    self.steerMax_range = [int(self.params.get('SteerMaxBaseAdj')), SteerLimitParams.STEER_MAX]
-    self.steerDeltaUp_range = [int(self.params.get('SteerDeltaUpAdj')), 5]
-    self.steerDeltaDown_range = [int(self.params.get('SteerDeltaDownAdj')), 10]
+    self.model_speed_range = [255, 90, 30]
+    self.steerMax_range = [int(self.params.get('SteerMaxBaseAdj')), int(self.params.get('SteerMaxBaseAdj')), SteerLimitParams.STEER_MAX]
+    self.steerDeltaUp_range = [int(self.params.get('SteerDeltaUpAdj')), int(self.params.get('SteerDeltaUpAdj')), 5]
+    self.steerDeltaDown_range = [int(self.params.get('SteerDeltaDownAdj')), int(self.params.get('SteerDeltaDownAdj')), 10]
 
     self.steerMax = int(self.params.get('SteerMaxBaseAdj'))
     self.steerDeltaUp = int(self.params.get('SteerDeltaUpAdj'))
     self.steerDeltaDown = int(self.params.get('SteerDeltaDownAdj'))
-    self.steerMax_prev = int(self.params.get('SteerMaxBaseAdj'))
-    self.steerDeltaUp_prev = int(self.params.get('SteerDeltaUpAdj'))
-    self.steerDeltaDown_prev = int(self.params.get('SteerDeltaDownAdj'))
-    self.steerMax_timer = 0
-    self.steerDeltaUp_timer = 0
-    self.steerDeltaDown_timer = 0
+
+    self.variable_steer_max = int(self.params.get('OpkrVariableSteerMax')) == b'1'
+    self.variable_steer_delta = int(self.params.get('OpkrVariableSteerDelta')) == b'1'
 
     if CP.lateralTuning.which() == 'pid':
       self.str_log2 = 'TUNE={:0.2f}/{:0.3f}/{:0.5f}'.format(CP.lateralTuning.pid.kpV[1], CP.lateralTuning.pid.kiV[1], CP.lateralTuning.pid.kf)
@@ -164,43 +161,18 @@ class CarController():
     path_plan = sm['pathPlan']
     self.outScale = path_plan.outputScale
 
-    self.angle_steers_des = path_plan.angleSteers - path_plan.angleOffset
-    self.angle_steers = CS.out.steeringAngle
-    self.angle_diff = abs(self.angle_steers_des) - abs(self.angle_steers)
+    if CS.out.vEgo > 8:
+      if self.variable_steer_max:
+        self.steerMax = interp(abs(self.model_speed), self.model_speed_range, self.steerMax_range)
+      if self.variable_steer_delta:
+        self.steerDeltaUp = interp(abs(self.model_speed), self.model_speed_range, self.steerDeltaUp_range)
+        self.steerDeltaDown = interp(abs(self.model_speed), self.model_speed_range, self.steerDeltaDown_range)
 
-    if abs(self.outScale) >= 1 and CS.out.vEgo > 8:
-      self.steerMax_prev = interp(self.angle_diff, self.angle_differ_range, self.steerMax_range)
-      if self.steerMax_prev > self.steerMax:
-        self.steerMax = self.steerMax_prev
-      self.steerDeltaUp_prev = interp(self.angle_diff, self.angle_differ_range, self.steerDeltaUp_range)
-      if self.steerDeltaUp_prev > self.steerDeltaUp:
-        self.steerDeltaUp = self.steerDeltaUp_prev
-      self.steerDeltaDown_prev = interp(self.angle_diff, self.angle_differ_range, self.steerDeltaDown_range)
-      if self.steerDeltaDown_prev > self.steerDeltaDown:
-        self.steerDeltaDown = self.steerDeltaDown_prev
-    else:
-      self.steerMax_timer += 1
-      self.steerDeltaUp_timer += 1
-      self.steerDeltaDown_timer += 1
-      if self.steerMax_timer > 20:
-        self.steerMax -= 5
-        self.steerMax_timer = 0
-        if self.steerMax < int(self.params.get('SteerMaxBaseAdj')):
-          self.steerMax = int(self.params.get('SteerMaxBaseAdj'))
-      if self.steerDeltaUp_timer > 100:
-        self.steerDeltaUp -= 1
-        self.steerDeltaUp_timer = 0
-        if self.steerDeltaUp <= int(self.params.get('SteerDeltaUpAdj')):
-          self.steerDeltaUp = int(self.params.get('SteerDeltaUpAdj'))
-      if self.steerDeltaDown_timer > 50:
-        self.steerDeltaDown -= 1
-        self.steerDeltaDown_timer = 0
-        if self.steerDeltaDown <= int(self.params.get('SteerDeltaDownAdj')):
-          self.steerDeltaDown = int(self.params.get('SteerDeltaDownAdj'))
-
-    param.STEER_MAX = min(SteerLimitParams.STEER_MAX, self.steerMax)
-    param.STEER_DELTA_UP = max(int(self.params.get('SteerDeltaUpAdj')), self.steerDeltaUp)
-    param.STEER_DELTA_DOWN = max(int(self.params.get('SteerDeltaDownAdj')), self.steerDeltaDown)
+    param.STEER_MAX = min(SteerLimitParams.STEER_MAX, self.steerMax) # variable steermax
+    param.STEER_DELTA_UP = max(int(self.params.get('SteerDeltaUpAdj')), self.steerDeltaUp) # variable deltaUp
+    param.STEER_DELTA_DOWN = max(int(self.params.get('SteerDeltaDownAdj')), self.steerDeltaDown) # variable deltaDown
+    #param.STEER_DELTA_UP = SteerLimitParams.STEER_DELTA_UP # fixed deltaUp
+    #param.STEER_DELTA_DOWN = SteerLimitParams.STEER_DELTA_DOWN # fixed deltaDown
 
     # Steering Torque
     if 0 <= self.driver_steering_torque_above_timer < 100:
