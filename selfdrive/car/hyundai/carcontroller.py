@@ -14,6 +14,9 @@ from selfdrive.controls.lib.longcontrol import LongCtrlState
 
 from selfdrive.controls.lib.pathplanner import LANE_CHANGE_SPEED_MIN
 
+# speed controller
+from selfdrive.car.hyundai.spdcontroller  import SpdController
+
 from common.params import Params
 import common.log as trace1
 import common.CTime1000 as tm
@@ -119,7 +122,10 @@ class CarController():
     self.opkr_maxanglelimit = int(self.params.get('OpkrMaxAngleLimit'))
 
     self.timer1 = tm.CTime1000("time")
-    
+
+    self.SC = SpdController()
+    self.model_speed = 0
+    self.model_sum = 0
     self.model_speed_range = [30, 90, 255, 300]
     self.steerMax_range = [SteerLimitParams.STEER_MAX, int(self.params.get('SteerMaxBaseAdj')), int(self.params.get('SteerMaxBaseAdj')), 0]
     self.steerDeltaUp_range = [5, int(self.params.get('SteerDeltaUpAdj')), int(self.params.get('SteerDeltaUpAdj')), 0]
@@ -158,6 +164,7 @@ class CarController():
 
     param = self.p
 
+    self.model_speed, self.model_sum = self.SC.calc_va(sm, CS.out.vEgo)
     path_plan = sm['pathPlan']
     self.outScale = path_plan.outputScale
 
@@ -274,7 +281,7 @@ class CarController():
 
       can_sends.append(create_clu11(self.packer, 1, CS.clu11, Buttons.NONE, enabled_speed, self.clu11_cnt))
 
-    str_log1 = 'TQ={:03.0f}  FR={:03.0f} ST={:03.0f}/{:01.0f}/{:01.0f}  CG={:01.0f}'.format(abs(new_steer), self.timer1.sampleTime(), self.steerMax, self.steerDeltaUp, self.steerDeltaDown, CS.out.cruiseGapSet)
+    str_log1 = 'CV={:03.0f}  TQ={:03.0f}  R={:03.0f} T={:03.0f}/{:01.0f}/{:01.0f}  G={:01.0f}'.format(abs(self.model_speed), abs(new_steer), self.timer1.sampleTime(), self.steerMax, self.steerDeltaUp, self.steerDeltaDown, CS.out.cruiseGapSet)
     trace1.printf1('{}  {}'.format(str_log1, self.str_log2))
 
     if pcm_cancel_cmd and CS.scc12["ACCMode"] != 0 and not CS.out.standstill:
