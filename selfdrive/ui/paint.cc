@@ -487,17 +487,17 @@ static void ui_draw_debug(UIState *s)
     ui_print(s, ui_viz_rx, ui_viz_ry+450, "SC:%.2f", scene.pathPlan.steerRateCost);
     ui_print(s, ui_viz_rx, ui_viz_ry+500, "OS:%.2f", abs(scene.output_scale));
     if (scene.long_plan_source == 0) {
-      ui_print(s, ui_viz_rx, ui_viz_ry+600, "LP:none");
+      ui_print(s, ui_viz_rx, ui_viz_ry+550, "LP:none");
     } else if (scene.long_plan_source == 1) {
-      ui_print(s, ui_viz_rx, ui_viz_ry+600, "LP:cruise");
+      ui_print(s, ui_viz_rx, ui_viz_ry+550, "LP:cruise");
     } else if (scene.long_plan_source == 2) {
-      ui_print(s, ui_viz_rx, ui_viz_ry+600, "LP:mpc1");
+      ui_print(s, ui_viz_rx, ui_viz_ry+550, "LP:mpc1");
     } else if (scene.long_plan_source == 3) {
-      ui_print(s, ui_viz_rx, ui_viz_ry+600, "LP:mpc2");
+      ui_print(s, ui_viz_rx, ui_viz_ry+550, "LP:mpc2");
     } else if (scene.long_plan_source == 4) {
-      ui_print(s, ui_viz_rx, ui_viz_ry+600, "LP:mpc3");
+      ui_print(s, ui_viz_rx, ui_viz_ry+550, "LP:mpc3");
     } else if (scene.long_plan_source == 5) {
-      ui_print(s, ui_viz_rx, ui_viz_ry+600, "LP:model");
+      ui_print(s, ui_viz_rx, ui_viz_ry+550, "LP:model");
     }
     nvgFontSize(s->vg, 45);
     nvgFillColor(s->vg, COLOR_YELLOW_ALPHA(200));
