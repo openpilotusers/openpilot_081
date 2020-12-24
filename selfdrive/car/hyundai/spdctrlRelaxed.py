@@ -13,7 +13,7 @@ from selfdrive.controls.lib.events import Events
 EventName = car.CarEvent.EventName
 
 
-class Spdctrl(SpdController):
+class SpdctrlRelaxed(SpdController):
     def __init__(self, CP=None):
         super().__init__( CP )
         self.cv_Raio = 0.5
