@@ -640,6 +640,7 @@ def main():
     ("OpkrVariableSteerMax", "1"),
     ("OpkrVariableSteerDelta", "0"),
     ("FingerprintTwoSet", "1"),
+    ("OpkrVariableCruiseProfile", "0"),
   ]
 
   # set unset params

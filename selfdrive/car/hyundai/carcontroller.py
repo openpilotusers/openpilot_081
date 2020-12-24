@@ -15,6 +15,7 @@ from selfdrive.controls.lib.pathplanner import LANE_CHANGE_SPEED_MIN
 # speed controller
 from selfdrive.car.hyundai.spdcontroller  import SpdController
 from selfdrive.car.hyundai.spdctrl  import Spdctrl
+from selfdrive.car.hyundai.spdctrl_relaxed  import SpdctrlRelaxed
 
 from common.params import Params
 import common.log as trace1
@@ -115,7 +116,12 @@ class CarController():
 
     self.timer1 = tm.CTime1000("time")
     
-    self.SC = Spdctrl()
+    if int(self.params.get('OpkrVariableCruiseProfile')) == 0:
+      self.SC = Spdctrl()
+    elif int(self.params.get('OpkrVariableCruiseProfile')) == 1:
+      self.SC = SpdctrlRelaxed()
+    else:
+      self.SC = Spdctrl()
     
     self.model_speed = 0
     self.model_sum = 0
