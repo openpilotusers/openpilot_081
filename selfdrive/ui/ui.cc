@@ -38,7 +38,6 @@ void ui_init(UIState *s) {
   read_param(&s->nDebugUi1, "DebugUi1");
   read_param(&s->nDebugUi2, "DebugUi2");
   read_param(&s->nOpkrBlindSpotDetect, "OpkrBlindSpotDetect");
-  read_param(&s->lateral_control, "LateralControlMethod");
 
   s->fb = framebuffer_init("ui", 0, true, &s->fb_w, &s->fb_h);
   assert(s->fb);
@@ -262,6 +261,7 @@ void update_sockets(UIState *s) {
     scene.speedlimitahead = sm["liveMapData"].getLiveMapData().getSpeedLimitAhead();
     scene.speedlimitahead_valid = sm["liveMapData"].getLiveMapData().getSpeedLimitAheadValid();
     scene.speedlimitaheaddistance = sm["liveMapData"].getLiveMapData().getSpeedLimitAheadDistance();
+    scene.current_way = sm["liveMapData"].getLiveMapData().getCurrentWay();
   }
   if (sm.updated("ubloxGnss")) {
     auto data = sm["ubloxGnss"].getUbloxGnss();
@@ -272,6 +272,11 @@ void update_sockets(UIState *s) {
     auto data2 = sm["gpsLocationExternal"].getGpsLocationExternal();
     s->scene.gpsAccuracyUblox = data2.getAccuracy();
     s->scene.altitudeUblox = data2.getAltitude();
+    s->scene.bearingUblox = data2.getBearing();
+    s->scene.bearingAccuracyUblox = data2.getBearingAccuracy();
+    s->scene.latitudeUblox = data2.getLatitude();
+    s->scene.longitudeUblox = data2.getLongitude();
+    s->scene.timestampUblox = data2.getTimestamp();
   }
   if (sm.updated("health")) {
     auto health = sm["health"].getHealth();
@@ -426,7 +431,6 @@ void ui_update(UIState *s) {
     read_param(&s->nDebugUi1, "DebugUi1");
     read_param(&s->nDebugUi2, "DebugUi2");
     read_param(&s->nOpkrBlindSpotDetect, "OpkrBlindSpotDetect");
-    read_param(&s->lateral_control, "LateralControlMethod");
   } else if ((s->sm)->frame % (6*UI_FREQ) == 0) {
     int param_read = read_param(&s->last_athena_ping, "LastAthenaPingTime");
     if (param_read != 0) { // Failed to read param
