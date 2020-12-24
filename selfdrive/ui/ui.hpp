@@ -113,6 +113,7 @@ typedef struct UIScene {
   float speedlimitaheaddistance;
   bool speedlimitahead_valid;
   bool map_valid;
+
   bool is_rhd;
   bool frontview;
   bool uilayout_sidebarcollapsed;
@@ -133,8 +134,15 @@ typedef struct UIScene {
 
   bool  brakePress;
   bool recording;
+
   float gpsAccuracyUblox;
   float altitudeUblox;
+  float bearingUblox;
+  float bearingAccuracyUblox;
+  float latitudeUblox;
+  float longitudeUblox;
+  float timestampUblox;
+
   int cpuPerc;
   bool rightblindspot;
   bool leftblindspot;
@@ -304,7 +312,6 @@ typedef struct UIState {
   bool is_ego_over_limit;
   float speed_lim_off;
   int is_OpenpilotViewEnabled;
-  int lateral_control;
   int lat_mode;
   int acc_mode;
 
@@ -314,6 +321,7 @@ typedef struct UIState {
   int nDebugUi1;
   int nDebugUi2;
   int nOpkrBlindSpotDetect;
+  int lat_control;
 
   uint64_t last_athena_ping;
   uint64_t started_frame;

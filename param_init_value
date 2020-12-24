@@ -53,3 +53,4 @@ OpkrAccMode:1
 OpkrLiveSteerRatio:0
 OpkrVariableSteerMax:1
 OpkrVariableSteerDelta:0
+FingerprintTwoSet:1

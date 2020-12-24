@@ -377,7 +377,7 @@ class Way:
         if 'maxspeed:backward' in way.way.tags:
           spd = way.way.tags['maxspeed:backward']
           spd = parse_speed_unit(spd)
-          if spd is not None and spd < current_speed_limit:
+          if spd is not None:
             speed_ahead = spd
             min_dist = min(np.linalg.norm(way_pts[1, :]),np.linalg.norm(way_pts[0, :]),np.linalg.norm(way_pts[-1, :]))
             speed_ahead_dist = min_dist
@@ -386,7 +386,7 @@ class Way:
         if 'maxspeed:forward' in way.way.tags:
           spd = way.way.tags['maxspeed:forward']
           spd = parse_speed_unit(spd)
-          if spd is not None and spd < current_speed_limit:
+          if spd is not None:
             speed_ahead = spd
             min_dist = min(np.linalg.norm(way_pts[1, :]),np.linalg.norm(way_pts[0, :]),np.linalg.norm(way_pts[-1, :]))
             speed_ahead_dist = min_dist
@@ -400,13 +400,12 @@ class Way:
           spd = geocode_maxspeed(way.way.tags, location_info)
           #print "spd is actually"
           #print spd
-        if spd is not None and spd < current_speed_limit:
+        if spd is not None:
           speed_ahead = spd
           min_dist = min(np.linalg.norm(way_pts[1, :]),np.linalg.norm(way_pts[0, :]),np.linalg.norm(way_pts[-1, :]))
           speed_ahead_dist = min_dist
           #print "slower speed found"
           #print min_dist
-
           break
       way_pts = way.points_in_car_frame(lat, lon, heading, False)
       #print(way_pts)
@@ -416,17 +415,18 @@ class Way:
         loop_must_break = False
         for n in way.way.nodes:
           if 'highway' in n.tags and n.tags['highway']=='speed_camera':
-            if int(n.tags['direction']) > -0.1 and int(n.tags['direction']) < 360.1:
-              direction = int(n.tags['direction']) - heading
-              if direction < -180:
-                direction = direction + 360
-              if direction > 180:
-                direction = direction - 360
-              if abs(direction) > 135:
-                speed_ahead = int(n.tags['maxspeed']) / 3.6
-                speed_ahead_dist = max(0. , way_pts[count, 0] - 5.0)
-                loop_must_break = True
-                break
+            camera_direction = -1
+            car_direction = heading
+            if int(n.tags['direction']) < 0:
+              camera_direction = 360 - abs(int(n.tags['direction']))
+            elif int(n.tags['direction']) >= 0:
+              camera_direction = abs(int(n.tags['direction']))
+            is_opposite = abs(car_direction - camera_direction)
+            if 225 > is_opposite > 135:
+              speed_ahead = int(n.tags['maxspeed']) / 3.6
+              speed_ahead_dist = max(0. , way_pts[count, 0] - 5.0)
+              loop_must_break = True
+              break
           count += 1
         if loop_must_break: break
       except (KeyError, IndexError, ValueError):

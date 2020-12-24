@@ -51,8 +51,8 @@ static void send_ml(UIState *s, bool enabled) {
 
 static bool handle_ml_touch(UIState *s, int touch_x, int touch_y) {
   //mlButton manager
-  int xs[2] = {1505, 1920};
-  int ys[2] = {738, 883}; //788
+  int xs[2] = {770, 1150};
+  int ys[2] = {911, 1050};
   if ((xs[0] <= touch_x && touch_x <= xs[1]) && (ys[0] <= touch_y && touch_y <= ys[1])) {
     s->scene.mlButtonEnabled = !s->scene.mlButtonEnabled;
     send_ml(s, s->scene.mlButtonEnabled);
