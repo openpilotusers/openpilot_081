@@ -477,11 +477,11 @@ static void ui_draw_debug(UIState *s)
     ui_print(s, ui_viz_rx, ui_viz_ry+500, "OS:%.3f", scene.output_scale);
     //ui_print(s, ui_viz_rx, ui_viz_ry+400, "Awareness:%.2f", scene.awareness_status);
     //ui_print(s, ui_viz_rx, ui_viz_ry+470, "FaceProb:%.2f", scene.face_prob);
-    if (scene.lateralControlMethod == 0) {
+    if (s->lat_control == 0) {
       ui_print(s, ui_viz_rx, ui_viz_ry+550, "LaC:PID");
-    } else if (scene.lateralControlMethod == 1) {
+    } else if (s->lat_control == 1) {
       ui_print(s, ui_viz_rx, ui_viz_ry+550, "LaC:INDI");
-    } else if (scene.lateralControlMethod == 2) {
+    } else if (s->lat_control == 2) {
       ui_print(s, ui_viz_rx, ui_viz_ry+550, "LaC:LQR");
     }
     //ui_print(s, ui_viz_rx, ui_viz_ry+600, "SL:%.1f", scene.speedlimitahead*3.6);

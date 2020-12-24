@@ -317,6 +317,7 @@ typedef struct UIState {
   int nDebugUi1;
   int nDebugUi2;
   int nOpkrBlindSpotDetect;
+  int lat_control;
 
   uint64_t last_athena_ping;
   uint64_t started_frame;
