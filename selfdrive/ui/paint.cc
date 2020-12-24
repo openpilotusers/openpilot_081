@@ -512,8 +512,8 @@ static void ui_draw_debug(UIState *s)
     nvgFontSize(s->vg, 45);
     nvgTextAlign(s->vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
     nvgFillColor(s->vg, COLOR_WHITE_ALPHA(150)); 
-    ui_print(s, ui_viz_rx_center, ui_viz_ry+750, "←좌측간격(%%)→    차선폭(m)    ←우측간격(%%)→");
-    ui_print(s, ui_viz_rx_center, ui_viz_ry+800, "%4.1f                     %4.2f                    %4.1f", 
+    ui_print(s, ui_viz_rx_center, ui_viz_ry+700, "←좌측간격(%%)→    차선폭(m)    ←우측간격(%%)→");
+    ui_print(s, ui_viz_rx_center, ui_viz_ry+750, "%4.1f                     %4.2f                    %4.1f", 
                                                     (scene.pathPlan.lPoly/(scene.pathPlan.lPoly+abs(scene.pathPlan.rPoly)))*100, 
                                                     scene.pathPlan.laneWidth, 
                                                     (abs(scene.pathPlan.rPoly)/(scene.pathPlan.lPoly+abs(scene.pathPlan.rPoly)))*100);
@@ -838,31 +838,30 @@ static void ui_draw_driver_view(UIState *s) {
 }
 
 static void ui_draw_ml_button(UIState *s) {
-  int btn_w = 380;
-  int btn_h = 95;
-  int x = 960;
-  int y = 1000;
-  int btn_x = x - btn_w / 2;
-  int btn_y = y - btn_h / 2;
-
+  int btn_w = 140;
+  int btn_h = 140;
+  int btn_x = 1920 - btn_w - 355;
+  int btn_y = 1080 - btn_h - 35;
+  int btn_xc = btn_x + (btn_w/2);
+  int btn_yc = btn_y + (btn_h/2);
   nvgBeginPath(s->vg);
-  nvgRoundedRect(s->vg, btn_x, btn_y, btn_w, btn_h, 15);
-  if (s->scene.mlButtonEnabled) {  // change outline color based on status of button
+  nvgRoundedRect(s->vg, btn_x, btn_y, btn_w, btn_h, 100);
+  if (s->scene.mlButtonEnabled) {
     nvgStrokeColor(s->vg, nvgRGBA(55, 184, 104, 255));
   } else {
-    nvgStrokeColor(s->vg, nvgRGBA(184, 55, 55, 255));
+    nvgStrokeColor(s->vg, nvgRGBA(255,0,255,80));
   }
-  nvgStrokeWidth(s->vg, 12);
+  nvgStrokeWidth(s->vg, 6);
   nvgStroke(s->vg);
-
-  nvgBeginPath(s->vg);  // dark background for readability
-  nvgRoundedRect(s->vg, btn_x, btn_y, btn_w, btn_h, 15);
-  nvgFillColor(s->vg, nvgRGBA(75, 75, 75, 75));
-  nvgFill(s->vg);
-
-  nvgFillColor(s->vg, nvgRGBA(255, 255, 255, 255));
-  nvgFontSize(s->vg, 60*0.8);
-  nvgText(s->vg, x, (y + btn_h / 8)+7, "MODEL LONG", NULL);
+  
+  nvgFontSize(s->vg, 45);
+  if (s->scene.mlButtonEnabled) {
+    nvgFillColor(s->vg, nvgRGBA(55, 184, 104, 255));
+    nvgText(s->vg,btn_xc,btn_yc,"ML",NULL);
+  } else {
+    nvgFillColor(s->vg, nvgRGBA(255,255,255,200));
+    nvgText(s->vg,btn_xc,btn_yc,"ML",NULL);
+  }
 }
 
 //BB START: functions added for the display of various items
