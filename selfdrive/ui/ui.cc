@@ -430,8 +430,18 @@ void ui_update(UIState *s) {
 
   // Read params
   if ((s->sm)->frame % (5*UI_FREQ) == 0) {
-    read_param(&s->is_metric, "IsMetric");
     read_param(&s->is_OpenpilotViewEnabled, "IsOpenpilotViewEnabled");
+  } else if ((s->sm)->frame % (6*UI_FREQ) == 0) {
+    int param_read = read_param(&s->last_athena_ping, "LastAthenaPingTime");
+    if (param_read != 0) { // Failed to read param
+      s->scene.athenaStatus = NET_DISCONNECTED;
+    } else if (nanos_since_boot() - s->last_athena_ping < 70e9) {
+      s->scene.athenaStatus = NET_CONNECTED;
+    } else {
+      s->scene.athenaStatus = NET_ERROR;
+    }
+  } else if ((s->sm)->frame % (20*UI_FREQ) == 0) {
+    read_param(&s->is_metric, "IsMetric");
     read_param(&s->nOpkrAutoScreenOff, "OpkrAutoScreenOff");
     read_param(&s->nOpkrUIBrightness, "OpkrUIBrightness");
     read_param(&s->nOpkrUIVolumeBoost, "OpkrUIVolumeBoost");
@@ -442,14 +452,5 @@ void ui_update(UIState *s) {
     read_param(&s->nDebugUi2, "DebugUi2");
     read_param(&s->nOpkrBlindSpotDetect, "OpkrBlindSpotDetect");
     read_param(&s->lat_control, "LateralControlMethod");
-  } else if ((s->sm)->frame % (6*UI_FREQ) == 0) {
-    int param_read = read_param(&s->last_athena_ping, "LastAthenaPingTime");
-    if (param_read != 0) { // Failed to read param
-      s->scene.athenaStatus = NET_DISCONNECTED;
-    } else if (nanos_since_boot() - s->last_athena_ping < 70e9) {
-      s->scene.athenaStatus = NET_CONNECTED;
-    } else {
-      s->scene.athenaStatus = NET_ERROR;
-    }
   }
 }
