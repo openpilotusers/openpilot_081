@@ -112,7 +112,6 @@ typedef struct UIScene {
   float speedlimitaheaddistance;
   bool speedlimitahead_valid;
   bool map_valid;
-  char current_way[128];
 
   bool is_rhd;
   bool frontview;

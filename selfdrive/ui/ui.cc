@@ -261,7 +261,6 @@ void update_sockets(UIState *s) {
     scene.speedlimitahead = sm["liveMapData"].getLiveMapData().getSpeedLimitAhead();
     scene.speedlimitahead_valid = sm["liveMapData"].getLiveMapData().getSpeedLimitAheadValid();
     scene.speedlimitaheaddistance = sm["liveMapData"].getLiveMapData().getSpeedLimitAheadDistance();
-    scene.current_way = sm["liveMapData"].getLiveMapData().getCurrentWay();
   }
   if (sm.updated("ubloxGnss")) {
     auto data = sm["ubloxGnss"].getUbloxGnss();

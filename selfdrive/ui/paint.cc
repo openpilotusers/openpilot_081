@@ -464,7 +464,7 @@ static void ui_draw_debug(UIState *s)
   nvgFillColor(s->vg, COLOR_WHITE_ALPHA(150));
   if (s->nDebugUi2 == 1) {
     if (scene.gpsAccuracyUblox != 0.00) {
-      ui_print(s, 0, 0, "LAT/LON:%.5f/%.5f LOC:%s", scene.latitudeUblox, scene.longitudeUblox, scene.current_way);
+      ui_print(s, 0, 0, "LAT/LON:%.5f/%.5f", scene.latitudeUblox, scene.longitudeUblox);
     }
     //ui_print(s, ui_viz_rx, ui_viz_ry, "Live Parameters");
     ui_print(s, ui_viz_rx, ui_viz_ry+250, "SR:%.2f", scene.liveParams.steerRatio);

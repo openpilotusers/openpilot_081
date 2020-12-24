@@ -396,9 +396,6 @@ class MapsdThread(LoggerThread):
                 dat.liveMapData.wayId = cur_way.id
                 self.sharedParams['osm_way_id'] = cur_way.id
 
-                # current way
-                dat.liveMapData.currentWay = cur_way.way.tags['highway']
-
                 # Speed limit
                 max_speed = cur_way.max_speed(heading)
                 max_speed_ahead = None
