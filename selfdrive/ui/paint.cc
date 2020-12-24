@@ -840,7 +840,7 @@ static void ui_draw_driver_view(UIState *s) {
 static void ui_draw_ml_button(UIState *s) {
   int btn_w = 140;
   int btn_h = 140;
-  int btn_x = 1920 - btn_w - 355;
+  int btn_x = 1920 - btn_w - 995;
   int btn_y = 1080 - btn_h - 35;
   int btn_xc = btn_x + (btn_w/2);
   int btn_yc = btn_y + (btn_h/2);
@@ -853,7 +853,8 @@ static void ui_draw_ml_button(UIState *s) {
   }
   nvgStrokeWidth(s->vg, 6);
   nvgStroke(s->vg);
-  
+
+  nvgTextAlign(s->vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
   nvgFontSize(s->vg, 45);
   if (s->scene.mlButtonEnabled) {
     nvgFillColor(s->vg, nvgRGBA(55, 184, 104, 255));
