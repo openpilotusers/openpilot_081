@@ -849,7 +849,7 @@ static void ui_draw_ml_button(UIState *s) {
   if (s->scene.mlButtonEnabled) {
     nvgStrokeColor(s->vg, nvgRGBA(55, 184, 104, 255));
   } else {
-    nvgStrokeColor(s->vg, nvgRGBA(255,0,255,80));
+    nvgStrokeColor(s->vg, nvgRGBA(255,10,10,80));
   }
   nvgStrokeWidth(s->vg, 6);
   nvgStroke(s->vg);
@@ -858,6 +858,7 @@ static void ui_draw_ml_button(UIState *s) {
   nvgFontSize(s->vg, 45);
   if (s->scene.mlButtonEnabled) {
     nvgFillColor(s->vg, nvgRGBA(55, 184, 104, 255));
+    nvgFontSize(s->vg, 55);
     nvgText(s->vg,btn_xc,btn_yc,"ML",NULL);
   } else {
     nvgFillColor(s->vg, nvgRGBA(255,255,255,200));
