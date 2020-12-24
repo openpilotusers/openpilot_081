@@ -60,8 +60,8 @@ class Buttons:
   CANCEL = 4
 
 params = Params()
-fingerprint_issued_fix = params.get('FingerprintIssuedFix') == "1"
-fingerprint_two = params.get('FingerprintTwoSet') == "1"
+fingerprint_issued_fix = int(params.get("FingerprintIssuedFix", encoding='utf8')) == 1
+fingerprint_two = int(params.get("FingerprintTwoSet", encoding='utf8')) == 1
 
 if fingerprint_issued_fix: # 핑거인식문제 혹은 다른차량과 핑거프린트 충돌이 나는경우 여기다가 핑거를 넣으시고 개발자 메뉴에서 핑거프린트 이슈차량 전용을 켜면 적용됩니다.
   FINGERPRINTS = {
