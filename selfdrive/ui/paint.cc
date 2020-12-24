@@ -474,15 +474,15 @@ static void ui_draw_debug(UIState *s)
 
     ui_print(s, ui_viz_rx, ui_viz_ry+400, "AD:%.2f", scene.pathPlan.steerActuatorDelay);
     ui_print(s, ui_viz_rx, ui_viz_ry+450, "SC:%.2f", scene.pathPlan.steerRateCost);
-    ui_print(s, ui_viz_rx, ui_viz_ry+500, "OS:%.3f", scene.output_scale);
+    ui_print(s, ui_viz_rx, ui_viz_ry+500, "OS:%.2f", abs(scene.output_scale));
     //ui_print(s, ui_viz_rx, ui_viz_ry+400, "Awareness:%.2f", scene.awareness_status);
     //ui_print(s, ui_viz_rx, ui_viz_ry+470, "FaceProb:%.2f", scene.face_prob);
     if (s->lat_control == 0) {
-      ui_print(s, ui_viz_rx, ui_viz_ry+550, "LaC:PID");
+      ui_print(s, ui_viz_rx, ui_viz_ry+550, "LC:PID");
     } else if (s->lat_control == 1) {
-      ui_print(s, ui_viz_rx, ui_viz_ry+550, "LaC:INDI");
+      ui_print(s, ui_viz_rx, ui_viz_ry+550, "LC:INDI");
     } else if (s->lat_control == 2) {
-      ui_print(s, ui_viz_rx, ui_viz_ry+550, "LaC:LQR");
+      ui_print(s, ui_viz_rx, ui_viz_ry+550, "LC:LQR");
     }
     //ui_print(s, ui_viz_rx, ui_viz_ry+600, "SL:%.1f", scene.speedlimitahead*3.6);
     nvgFontSize(s->vg, 45);
