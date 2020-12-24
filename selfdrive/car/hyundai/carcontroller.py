@@ -15,7 +15,7 @@ from selfdrive.controls.lib.pathplanner import LANE_CHANGE_SPEED_MIN
 # speed controller
 from selfdrive.car.hyundai.spdcontroller  import SpdController
 from selfdrive.car.hyundai.spdctrl  import Spdctrl
-from selfdrive.car.hyundai.spdctrl_relaxed  import SpdctrlRelaxed
+from selfdrive.car.hyundai.spdctrlRelaxed  import SpdctrlRelaxed
 
 from common.params import Params
 import common.log as trace1
