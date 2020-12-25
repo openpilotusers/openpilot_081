@@ -15,7 +15,7 @@ DT_TRML = 0.5  # thermald and manager
 
 # driver monitoring
 if TICI:
-  DT_DMON = 0.05
+  DT_DMON = 0.1
 else:
   DT_DMON = 0.1
 
@@ -24,7 +24,7 @@ class Priority:
   # CORE 2
   # - modeld = 55
   # - camerad = 54
-  CTRL_LOW = 51 # plannerd & radard
+  CTRL_LOW = 52 # plannerd & radard
 
   # CORE 3
   # - boardd = 55
