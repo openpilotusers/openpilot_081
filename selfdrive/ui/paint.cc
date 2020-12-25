@@ -471,12 +471,14 @@ static void ui_draw_debug(UIState *s)
     ui_draw_text(s->vg, 0, 1078, scene.alertTextMsg2.c_str(), 50, COLOR_WHITE_ALPHA(150), s->font_sans_semibold);
   }
 
-  nvgFontSize(s->vg, 42);
+  
   nvgFillColor(s->vg, COLOR_WHITE_ALPHA(150));
   if (s->nDebugUi2 == 1) {
     if (scene.gpsAccuracyUblox != 0.00) {
+      nvgFontSize(s->vg, 38);
       ui_print(s, 0, 30, "LAT/LON:%.5f/%.5f", scene.latitudeUblox, scene.longitudeUblox);
     }
+    nvgFontSize(s->vg, 42);
     //ui_print(s, ui_viz_rx, ui_viz_ry, "Live Parameters");
     ui_print(s, ui_viz_rx, ui_viz_ry+250, "SR:%.2f", scene.liveParams.steerRatio);
     //ui_print(s, ui_viz_rx, ui_viz_ry+100, "AOfs:%.2f", scene.liveParams.angleOffset);
@@ -971,8 +973,8 @@ static void bb_ui_draw_measures_left(UIState *s, int bb_x, int bb_y, int bb_w ) 
     char uom_str[3];
     NVGcolor val_color = COLOR_WHITE_ALPHA(200);
     snprintf(val_str, sizeof(val_str), "%.0f°", (s->scene.bearingUblox));
-    snprintf(uom_str, sizeof(uom_str), "E:%.1f°", (s->scene.bearingAccuracyUblox));
-    bb_h +=bb_ui_draw_measure(s,  val_str, uom_str, "방향",
+    snprintf(uom_str, sizeof(uom_str), "");
+    bb_h +=bb_ui_draw_measure(s,  val_str, uom_str, "주행방향",
         bb_rx, bb_ry, bb_uom_dx,
         val_color, lab_color, uom_color,
         value_fontSize, label_fontSize, uom_fontSize );
