@@ -475,8 +475,8 @@ static void ui_draw_debug(UIState *s)
   nvgFillColor(s->vg, COLOR_WHITE_ALPHA(150));
   if (s->nDebugUi2 == 1) {
     if (scene.gpsAccuracyUblox != 0.00) {
-      nvgFontSize(s->vg, 38);
-      ui_print(s, 0, 30, "LAT/LON:%.5f/%.5f", scene.latitudeUblox, scene.longitudeUblox);
+      nvgFontSize(s->vg, 34);
+      ui_print(s, 0, 28, "LAT/LON:%.5f/%.5f", scene.latitudeUblox, scene.longitudeUblox);
     }
     nvgFontSize(s->vg, 42);
     //ui_print(s, ui_viz_rx, ui_viz_ry, "Live Parameters");
@@ -498,14 +498,8 @@ static void ui_draw_debug(UIState *s)
     } else if (s->lat_control == 2) {
       ui_print(s, ui_viz_rx_center, ui_viz_ry+270, "LQR");
     }
-    nvgFontSize(s->vg, 45);
-    nvgTextAlign(s->vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
-    nvgFillColor(s->vg, COLOR_WHITE_ALPHA(150)); 
-    ui_print(s, ui_viz_rx_center, ui_viz_ry+750, "←좌측간격(%%)→    차선폭(m)    ←우측간격(%%)→");
-    ui_print(s, ui_viz_rx_center, ui_viz_ry+800, "%4.1f                     %4.2f                    %4.1f", 
-                                                    (scene.pathPlan.lPoly/(scene.pathPlan.lPoly+abs(scene.pathPlan.rPoly)))*100, 
-                                                    scene.pathPlan.laneWidth, 
-                                                    (abs(scene.pathPlan.rPoly)/(scene.pathPlan.lPoly+abs(scene.pathPlan.rPoly)))*100);
+    ui_print(s, ui_viz_rx_center, ui_viz_ry+700, " 좌측간격(m)    차선폭(m)    우측간격(m)");
+    ui_print(s, ui_viz_rx_center, ui_viz_ry+750, "%.2f                    %.2f                    %.2f", scene.pathPlan.lPoly, scene.pathPlan.laneWidth, abs(scene.pathPlan.rPoly));
   }
 }
 
