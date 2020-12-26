@@ -284,10 +284,8 @@ void update_sockets(UIState *s) {
     s->scene.gpsAccuracyUblox = data2.getAccuracy();
     s->scene.altitudeUblox = data2.getAltitude();
     s->scene.bearingUblox = data2.getBearing();
-    s->scene.bearingAccuracyUblox = data2.getBearingAccuracy();
     s->scene.latitudeUblox = data2.getLatitude();
     s->scene.longitudeUblox = data2.getLongitude();
-    s->scene.timestampUblox = data2.getTimestamp();
   }
   if (sm.updated("health")) {
     auto health = sm["health"].getHealth();
@@ -301,13 +299,11 @@ void update_sockets(UIState *s) {
   }
   if (sm.updated("driverState")) {
     scene.driver_state = sm["driverState"].getDriverState();
-    scene.face_prob = scene.driver_state.getFaceProb();
   }
   if (sm.updated("dMonitoringState")) {
     scene.dmonitoring_state = sm["dMonitoringState"].getDMonitoringState();
     scene.is_rhd = scene.dmonitoring_state.getIsRHD();
     scene.frontview = scene.dmonitoring_state.getIsPreview();
-    scene.awareness_status = scene.dmonitoring_state.getAwarenessStatus();
   } else if ((sm.frame - sm.rcv_frame("dMonitoringState")) > UI_FREQ/2) {
     scene.frontview = false;
   }
@@ -430,6 +426,7 @@ void ui_update(UIState *s) {
 
   // Read params
   if ((s->sm)->frame % (5*UI_FREQ) == 0) {
+    read_param(&s->is_metric, "IsMetric");
     read_param(&s->is_OpenpilotViewEnabled, "IsOpenpilotViewEnabled");
   } else if ((s->sm)->frame % (6*UI_FREQ) == 0) {
     int param_read = read_param(&s->last_athena_ping, "LastAthenaPingTime");
@@ -440,17 +437,12 @@ void ui_update(UIState *s) {
     } else {
       s->scene.athenaStatus = NET_ERROR;
     }
-  } else if ((s->sm)->frame % (20*UI_FREQ) == 0) {
-    read_param(&s->is_metric, "IsMetric");
-    read_param(&s->nOpkrAutoScreenOff, "OpkrAutoScreenOff");
+  } else if ((s->sm)->frame % (10*UI_FREQ) == 0) {
     read_param(&s->nOpkrUIBrightness, "OpkrUIBrightness");
     read_param(&s->nOpkrUIVolumeBoost, "OpkrUIVolumeBoost");
     read_param(&s->limit_set_speed, "LimitSetSpeed");
     read_param(&s->limit_set_speed_camera, "LimitSetSpeedCamera");
     read_param(&s->limit_set_speed_curv, "LimitSetSpeedCurv");
-    read_param(&s->nDebugUi1, "DebugUi1");
-    read_param(&s->nDebugUi2, "DebugUi2");
-    read_param(&s->nOpkrBlindSpotDetect, "OpkrBlindSpotDetect");
     read_param(&s->lat_control, "LateralControlMethod");
   }
 }

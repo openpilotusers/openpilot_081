@@ -7,6 +7,7 @@
 #define nvgCreate nvgCreateGL3
 #else
 #include <GLES3/gl3.h>
+#include <EGL/egl.h>
 #define NANOVG_GLES3_IMPLEMENTATION
 #define nvgCreate nvgCreateGLES3
 #endif
@@ -129,8 +130,6 @@ typedef struct UIScene {
   std::string alertTextMsg2;
   std::string alert_type;
   cereal::ControlsState::AlertSize alert_size;
-  float awareness_status;
-  float face_prob;
 
   bool  brakePress;
   bool recording;
@@ -138,10 +137,8 @@ typedef struct UIScene {
   float gpsAccuracyUblox;
   float altitudeUblox;
   float bearingUblox;
-  float bearingAccuracyUblox;
   float latitudeUblox;
   float longitudeUblox;
-  float timestampUblox;
 
   int cpuPerc;
   bool rightblindspot;
