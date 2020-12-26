@@ -497,8 +497,8 @@ static void ui_draw_debug(UIState *s)
     } else if (s->lat_control == 2) {
       ui_print(s, ui_viz_rx_center, ui_viz_ry+265, "LQR");
     }
-    ui_print(s, ui_viz_rx_center, ui_viz_ry+700, " 좌측간격(m)    차선폭(m)    우측간격(m)");
-    ui_print(s, ui_viz_rx_center, ui_viz_ry+750, "%.2f                    %.2f                    %.2f", scene.pathPlan.lPoly, scene.pathPlan.laneWidth, abs(scene.pathPlan.rPoly));
+    ui_print(s, ui_viz_rx_center, ui_viz_ry+725, " 좌측간격(m)    차선폭(m)    우측간격(m)");
+    ui_print(s, ui_viz_rx_center, ui_viz_ry+775, "%.2f                    %.2f                    %.2f", scene.pathPlan.lPoly, scene.pathPlan.laneWidth, abs(scene.pathPlan.rPoly));
   }
 }
 
