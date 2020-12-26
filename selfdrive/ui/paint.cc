@@ -460,8 +460,8 @@ static void ui_draw_debug(UIState *s)
 {
   UIScene &scene = s->scene;
 
-  int ui_viz_rx = scene.viz_rect.x + 275;
-  int ui_viz_ry = 108;
+  int ui_viz_rx = scene.viz_rect.x + 270;
+  int ui_viz_ry = 100;
   int ui_viz_rx_center = scene.viz_rect.centerX();
   
   nvgTextAlign(s->vg, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE);
@@ -477,7 +477,7 @@ static void ui_draw_debug(UIState *s)
       nvgFontSize(s->vg, 34);
       ui_print(s, 0, 28, "LAT/LON:%.5f/%.5f", scene.latitudeUblox, scene.longitudeUblox);
     }
-  nvgFontSize(s->vg, 42);
+    nvgFontSize(s->vg, 42);
     //ui_print(s, ui_viz_rx, ui_viz_ry, "Live Parameters");
     ui_print(s, ui_viz_rx, ui_viz_ry+250, "SR:%.2f", scene.liveParams.steerRatio);
     //ui_print(s, ui_viz_rx, ui_viz_ry+100, "AOfs:%.2f", scene.liveParams.angleOffset);
@@ -501,17 +501,16 @@ static void ui_draw_debug(UIState *s)
       ui_print(s, ui_viz_rx, ui_viz_ry+550, "LP:model");
     }
     nvgFontSize(s->vg, 45);
-    nvgFillColor(s->vg, COLOR_YELLOW_ALPHA(200));
     nvgTextAlign(s->vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
     if (s->lat_control == 0) {
-      ui_print(s, ui_viz_rx_center, ui_viz_ry+270, "PID");
+      ui_print(s, ui_viz_rx_center, ui_viz_ry+265, "PID");
     } else if (s->lat_control == 1) {
-      ui_print(s, ui_viz_rx_center, ui_viz_ry+270, "INDI");
+      ui_print(s, ui_viz_rx_center, ui_viz_ry+265, "INDI");
     } else if (s->lat_control == 2) {
-      ui_print(s, ui_viz_rx_center, ui_viz_ry+270, "LQR");
+      ui_print(s, ui_viz_rx_center, ui_viz_ry+265, "LQR");
     }
-    ui_print(s, ui_viz_rx_center, ui_viz_ry+700, " 좌측간격(m)    차선폭(m)    우측간격(m)");
-    ui_print(s, ui_viz_rx_center, ui_viz_ry+750, "%.2f                    %.2f                    %.2f", scene.pathPlan.lPoly, scene.pathPlan.laneWidth, abs(scene.pathPlan.rPoly));
+    ui_print(s, ui_viz_rx_center, ui_viz_ry+725, " 좌측간격(m)    차선폭(m)    우측간격(m)");
+    ui_print(s, ui_viz_rx_center, ui_viz_ry+775, "%.2f                    %.2f                    %.2f", scene.pathPlan.lPoly, scene.pathPlan.laneWidth, abs(scene.pathPlan.rPoly));
   }
 }
 
