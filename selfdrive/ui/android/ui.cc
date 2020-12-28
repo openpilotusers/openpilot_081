@@ -14,6 +14,8 @@
 #include "ui.hpp"
 #include "paint.hpp"
 #include "android/sl_sound.hpp"
+#include "dashcam.h"
+
 
 volatile sig_atomic_t do_exit = 0;
 static void set_do_exit(int sig) {
@@ -145,12 +147,19 @@ int main(int argc, char* argv[]) {
   const int MIN_VOLUME = LEON ? 12 : 9;
   const int MAX_VOLUME = LEON ? 15 : 12;
   s->sound->setVolume(MIN_VOLUME);
-
+  int nFrame30 = 0;
   while (!do_exit) {
     if (!s->started) {
       usleep(50 * 1000);
     }
     double u1 = millis_since_boot();
+    // parameter Read.
+    nFrame30++;
+    if( nFrame30 > 8 )
+    {
+      s->scene.nTimer++;
+      nFrame30 = 0;
+    }
 
     ui_update(s);
 
@@ -158,8 +167,11 @@ int main(int argc, char* argv[]) {
     int touch_x = -1, touch_y = -1;
     int touched = touch_poll(&touch, &touch_x, &touch_y, 0);
     if (touched == 1) {
-      handle_sidebar_touch(s, touch_x, touch_y);
-      handle_vision_touch(s, touch_x, touch_y);
+      if( touch_x  < 1660 || touch_y < 885 )
+      {        
+        handle_sidebar_touch(s, touch_x, touch_y);
+        handle_vision_touch(s, touch_x, touch_y);
+      }
     }
 
     // Don't waste resources on drawing in case screen is off
@@ -178,6 +190,7 @@ int main(int argc, char* argv[]) {
 
     update_offroad_layout_state(s, pm);
 
+    dashcam(s, touch_x, touch_y);
     ui_draw(s);
     double u2 = millis_since_boot();
     if (!s->scene.frontview && (u2-u1 > 66)) {

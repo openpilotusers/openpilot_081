@@ -3,7 +3,8 @@ from selfdrive.controls.lib.drive_helpers import get_steer_max
 from common.numpy_fast import clip
 from common.realtime import DT_CTRL
 from cereal import log
-
+from common.numpy_fast import interp
+from selfdrive.config import Conversions as CV
 
 class LatControlLQR():
   def __init__(self, CP):
@@ -43,6 +44,29 @@ class LatControlLQR():
 
     return self.sat_count > self.sat_limit
 
+
+  def atom_tune( self, v_ego_kph, sr_value, CP ):  # 조향각에 따른 변화.
+    self.sr_KPH = CP.atomTuning.sRKPH
+    self.sr_BPV = CP.atomTuning.sRBPV
+    self.sR_lqr_kiV  = CP.atomTuning.sRlqrkiV
+    self.sR_lqr_scaleV = CP.atomTuning.sRlqrscaleV
+
+    self.ki = []
+    self.scale = []
+
+    nPos = 0
+    for steerRatio in self.sr_BPV:  # steerRatio
+      self.ki.append( interp( sr_value, steerRatio, self.sR_lqr_kiV[nPos] ) )
+      self.scale.append( interp( sr_value, steerRatio, self.sR_lqr_scaleV[nPos] ) )
+      nPos += 1
+      if nPos > 10:
+        break
+
+    rt_ki = interp( v_ego_kph, self.sr_KPH, self.ki )
+    rt_scale  = interp( v_ego_kph, self.sr_KPH, self.scale )
+     
+    return rt_ki, rt_scale
+
   def update(self, active, CS, CP, path_plan):
     lqr_log = log.ControlsState.LateralLQRState.new_message()
 
@@ -50,6 +74,9 @@ class LatControlLQR():
     torque_scale = (0.45 + CS.vEgo / 60.0)**2  # Scale actuator model with speed
 
     steering_angle = CS.steeringAngle
+
+    v_ego_kph = CS.vEgo * CV.MS_TO_KPH
+    self.ki, self.scale = self.atom_tune( v_ego_kph, CS.steeringAngle, CP )
 
     # Subtract offset. Zero angle should correspond to zero torque
     self.angle_steers_des = path_plan.angleSteers - path_plan.angleOffset

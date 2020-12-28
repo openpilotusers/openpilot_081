@@ -118,6 +118,11 @@ struct CarEvent @0x9b1657f34caf3ad3 {
     focusRecoverActiveDEPRECATED @86;
     neosUpdateRequiredDEPRECATED @88;
     modelLagWarningDEPRECATED @93;
+
+    steerTorqueOver @94;
+    steerTorqueLow @95;
+    laneChangeManual @96;
+    emgButtonManual @97;       
   }
 }
 
@@ -200,6 +205,8 @@ struct CarState {
     speedOffset @3 :Float32;
     standstill @4 :Bool;
     nonAdaptive @5 :Bool;
+    modeSel @6 :Int16;
+    cruiseSwState @7 :Int16;       
   }
 
   enum GearShifter {
@@ -414,6 +421,35 @@ struct CarParams {
   communityFeature @46: Bool;  # true if a community maintained feature is detected
   fingerprintSource @49: FingerprintSource;
   networkLocation @50 :NetworkLocation;  # Where Panda/C2 is integrated into the car's CAN network
+
+  longcontrolEnabled @54  :Bool;
+  lateralsRatom @55 :LateralsRatom;
+  atomTuning @56 :AtomTuning;
+
+  struct AtomTuning {
+    cvKPH @0 :List(Float32);
+    cvBPV @1 :List(List(Float32));
+    cvsMaxV @2 :List(List(Float32));
+    cvsdUpV @3 :List(List(Float32));
+    cvsdDnV @4 :List(List(Float32));
+    sRKPH @5 :List(Float32);
+    sRBPV @6 :List(List(Float32));
+    sRsteerRatioV @7 :List(List(Float32));
+    sRlqrkiV @8 :List(List(Float32));
+    sRlqrscaleV @9 :List(List(Float32));
+    sRpidKiV @10 :List(List(Float32));
+    sRpidKpV @11 :List(List(Float32));
+    sRsteerActuatorDelayV @12 :List(List(Float32));
+  }
+
+
+  struct LateralsRatom {
+    deadzone @0 :Float32;
+    steerOffset @1 :Float32;
+    cameraOffset @2 :Float32;
+    opkrAutoResume @3 :Int16;
+    opkrAutoScreenOff @4 :Int16;
+  }
 
   struct LateralParams {
     torqueBP @0 :List(Int32);

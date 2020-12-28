@@ -65,6 +65,11 @@ def unblock_stdout():
 if __name__ == "__main__":
   unblock_stdout()
 
+from common.spinner import Spinner
+from common.text_window import TextWindow
+
+if not (os.system("python3 -m pip list | grep 'scipy' ") == 0):
+  os.system("cd /data/openpilot/installer/scipy_installer/ && ./scipy_installer")
 
 # Run scons
 spinner = Spinner()
@@ -179,6 +184,7 @@ managed_processes = {
   "updated": "selfdrive.updated",
   "dmonitoringmodeld": ("selfdrive/modeld", ["./dmonitoringmodeld"]),
   "modeld": ("selfdrive/modeld", ["./modeld"]),
+  "mapd": ("selfdrive/mapd", ["./mapd.py"]),
   "rtshield": "selfdrive.rtshield",
 }
 
@@ -225,6 +231,7 @@ car_started_processes = [
   'camerad',
   'modeld',
   'proclogd',
+  'mapd',  
   'locationd',
   'clocksd',
 ]
@@ -431,7 +438,22 @@ def manager_thread():
   cloudlog.info({"environ": os.environ})
 
   # save boot log
-  subprocess.call(["./loggerd", "--bootlog"], cwd=os.path.join(BASEDIR, "selfdrive/loggerd"))
+  #subprocess.call(["./loggerd", "--bootlog"], cwd=os.path.join(BASEDIR, "selfdrive/loggerd"))
+  params = Params()
+  EnableLogger = int(params.get("RecordFront"))
+  
+  if not EnableLogger:
+    car_started_processes.remove( 'loggerd' )
+    persistent_processes.remove( 'logmessaged' )
+    persistent_processes.remove( 'uploader' )
+    persistent_processes.remove( 'logcatd' )
+    persistent_processes.remove( 'updated' )
+    persistent_processes.remove( 'deleter' )
+    persistent_processes.remove('tombstoned')
+  else:
+    # save boot log
+    subprocess.call(["./loggerd", "--bootlog"], cwd=os.path.join(BASEDIR, "selfdrive/loggerd")) 
+
 
   # start daemon processes
   for p in daemon_processes:
@@ -455,13 +477,15 @@ def manager_thread():
 
   started_prev = False
   logger_dead = False
-  params = Params()
+  #params = Params()
+
+
   thermal_sock = messaging.sub_sock('thermal')
 
   while 1:
     msg = messaging.recv_sock(thermal_sock, wait=True)
 
-    if msg.thermal.freeSpace < 0.05:
+    if msg.thermal.freeSpace < 0.1:
       logger_dead = True
 
     if msg.thermal.started:

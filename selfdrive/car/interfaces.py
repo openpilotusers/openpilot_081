@@ -25,6 +25,9 @@ class CarInterfaceBase():
 
     self.frame = 0
     self.low_speed_alert = False
+    self.cruise_enabled_prev = False
+    self.pcm_enable_prev = False
+    self.pcm_enable_cmd = False 
 
     if CarState is not None:
       self.CS = CarState(CP)
@@ -81,6 +84,25 @@ class CarInterfaceBase():
     ret.longitudinalTuning.kpV = [1.]
     ret.longitudinalTuning.kiBP = [0.]
     ret.longitudinalTuning.kiV = [1.]
+
+    ret.atomTuning.cvKPH    = [0.] 
+    ret.atomTuning.cvBPV    = [[150., 255.]]  # CV
+    ret.atomTuning.cvsMaxV  = [[255., 230.]]
+    ret.atomTuning.cvsdUpV  = [[3,3]]
+    ret.atomTuning.cvsdDnV  = [[7,5]]
+    
+    ret.atomTuning.sRKPH     = [30, 40, 80]   # Speed  kph
+    ret.atomTuning.sRBPV     = [[0.],      [0.],      [0.]     ]
+    ret.atomTuning.sRlqrkiV      = [[0.005],   [0.015],   [0.02]   ]
+    ret.atomTuning.sRlqrscaleV   = [[2000],    [1900.0],  [1850.0] ]
+    ret.atomTuning.sRpidKiV      = [[0.02,0.01,0.02],[0.03,0.02,0.03],[0.03,0.02,0.03]]
+    ret.atomTuning.sRpidKpV      = [[0.20,0.15,0.20],[0.25,0.20,0.25],[0.25,0.20,0.25]]
+    ret.atomTuning.sRsteerRatioV = [[13.95,13.85,13.95],[13.95,13.85,13.95],[13.95,13.85,13.95]]
+    ret.atomTuning.sRsteerActuatorDelayV = [[0.25,0.5,0.25],[0.25,0.8,0.25],[0.25,0.8,0.25]]
+  
+    ret.lateralsRatom.deadzone = 0.1
+    ret.lateralsRatom.steerOffset = 0
+    ret.lateralsRatom.cameraOffset = 0           
     return ret
 
   # returns a car.CarState, pass in car.CarControl
@@ -88,7 +110,7 @@ class CarInterfaceBase():
     raise NotImplementedError
 
   # return sendcan, pass in a car.CarControl
-  def apply(self, c):
+  def apply(self, c, sm, CP):
     raise NotImplementedError
 
   def create_common_events(self, cs_out, extra_gears=[], gas_resume_speed=-1, pcm_enable=True):  # pylint: disable=dangerous-default-value
@@ -106,7 +128,7 @@ class CarInterfaceBase():
       events.add(EventName.wrongCarMode)
     if cs_out.espDisabled:
       events.add(EventName.espDisabled)
-    if cs_out.gasPressed:
+    if cs_out.gasPressed and self.CP.longcontrolEnabled:
       events.add(EventName.gasPressed)
     if cs_out.stockFcw:
       events.add(EventName.stockFcw)
@@ -125,15 +147,37 @@ class CarInterfaceBase():
     # Disable on rising edge of gas or brake. Also disable on brake when speed > 0.
     # Optionally allow to press gas at zero speed to resume.
     # e.g. Chrysler does not spam the resume button yet, so resuming with gas is handy. FIXME!
-    if (cs_out.gasPressed and (not self.CS.out.gasPressed) and cs_out.vEgo > gas_resume_speed) or \
-       (cs_out.brakePressed and (not self.CS.out.brakePressed or not cs_out.standstill)):
-      events.add(EventName.pedalPressed)
+    if self.CP.longcontrolEnabled:
+      if (cs_out.gasPressed and (not self.CS.out.gasPressed) and cs_out.vEgo > gas_resume_speed) or \
+        (cs_out.brakePressed and (not self.CS.out.brakePressed or not cs_out.standstill)):
+        events.add(EventName.pedalPressed)
 
     # we engage when pcm is active (rising edge)
-    if pcm_enable:
-      if cs_out.cruiseState.enabled and not self.CS.out.cruiseState.enabled:
+    #if pcm_enable:
+    #  if cs_out.cruiseState.enabled and not self.CS.out.cruiseState.enabled:
+    #    events.add(EventName.pcmEnable)
+    #  elif not cs_out.cruiseState.enabled:
+    #    events.add(EventName.pcmDisable)
+
+
+    if not pcm_enable:
+      pass
+    elif cs_out.gearShifter != GearShifter.drive:
+      self.cruise_enabled_prev = cs_out.cruiseState.enabled
+      if self.pcm_enable_prev:
+        self.pcm_enable_cmd = False
+    elif cs_out.cruiseState.enabled != self.cruise_enabled_prev:
+      self.cruise_enabled_prev = cs_out.cruiseState.enabled
+      if cs_out.cruiseState.enabled:
+        self.pcm_enable_cmd = True
+      else:
+        self.pcm_enable_cmd = False
+
+    if self.pcm_enable_prev != self.pcm_enable_cmd:
+      self.pcm_enable_prev = self.pcm_enable_cmd
+      if self.pcm_enable_cmd:
         events.add(EventName.pcmEnable)
-      elif not cs_out.cruiseState.enabled:
+      else:
         events.add(EventName.pcmDisable)
 
     return events

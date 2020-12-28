@@ -55,6 +55,11 @@ class PIController():
     self.saturated = False
     self.control = 0
 
+  def gain(self, k_p, k_i, k_f ):
+    self._k_p = k_p # proportional gain
+    self._k_i = k_i # integral gain
+    self.k_f = k_f  # feedforward gain    
+
   def update(self, setpoint, measurement, speed=0.0, check_saturation=True, override=False, feedforward=0., deadzone=0., freeze_integrator=False):
     self.speed = speed
 

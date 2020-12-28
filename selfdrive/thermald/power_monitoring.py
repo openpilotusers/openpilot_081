@@ -29,6 +29,8 @@ class PowerMonitoring:
     self.car_voltage_mV = 12e3                  # Low-passed version of health voltage
     self.integration_lock = threading.Lock()
 
+    self.ts_last_charging_ctrl = None
+
     car_battery_capacity_uWh = self.params.get("CarBatteryCapacity")
     if car_battery_capacity_uWh is None:
       car_battery_capacity_uWh = 0
@@ -38,7 +40,7 @@ class PowerMonitoring:
 
 
   # Calculation tick
-  def calculate(self, health):
+  def calculate(self, health, msg):
     try:
       now = sec_since_boot()
 
@@ -172,13 +174,29 @@ class PowerMonitoring:
     if health is None or offroad_timestamp is None:
       return False
 
+    if HARDWARE.get_battery_charging():
+      return False      
+
     now = sec_since_boot()
     panda_charging = (health.health.usbPowerMode != log.HealthData.UsbPowerMode.client)
-    BATT_PERC_OFF = 10 if LEON else 3
+    BATT_PERC_OFF = 90 # 10 if LEON else 3
+
+    delta_ts = now - offroad_timestamp
 
     should_shutdown = False
     # Wait until we have shut down charging before powering down
     should_shutdown |= (not panda_charging and self.should_disable_charging(health, offroad_timestamp))
-    should_shutdown |= ((HARDWARE.get_battery_capacity() < BATT_PERC_OFF) and (not HARDWARE.get_battery_charging()) and ((now - offroad_timestamp) > 60))
+    should_shutdown |= ((HARDWARE.get_battery_capacity() < BATT_PERC_OFF) and (not HARDWARE.get_battery_charging()) and (delta_ts > 10) )
     should_shutdown &= started_seen
     return should_shutdown
+
+
+  def charging_ctrl(self, msg, ts, to_discharge, to_charge ):
+    if self.ts_last_charging_ctrl is None or (ts - self.ts_last_charging_ctrl) >= 300.:
+      battery_changing = HARDWARE.get_battery_charging()
+      if self.ts_last_charging_ctrl:
+        if msg.thermal.batteryPercent >= to_discharge and battery_changing:
+          HARDWARE.set_battery_charging(False)
+        elif msg.thermal.batteryPercent <= to_charge and not battery_changing:
+          HARDWARE.set_battery_charging(True)
+      self.ts_last_charging_ctrl = ts

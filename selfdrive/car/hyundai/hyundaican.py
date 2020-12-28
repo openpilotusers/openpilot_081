@@ -1,21 +1,26 @@
 import crcmod
+import copy
 from selfdrive.car.hyundai.values import CAR, CHECKSUM
 
 hyundai_checksum = crcmod.mkCrcFun(0x11D, initCrc=0xFD, rev=False, xorOut=0xdf)
 
 
 def create_lkas11(packer, frame, car_fingerprint, apply_steer, steer_req,
-                  lkas11, sys_warning, sys_state, enabled,
-                  left_lane, right_lane,
-                  left_lane_depart, right_lane_depart):
+                  lkas11, sys_warning, sys_state, CC ):
+ 
   values = lkas11
+  #values = copy.deepcopy( lkas11 )
   values["CF_Lkas_LdwsSysState"] = sys_state
   values["CF_Lkas_SysWarning"] = 3 if sys_warning else 0
-  values["CF_Lkas_LdwsLHWarning"] = left_lane_depart
-  values["CF_Lkas_LdwsRHWarning"] = right_lane_depart
+  #values["CF_Lkas_LdwsLHWarning"] = left_lane_depart
+  #values["CF_Lkas_LdwsRHWarning"] = right_lane_depart
   values["CR_Lkas_StrToqReq"] = apply_steer
   values["CF_Lkas_ActToi"] = steer_req
   values["CF_Lkas_MsgCount"] = frame % 0x10
+
+  left_lane = CC.hudControl.leftLaneVisible
+  right_lane = CC.hudControl.rightLaneVisible
+  enabled = CC.enabled
 
   if car_fingerprint in [CAR.SONATA, CAR.PALISADE, CAR.KIA_NIRO_EV, CAR.SANTA_FE, CAR.IONIQ_EV_2020]:
     values["CF_Lkas_LdwsActivemode"] = int(left_lane) + (int(right_lane) << 1)
@@ -60,8 +65,13 @@ def create_lkas11(packer, frame, car_fingerprint, apply_steer, steer_req,
   return packer.make_can_msg("LKAS11", 0, values)
 
 
-def create_clu11(packer, frame, clu11, button):
+def create_clu11(packer, frame, clu11, button, speed = None):
+  #values = copy.deepcopy( clu11 )
   values = clu11
+
+  if speed != None:
+    values["CF_Clu_Vanz"] = speed
+
   values["CF_Clu_CruiseSwState"] = button
   values["CF_Clu_AliveCnt1"] = frame % 0x10
   return packer.make_can_msg("CLU11", 0, values)
@@ -85,3 +95,19 @@ def create_lfa_mfa(packer, frame, enabled):
   # HDA_USM: nothing
 
   return packer.make_can_msg("LFAHDA_MFC", 0, values)
+
+
+
+def create_mdps12(packer, frame, mdps12):
+  #values = copy.deepcopy( mdps12 )
+  values = mdps12
+  values["CF_Mdps_ToiActive"] = 0
+  values["CF_Mdps_ToiUnavail"] = 1
+  values["CF_Mdps_MsgCount2"] = frame % 0x100
+  values["CF_Mdps_Chksum2"] = 0
+
+  dat = packer.make_can_msg("MDPS12", 2, values)[2]
+  checksum = sum(dat) % 256
+  values["CF_Mdps_Chksum2"] = checksum
+
+  return packer.make_can_msg("MDPS12", 2, values)
