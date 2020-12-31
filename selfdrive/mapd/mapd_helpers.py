@@ -3,18 +3,11 @@ import json
 import numpy as np
 from datetime import datetime
 from common.basedir import BASEDIR
-from common.op_params import opParams
 from selfdrive.config import Conversions as CV
 from common.transformations.coordinates import LocalCoord, geodetic2ecef
 
 LOOKAHEAD_TIME = 10.
 MAPS_LOOKAHEAD_DISTANCE = 50 * LOOKAHEAD_TIME
-
-op_params = opParams()
-
-traffic_lights = op_params.get('traffic_lights')
-traffic_lights_without_direction = op_params.get('traffic_lights_without_direction')
-rolling_stop = op_params.get('rolling_stop')
 
 DEFAULT_SPEEDS_JSON_FILE = BASEDIR + "/selfdrive/mapd/default_speeds.json"
 DEFAULT_SPEEDS = {}
@@ -84,56 +77,6 @@ def parse_speed_tags(tags):
 
   if 'maxspeed' in tags:
     max_speed = tags['maxspeed']
-
-  if 'maxspeed:conditional' in tags:
-    try:
-      weekday = True
-      max_speed_cond, cond = tags['maxspeed:conditional'].split(' @ ')
-      if cond.find('wet') > -0.5:
-        cond = cond.replace('wet','')
-        cond = cond.replace(' ','')
-        weekday = False
-        #TODO Check if road is wet waybe if wipers are on.
-      cond = cond[1:-1]
-      
-      now = datetime.now()  # TODO: Get time and timezone from gps fix so this will work correctly on replays
-      if cond.find('Mo-Fr') > -0.5:
-        cond = cond.replace('Mo-Fr','')
-        cond = cond.replace(' ','')
-        if now.weekday() > 4:
-          weekday = False
-      if cond.find('Mo-Su') > -0.5:
-        cond = cond.replace('Mo-Su','')
-        cond = cond.replace(' ','')
-      if cond.find('; SH off') > -0.5:
-        cond = cond.replace('; SH off','')
-        cond = cond.replace(' ','')
-      if cond.find('Oct-Apr') > -0.5:
-        if 4 > now.month > 10:
-          weekday = False
-        else:
-          max_speed = max_speed_cond
-      else:
-        start, end = cond.split('-')
-        starthour, startminute = start.split(':')
-        endhour, endminute = end.split(':')
-        start = datetime.strptime(start, "%H:%M").replace(year=now.year, month=now.month, day=now.day)
-        midnight = datetime.strptime("00:00", "%H:%M").replace(year=now.year, month=now.month, day=now.day)
-        end1 = datetime.strptime(end, "%H:%M").replace(year=now.year, month=now.month, day=now.day)
-        if int(endhour) + int(endminute)/60 < int(starthour) + int(startminute)/60:
-          end2 = datetime.strptime(end, "%H:%M").replace(year=now.year, month=now.month, day=now.day+1)
-          if start <= now <= end2 or midnight <= now <= end1 and weekday:
-            max_speed = max_speed_cond
-        else:
-          if start <= now <= end1 and weekday:
-            max_speed = max_speed_cond
-    except ValueError:
-      pass
-
-  if not max_speed and 'source:maxspeed' in tags:
-    max_speed = DEFAULT_SPEEDS.get(tags['source:maxspeed'], None)
-  if not max_speed and 'maxspeed:type' in tags:
-    max_speed = DEFAULT_SPEEDS.get(tags['maxspeed:type'], None)
 
   max_speed = parse_speed_unit(max_speed)
   return max_speed
@@ -290,23 +233,6 @@ class Way:
     """Extracts the (conditional) speed limit from a way"""
     if not self.way:
       return None
-    angle=heading - math.atan2(self.way.nodes[0].lon-self.way.nodes[-1].lon,self.way.nodes[0].lat-self.way.nodes[-1].lat)*180/3.14159265358979 - 180
-    if angle < -180:
-      angle = angle + 360
-    if angle > 180:
-      angle = angle - 360
-    backwards = abs(angle) > 90
-    if backwards:
-      if 'maxspeed:backward' in self.way.tags:
-        max_speed = self.way.tags['maxspeed:backward']
-        max_speed = parse_speed_unit(max_speed)
-        return max_speed
-    else:
-      if 'maxspeed:forward' in self.way.tags:
-        max_speed = self.way.tags['maxspeed:forward']
-        max_speed = parse_speed_unit(max_speed)
-        return max_speed
-
     max_speed = parse_speed_tags(self.way.tags)
     if not max_speed:
       location_info = self.query_results[4]
@@ -314,7 +240,7 @@ class Way:
 
     return max_speed
 
-  def max_speed_ahead(self, current_speed_limit, lat, lon, heading, lookahead, traffic_status, traffic_confidence, last_not_none_signal):
+  def max_speed_ahead(self, current_speed_limit, lat, lon, heading, lookahead):
     """Look ahead for a max speed"""
     if not self.way:
       return None
@@ -340,76 +266,8 @@ class Way:
       if max_dist > 2 * lookahead:
         #print "max_dist break"
         break
-      try:
-        if way.way.tags['junction']=='roundabout' or way.way.tags['junction']=='circular':
-          latmin = 181
-          lonmin = 181
-          latmax = -181
-          lonmax = -181
-          for n in way.way.nodes:
-            lonmax = max(n.lon,lonmax)
-            lonmin = min(n.lon,lonmin)
-            latmax = max(n.lat,latmax)
-            latmin = min(n.lat,latmin)
-          if way.way.nodes[0].id == way.way.nodes[-1].id:
-            a = 111132.954*math.cos(float(latmax+latmin)/360*3.141592)*float(lonmax-lonmin)
-          else:
-            if way.way.nodes[1].id == way.way.nodes[-1].id:
-              circle = [0,0,30]
-            else:
-              circle = circle_through_points([way.way.nodes[0].lat,way.way.nodes[0].lon,1], [way.way.nodes[1].lat,way.way.nodes[1].lon,1], [way.way.nodes[-1].lat,way.way.nodes[-1].lon,1],True)
-            a = 111132.954*math.cos(float(latmax+latmin)/360*3.141592)*float(circle[2])*2
-          speed_ahead = np.sqrt(2.0*a)
-          min_dist = 999.9
-          for w in way_pts:
-            min_dist = min(min_dist, float(np.linalg.norm(w)))
-          speed_ahead_dist = min_dist
-          break
-      except KeyError:
-        pass
       angle=heading - math.atan2(way.way.nodes[0].lon-way.way.nodes[-1].lon,way.way.nodes[0].lat-way.way.nodes[-1].lat)*180/3.14159265358979 - 180
-      if angle < -180:
-        angle = angle + 360
-      if angle > 180:
-        angle = angle - 360
-      backwards = abs(angle) > 90
-      if backwards:
-        if 'maxspeed:backward' in way.way.tags:
-          spd = way.way.tags['maxspeed:backward']
-          spd = parse_speed_unit(spd)
-          if spd is not None:
-            speed_ahead = spd
-            min_dist = min(np.linalg.norm(way_pts[1, :]),np.linalg.norm(way_pts[0, :]),np.linalg.norm(way_pts[-1, :]))
-            speed_ahead_dist = min_dist
-            break
-      else:
-        if 'maxspeed:forward' in way.way.tags:
-          spd = way.way.tags['maxspeed:forward']
-          spd = parse_speed_unit(spd)
-          if spd is not None:
-            speed_ahead = spd
-            min_dist = min(np.linalg.norm(way_pts[1, :]),np.linalg.norm(way_pts[0, :]),np.linalg.norm(way_pts[-1, :]))
-            speed_ahead_dist = min_dist
-            break
-      if 'maxspeed:none' in way.way.tags:
-        spd = parse_speed_tags(way.way.tags)
-        #print "spd found"
-        #print spd
-        if not spd:
-          location_info = self.query_results[4]
-          spd = geocode_maxspeed(way.way.tags, location_info)
-          #print "spd is actually"
-          #print spd
-        if spd is not None:
-          speed_ahead = spd
-          min_dist = min(np.linalg.norm(way_pts[1, :]),np.linalg.norm(way_pts[0, :]),np.linalg.norm(way_pts[-1, :]))
-          speed_ahead_dist = min_dist
-          #print "slower speed found"
-          #print min_dist
-          break
       way_pts = way.points_in_car_frame(lat, lon, heading, False)
-      #print(way_pts)
-
       try:
         count = 0
         loop_must_break = False
@@ -438,18 +296,6 @@ class Way:
         break
 
     return speed_ahead, speed_ahead_dist
-
-  def advisory_max_speed(self):
-    if not self.way:
-      return None
-
-    tags = self.way.tags
-    adv_speed = None
-
-    if 'maxspeed:advisory' in tags:
-      adv_speed = tags['maxspeed:advisory']
-      adv_speed = parse_speed_unit(adv_speed)
-    return adv_speed
 
   def on_way(self, lat, lon, heading, points = None):
     #if len(self.way.nodes) < 10:
@@ -534,13 +380,6 @@ class Way:
         return way
       if len(ways) == 2:
         try:
-          if ways[0].tags['junction']=='roundabout' or ways[0].tags['junction']=='circular':
-            #print ("roundabout found")
-            way = Way(ways[0], self.query_results)
-            return way
-        except (KeyError, IndexError):
-          pass
-        try:
           if (ways[0].tags['oneway'] == 'yes') and (ways[1].tags['oneway'] == 'yes'):
             if (ways[0].nodes[0].id == node.id and ways[1].nodes[0].id != node.id) and not (ways[0].nodes[0].id != node.id and ways[1].nodes[0].id == node.id):
               way = Way(ways[0], self.query_results)
@@ -569,13 +408,6 @@ class Way:
         #print "only one way found"
         return way
       if len(ways) == 2:
-        try:
-          if ways[0].tags['junction']=='roundabout' or ways[0].tags['junction']=='circular':
-            #print ("roundabout found")
-            way = Way(ways[0], self.query_results)
-            return way
-        except (KeyError, IndexError):
-          pass
         try:
           if (ways[0].tags['oneway'] == 'yes') and (ways[1].tags['oneway'] == 'yes'):
             if (ways[0].nodes[0].id == node.id and ways[1].nodes[0].id != node.id) and not (ways[0].nodes[0].id != node.id and ways[1].nodes[0].id == node.id):
@@ -610,12 +442,6 @@ class Way:
     for i in range(5):
       # Get new points and append to list
       new_pnts = way.points_in_car_frame(lat, lon, heading, True)
-
-      try:
-        if way.way.tags['junction']=='roundabout' or way.way.tags['junction']=='circular':
-          break
-      except KeyError:
-        pass
       if pnts is None:
         pnts = new_pnts
         valid = True

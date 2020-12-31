@@ -24,11 +24,7 @@ from selfdrive.swaglog import cloudlog, add_logentries_handler
 os.environ['BASEDIR'] = BASEDIR
 sys.path.append(os.path.join(BASEDIR, "pyextra"))
 
-from common.op_params import opParams
 from common.travis_checker import travis
-op_params = opParams()
-
-traffic_lights = op_params.get('traffic_lights')
 
 
 TOTAL_SCONS_NODES = 1040
@@ -171,8 +167,6 @@ from selfdrive.hardware.eon.apk import update_apks, pm_apply_packages, start_off
 # comment out anything you don't want to run
 managed_processes = {
   "thermald": "selfdrive.thermald.thermald",
-  "trafficd": ("selfdrive/trafficd", ["./trafficd"]),
-  "traffic_manager": "selfdrive.trafficd.traffic_manager",
   "uploader": "selfdrive.loggerd.uploader",
   "deleter": "selfdrive.loggerd.deleter",
   "controlsd": "selfdrive.controls.controlsd",
@@ -256,11 +250,6 @@ driver_view_processes = [
   'dmonitoringd',
   'dmonitoringmodeld'
 ]
-if traffic_lights:
-  car_started_processes += [
-    'trafficd',
-    'traffic_manager',
-  ]
 
 if not PC or WEBCAM:
   car_started_processes += [
@@ -604,9 +593,10 @@ def main():
     ("Scale", "1750"),
     ("LqrKi", "10"),
     ("DcGain", "30"),
-    ("IgnoreZone", "0"),
+    ("IgnoreZone", "1"),
     ("PidKp", "20"),
     ("PidKi", "40"),
+    ("PidKd", "150"),
     ("PidKf", "5"),
     ("CameraOffsetAdj", "60"),
     ("SteerRatioAdj", "140"),
@@ -641,6 +631,7 @@ def main():
     ("OpkrVariableSteerDelta", "0"),
     ("FingerprintTwoSet", "1"),
     ("OpkrVariableCruiseProfile", "0"),
+    ("OpkrLiveTune", "0"),
   ]
 
   # set unset params

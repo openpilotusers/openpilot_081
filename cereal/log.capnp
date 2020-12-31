@@ -2086,22 +2086,6 @@ struct Sentinel {
   type @0 :SentinelType;
 }
 
-struct LiveTrafficData {
-  speedLimitValid @0 :Bool;
-  speedLimit @1 :Float32;
-  speedAdvisoryValid @2 :Bool;
-  speedAdvisory @3 :Float32;
-}
-
-struct TrafficModelRaw {
-  prediction @0 :List(Float32);
-}
-
-struct TrafficModelEvent {
-  status @0 :Text;
-  confidence @1 :Float32;
-}
-
 struct Event {
   # in nanoseconds?
   logMonoTime @0 :UInt64;
@@ -2184,8 +2168,5 @@ struct Event {
     modelV2 @75 :ModelDataV2;
     frontEncodeIdx @76 :EncodeIndex; # driver facing camera
     wideEncodeIdx @77 :EncodeIndex;
-    liveTrafficData @78:LiveTrafficData;
-    trafficModelRaw @79: TrafficModelRaw;
-    trafficModelEvent @80: TrafficModelEvent;
   }
 }

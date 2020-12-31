@@ -84,9 +84,6 @@ modelV2: [8077, true, 20., 20]
 testModel: [8040, false, 0.]
 testLiveLocation: [8045, false, 0.]
 testJoystick: [8056, false, 0.]
-liveTrafficData: [8208, false, 100.]
-trafficModelEvent: [8218, false, 5.]
-trafficModelRaw: [8219, false, 5.]
 
 # 8080 is reserved for slave testing daemon
 # 8762 is reserved for logserver

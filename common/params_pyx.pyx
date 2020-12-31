@@ -99,6 +99,7 @@ keys = {
   b"IgnoreZone": [TxType.PERSISTENT],
   b"PidKp": [TxType.PERSISTENT],
   b"PidKi": [TxType.PERSISTENT],
+  b"PidKd": [TxType.PERSISTENT],
   b"PidKf": [TxType.PERSISTENT],
   b"CameraOffsetAdj": [TxType.PERSISTENT],
   b"SteerRatioAdj": [TxType.PERSISTENT],
@@ -133,6 +134,7 @@ keys = {
   b"OpkrVariableSteerDelta": [TxType.PERSISTENT],
   b"FingerprintTwoSet": [TxType.PERSISTENT],
   b"OpkrVariableCruiseProfile": [TxType.PERSISTENT],
+  b"OpkrLiveTune": [TxType.PERSISTENT],
 }
 
 def ensure_bytes(v):

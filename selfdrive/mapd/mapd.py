@@ -13,6 +13,7 @@ import logging.handlers
 from scipy import spatial
 import selfdrive.crash as crash
 from common.params import Params
+from common.realtime import Priority, config_realtime_process
 from collections import defaultdict
 import cereal.messaging as messaging
 from selfdrive.version import version, dirty
@@ -253,7 +254,6 @@ class MapsdThread(LoggerThread):
         max_speed_ahead = None
         max_speed_ahead_dist = None
         max_speed_prev = 0
-        had_good_gps = False
         start = time.time()
         while True:
             if time.time() - start > 0.2:
@@ -267,38 +267,12 @@ class MapsdThread(LoggerThread):
             query_lock = self.sharedParams.get('query_lock', None)
             query_lock.acquire()
             gps = self.sharedParams['last_gps']
-            traffic_status = self.sharedParams['traffic_status']
-            traffic_confidence = self.sharedParams['traffic_confidence']
-            last_not_none_signal = self.sharedParams['last_not_none_signal']
-            speedLimittraffic = self.sharedParams['speedLimittraffic']
-            speedLimittrafficvalid = self.sharedParams['speedLimittrafficvalid']
-            speedLimittrafficAdvisory = self.sharedParams['speedLimittrafficAdvisory']
-            speedLimittrafficAdvisoryvalid = self.sharedParams['speedLimittrafficAdvisoryvalid']
             query_lock.release()
             if gps is None:
                 continue
             fix_ok = gps.flags & 1
             self.logger.debug("fix_ok = %s" % str(fix_ok))
 
-            if gps.accuracy > 3.5:
-                if gps.accuracy > 5.0:
-                    if not speedLimittrafficvalid:
-                        if had_good_gps:
-                            query_lock = self.sharedParams.get('query_lock', None)
-                            query_lock.acquire()
-                            self.sharedParams['speedLimittrafficvalid'] = True
-                            if max_speed is not None:
-                                speedLimittraffic = max_speed * 3.6
-                            else:
-                                speedLimittraffic = 130
-                            query_lock.release()
-                        else:
-                            fix_ok = False
-                    had_good_gps = False
-                if not speedLimittrafficvalid and not had_good_gps:
-                    fix_ok = False
-            elif not had_good_gps:
-                had_good_gps = True
             if not fix_ok or self.sharedParams['last_query_result'] is None or not self.sharedParams['cache_valid']:
                 self.logger.debug("fix_ok %s" % fix_ok)
                 self.logger.error("Error in fix_ok logic")
@@ -401,9 +375,9 @@ class MapsdThread(LoggerThread):
                 max_speed_ahead = None
                 max_speed_ahead_dist = None
                 if max_speed is not None:
-                    max_speed_ahead, max_speed_ahead_dist = cur_way.max_speed_ahead(max_speed, lat, lon, heading, MAPS_LOOKAHEAD_DISTANCE, traffic_status, traffic_confidence, last_not_none_signal)
+                    max_speed_ahead, max_speed_ahead_dist = cur_way.max_speed_ahead(max_speed, lat, lon, heading, MAPS_LOOKAHEAD_DISTANCE)
                 else:
-                    max_speed_ahead, max_speed_ahead_dist = cur_way.max_speed_ahead(speed*1.1, lat, lon, heading, MAPS_LOOKAHEAD_DISTANCE, traffic_status, traffic_confidence, last_not_none_signal)
+                    max_speed_ahead, max_speed_ahead_dist = cur_way.max_speed_ahead(speed*1.1, lat, lon, heading, MAPS_LOOKAHEAD_DISTANCE)
                     # TODO: anticipate T junctions and right and left hand turns based on indicator
 
                 if max_speed_ahead is not None and max_speed_ahead_dist is not None:
@@ -412,19 +386,7 @@ class MapsdThread(LoggerThread):
                     dat.liveMapData.speedLimitAheadDistance = float(max_speed_ahead_dist)
                 if max_speed is not None:
                     if abs(max_speed - max_speed_prev) > 0.1:
-                        query_lock = self.sharedParams.get('query_lock', None)
-                        query_lock.acquire()
-                        self.sharedParams['speedLimittrafficvalid'] = False
-                        query_lock.release()
                         max_speed_prev = max_speed
-                advisory_max_speed = cur_way.advisory_max_speed()
-                if speedLimittrafficAdvisoryvalid:
-                    dat.liveMapData.speedAdvisoryValid = True
-                    dat.liveMapData.speedAdvisory = speedLimittrafficAdvisory / 3.6
-                else:
-                    if advisory_max_speed is not None:
-                        dat.liveMapData.speedAdvisoryValid = True
-                        dat.liveMapData.speedAdvisory = advisory_max_speed
 
                 # Curvature
                 dat.liveMapData.curvatureValid = curvature_valid
@@ -437,20 +399,9 @@ class MapsdThread(LoggerThread):
                     dat.liveMapData.roadCurvature = [float(x) for x in curvature]
             else:
                 self.sharedParams['osm_way_id'] = 0
-            if self.sharedParams['speedLimittrafficvalid']:
-                if speedLimittraffic > 0.1:
-                    dat.liveMapData.speedLimitValid = True
-                    dat.liveMapData.speedLimit = speedLimittraffic / 3.6
-                    map_valid = False
-                else:
-                    query_lock = self.sharedParams.get('query_lock', None)
-                    query_lock.acquire()
-                    self.sharedParams['speedLimittrafficvalid'] = False
-                    query_lock.release()
-            else:
-                if max_speed is not None and map_valid:
-                    dat.liveMapData.speedLimitValid = True
-                    dat.liveMapData.speedLimit = max_speed
+            if max_speed is not None and map_valid:
+                dat.liveMapData.speedLimitValid = True
+                dat.liveMapData.speedLimit = max_speed
 
             dat.liveMapData.mapValid = map_valid
             self.logger.debug("Sending ... liveMapData ... %s", str(dat))
@@ -488,77 +439,6 @@ class MessagedGPSThread(LoggerThread):
             query_lock.release()
             self.logger.debug("setting last_gps to %s" % str(gps))
 
-class MessagedThread(LoggerThread):
-    def __init__(self, threadID, name, sharedParams={}):
-        # invoke parent constructor
-        LoggerThread.__init__(self, threadID, name)
-        self.sharedParams = sharedParams
-        self.sm = messaging.SubMaster(['liveTrafficData','trafficModelEvent'])
-        self.logger.debug("entered messaged_thread, ... %s" % str(self.sm))
-    def run(self):
-        self.logger.debug("Entered run method for thread :" + str(self.name))
-        last_not_none_signal = 'NONE'
-        last_not_none_signal_counter = 0
-        traffic_confidence = 0
-        traffic_status = 'NONE'
-        speedLimittraffic = 0
-        speedLimittraffic_prev = 0
-        speedLimittrafficAdvisoryvalid = False
-        speedLimittrafficAdvisory = 0
-        start = time.time()
-        while True:
-            if time.time() - start > 0.2:
-                print("Mapd MessagedThread lagging by: %s" % str(time.time() - start - 0.1))
-            if time.time() - start < 0.1:
-                time.sleep(0.01)
-                continue
-            else:
-                start = time.time()
-            self.logger.debug("starting new cycle in endless loop")
-            self.sm.update(0)
-            if self.sm.updated['trafficModelEvent']:
-              traffic_status = self.sm['trafficModelEvent'].status
-              traffic_confidence = round(self.sm['trafficModelEvent'].confidence * 100, 2)
-              if traffic_confidence >= 50 and (traffic_status == 'GREEN' or traffic_status == 'SLOW'):
-                last_not_none_signal = traffic_status
-                last_not_none_signal_counter = 0
-              elif traffic_confidence >= 50 and traffic_status == 'NONE' and last_not_none_signal != 'NONE':
-                if last_not_none_signal_counter < 25:
-                  last_not_none_signal_counter = last_not_none_signal_counter + 1
-                  #print("self.last_not_none_signal_counter")
-                  #print(self.last_not_none_signal_counter)
-                  #print("self.last_not_none_signal")
-                  #print(self.last_not_none_signal)
-                else:
-                  last_not_none_signal = 'NONE'
-            query_lock = self.sharedParams.get('query_lock', None)
-            query_lock.acquire()
-            speedLimittrafficvalid = self.sharedParams['speedLimittrafficvalid']
-            query_lock.release()
-            traffic = self.sm['liveTrafficData']
-            if traffic.speedLimitValid:
-                speedLimittraffic = traffic.speedLimit
-                if abs(speedLimittraffic_prev - speedLimittraffic) > 0.1:
-                    speedLimittrafficvalid = True
-                    speedLimittraffic_prev = speedLimittraffic
-            else:
-                speedLimittrafficvalid = False
-            if traffic.speedAdvisoryValid:
-                speedLimittrafficAdvisory = traffic.speedAdvisory
-                speedLimittrafficAdvisoryvalid = True
-            else:
-                speedLimittrafficAdvisoryvalid = False
-
-            query_lock.acquire()
-            self.sharedParams['traffic_status'] = traffic_status
-            self.sharedParams['traffic_confidence'] = traffic_confidence
-            self.sharedParams['last_not_none_signal'] = last_not_none_signal
-            self.sharedParams['speedLimittraffic'] = speedLimittraffic
-            self.sharedParams['speedLimittrafficvalid'] = speedLimittrafficvalid
-            self.sharedParams['speedLimittrafficAdvisory'] = speedLimittrafficAdvisory
-            self.sharedParams['speedLimittrafficAdvisoryvalid'] = speedLimittrafficAdvisoryvalid
-            query_lock.release()
-
 def main():
     params = Params()
     dongle_id = params.get("DongleId")
@@ -572,29 +452,18 @@ def main():
     last_query_result = None
     last_query_pos = None
     cache_valid = False
-    traffic_status = 'None'
-    traffic_confidence = 100
-    last_not_none_signal = 'None'
-    speedLimittraffic = 0
-    speedLimittrafficvalid = False
-    speedLimittrafficAdvisory = 0
     osm_way_id = 0
-    speedLimittrafficAdvisoryvalid = False
     sharedParams = {'last_gps' : last_gps, 'query_lock' : query_lock, 'last_query_result' : last_query_result, \
-                    'last_query_pos' : last_query_pos, 'cache_valid' : cache_valid, 'traffic_status' : traffic_status, \
-                    'traffic_confidence' : traffic_confidence, 'last_not_none_signal' : last_not_none_signal, \
-                    'speedLimittraffic' : speedLimittraffic, 'speedLimittrafficvalid' : speedLimittrafficvalid, \
-                    'speedLimittrafficAdvisory' : speedLimittrafficAdvisory, 'speedLimittrafficAdvisoryvalid' : speedLimittrafficAdvisoryvalid, 'osm_way_id' : osm_way_id}
+                    'last_query_pos' : last_query_pos, 'cache_valid' : cache_valid, \
+                    'osm_way_id' : osm_way_id}
 
     qt = QueryThread(1, "QueryThread", sharedParams=sharedParams)
     mt = MapsdThread(2, "MapsdThread", sharedParams=sharedParams)
     mggps = MessagedGPSThread(3, "MessagedGPSThread", sharedParams=sharedParams)
-    mg = MessagedThread(4, "MessagedThread", sharedParams=sharedParams)
 
     qt.start()
     mt.start()
     mggps.start()
-    mg.start()
 
 if __name__ == "__main__":
     main()

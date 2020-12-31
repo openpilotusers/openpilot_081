@@ -14,10 +14,6 @@ GearShifter = car.CarState.GearShifter
 class CarState(CarStateBase):
   def __init__(self, CP):
     super().__init__(CP)
-    self.engaged_when_gas_was_pressed = False
-    self.gas_pressed = False
-
-    self.smartspeed = 0
 
     #Auto detection for setup
     self.no_radar = CP.sccBus == -1
@@ -90,6 +86,7 @@ class CarState(CarStateBase):
     ret.leftBlinker, ret.rightBlinker = self.update_blinker(cp)
 
     self.VSetDis = cp_scc.vl["SCC11"]['VSetDis']
+    ret.vSetDis = self.VSetDis
     self.clu_Vanz = cp.vl["CLU11"]["CF_Clu_Vanz"]
     lead_objspd = cp_scc.vl["SCC11"]['ACC_ObjRelSpd']
     self.lead_objspd = lead_objspd * CV.MS_TO_KPH
@@ -158,19 +155,6 @@ class CarState(CarStateBase):
 
     self.cruiseGapSet = cp_scc.vl["SCC11"]['TauGapSet']
     ret.limitSpeedmanual = self.CP.limitSpeedmanual
-
-    self.sm.update(0)
-    self.smartspeed = self.sm['liveMapData'].speedLimit
-
-    self.pcm_acc_active = (cp_scc.vl["SCC12"]['ACCMode'] != 0)
-    if ret.gasPressed and not self.gas_pressed:
-      self.engaged_when_gas_was_pressed = self.pcm_acc_active
-    if ((ret.gasPressed) or (self.gas_pressed and not ret.gasPressed)) and self.engaged_when_gas_was_pressed and ret.vEgo > self.smartspeed:
-      dat = messaging.new_message('liveTrafficData')
-      dat.liveTrafficData.speedLimitValid = True
-      dat.liveTrafficData.speedLimit = ret.vEgo * 3.6
-      self.pm.send('liveTrafficData', dat)
-    self.gas_pressed = ret.gasPressed
 
     # TODO: refactor gear parsing in function
     # Gear Selection via Cluster - For those Kia/Hyundai which are not fully discovered, we can use the Cluster Indicator for Gear Selection,
