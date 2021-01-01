@@ -48,6 +48,7 @@ void ui_init(UIState *s) {
   read_param(&s->nDebugUi2, "DebugUi2");
   read_param(&s->nOpkrBlindSpotDetect, "OpkrBlindSpotDetect");
   read_param(&s->lat_control, "LateralControlMethod");
+  read_param(&s->driving_record, "OpkrDrivingRecord");
 
   s->fb = framebuffer_init("ui", 0, true, &s->fb_w, &s->fb_h);
   assert(s->fb);
@@ -139,6 +140,7 @@ void update_sockets(UIState *s) {
 
     s->scene.angleSteers = scene.controls_state.getAngleSteers();
     s->scene.steerOverride = scene.controls_state.getSteerOverride();
+    s->scene.v_ego = scene.controls_state.getVEgo();
 
     s->scene.lateralControlMethod = scene.controls_state.getLateralControlMethod();
     if (s->scene.lateralControlMethod == 0) {

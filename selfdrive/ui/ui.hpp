@@ -169,6 +169,7 @@ typedef struct UIScene {
   float radarDistance;
   int long_plan_source;
   bool standStill;
+  float v_ego;
 
   cereal::HealthData::HwType hwType;
   int satelliteCount;
@@ -319,6 +320,7 @@ typedef struct UIState {
   int nDebugUi2;
   int nOpkrBlindSpotDetect;
   int lat_control;
+  int driving_record;
 
   uint64_t last_athena_ping;
   uint64_t started_frame;
