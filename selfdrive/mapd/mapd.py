@@ -13,7 +13,6 @@ import logging.handlers
 from scipy import spatial
 import selfdrive.crash as crash
 from common.params import Params
-from common.realtime import Priority, config_realtime_process
 from collections import defaultdict
 import cereal.messaging as messaging
 from selfdrive.version import version, dirty
