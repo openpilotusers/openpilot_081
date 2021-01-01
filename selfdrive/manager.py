@@ -637,6 +637,7 @@ def main():
     ("OpkrVariableCruiseProfile", "0"),
     ("OpkrLiveTune", "0"),
     ("OpkrEnableMap", "1"),
+    ("OpkrDrivingRecord", "0"),
   ]
 
   # set unset params

@@ -136,6 +136,7 @@ keys = {
   b"OpkrVariableCruiseProfile": [TxType.PERSISTENT],
   b"OpkrLiveTune": [TxType.PERSISTENT],
   b"OpkrEnableMap": [TxType.PERSISTENT],
+  b"OpkrDrivingRecord": [TxType.PERSISTENT],
 }
 
 def ensure_bytes(v):
