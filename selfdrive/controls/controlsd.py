@@ -303,10 +303,7 @@ class Controls:
     if not self.CP.enableCruise:
       self.v_cruise_kph = update_v_cruise(self.v_cruise_kph, CS.buttonEvents, self.enabled, self.is_metric)
     elif self.CP.enableCruise and CS.cruiseState.enabled:
-      if CS.buttonEvents == ButtonType.accelCruise and int(Params().get('OpkrVariableCruise')) == 1 and CS.cruiseState.modeSel != 0 and CS.vSetDis < self.v_cruise_kph_last:
-        self.v_cruise_kph = self.v_cruise_kph_last
-      else:
-        self.v_cruise_kph = CS.cruiseState.speed * CV.MS_TO_KPH
+      self.v_cruise_kph = CS.cruiseState.speed * CV.MS_TO_KPH
 
     # decrease the soft disable timer at every step, as it's reset on
     # entrance in SOFT_DISABLING state
