@@ -2095,22 +2095,6 @@ struct DynamicFollowButton {
   status @0 :UInt16;
 }
 
-struct LiveTrafficData {
-  speedLimitValid @0 :Bool;
-  speedLimit @1 :Float32;
-  speedAdvisoryValid @2 :Bool;
-  speedAdvisory @3 :Float32;
-}
-
-struct TrafficModelRaw {
-  prediction @0 :List(Float32);
-}
-
-struct TrafficModelEvent {
-  status @0 :Text;
-  confidence @1 :Float32;
-}
-
 struct ModelLongButton {
   enabled @0 :Bool;
 }
@@ -2200,8 +2184,5 @@ struct Event {
     dynamicFollowData @78 :DynamicFollowData;
     dynamicFollowButton @79 :DynamicFollowButton;
     modelLongButton @80 :ModelLongButton;
-    liveTrafficData @81:LiveTrafficData;
-    trafficModelRaw @82: TrafficModelRaw;
-    trafficModelEvent @83: TrafficModelEvent;
   }
 }

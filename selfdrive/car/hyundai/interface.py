@@ -29,26 +29,27 @@ class CarInterface(CarInterfaceBase):
     ret.safetyModel = car.CarParams.SafetyModel.hyundai
 
     params = Params()
-    PidKp = int(params.get('PidKp')) * 0.01
-    PidKi = int(params.get('PidKi')) * 0.001
-    PidKf = int(params.get('PidKf')) * 0.00001
-    InnerLoopGain = int(params.get('InnerLoopGain')) * 0.1
-    OuterLoopGain = int(params.get('OuterLoopGain')) * 0.1
-    TimeConstant = int(params.get('TimeConstant')) * 0.1
-    ActuatorEffectiveness = int(params.get('ActuatorEffectiveness')) * 0.1
-    Scale = int(params.get('Scale')) * 1.0
-    LqrKi = int(params.get('LqrKi')) * 0.001
-    DcGain = int(params.get('DcGain')) * 0.0001
-    LqrSteerMaxV = int(params.get('SteerMaxvAdj')) * 0.1
+    PidKp = float(int(params.get('PidKp')) * 0.01)
+    PidKi = float(int(params.get('PidKi')) * 0.001)
+    PidKd = float(int(params.get('PidKd')) * 0.01)
+    PidKf = float(int(params.get('PidKf')) * 0.00001)
+    InnerLoopGain = float(int(params.get('InnerLoopGain')) * 0.1)
+    OuterLoopGain = float(int(params.get('OuterLoopGain')) * 0.1)
+    TimeConstant = float(int(params.get('TimeConstant')) * 0.1)
+    ActuatorEffectiveness = float(int(params.get('ActuatorEffectiveness')) * 0.1)
+    Scale = float(int(params.get('Scale')) * 1.0)
+    LqrKi = float(int(params.get('LqrKi')) * 0.001)
+    DcGain = float(int(params.get('DcGain')) * 0.0001)
+    LqrSteerMaxV = float(int(params.get('SteerMaxvAdj')) * 0.1)
 
     # Most Hyundai car ports are community features for now
     ret.communityFeature = False
 
-    tire_stiffness_factor = int(params.get('TireStiffnessFactorAdj')) * 0.01
-    ret.steerActuatorDelay = int(params.get('SteerActuatorDelayAdj')) * 0.01
-    ret.steerRateCost = int(params.get('SteerRateCostAdj')) * 0.01
-    ret.steerLimitTimer = int(params.get('SteerLimitTimerAdj')) * 0.01
-    ret.steerRatio = int(params.get('SteerRatioAdj')) * 0.1
+    tire_stiffness_factor = float(int(params.get('TireStiffnessFactorAdj')) * 0.01)
+    ret.steerActuatorDelay = float(int(params.get('SteerActuatorDelayAdj')) * 0.01)
+    ret.steerRateCost = float(int(params.get('SteerRateCostAdj')) * 0.01)
+    ret.steerLimitTimer = float(int(params.get('SteerLimitTimerAdj')) * 0.01)
+    ret.steerRatio = float(int(params.get('SteerRatioAdj')) * 0.1)
 
     if candidate == CAR.GENESIS:
       ret.mass = 1900. + STD_CARGO_KG
@@ -127,6 +128,9 @@ class CarInterface(CarInterfaceBase):
       ret.lateralTuning.pid.kpV = [0.1, PidKp]
       ret.lateralTuning.pid.kiBP = [0., 9.]
       ret.lateralTuning.pid.kiV = [0.01, PidKi]
+      ret.lateralTuning.pid.kdBP = [0.]
+      ret.lateralTuning.pid.kdV = [PidKd]
+      ret.lateralTuning.pid.newKfTuned = True
     elif int(params.get('LateralControlMethod')) == 1:
       ret.lateralTuning.init('indi')
       ret.lateralTuning.indi.innerLoopGain = InnerLoopGain
@@ -143,7 +147,8 @@ class CarInterface(CarInterfaceBase):
       ret.lateralTuning.lqr.k = [-110., 451.]
       ret.lateralTuning.lqr.l = [0.33, 0.318]
       ret.lateralTuning.lqr.dcGain = DcGain
-
+      ret.steerMaxV = [LqrSteerMaxV]
+      ret.steerMaxBP = [0.]
 
     ret.longitudinalTuning.kpBP = [0., 1., 10., 35.]
     ret.longitudinalTuning.kpV = [0.8, 0.7, 0.6, 0.55]
@@ -158,9 +163,6 @@ class CarInterface(CarInterfaceBase):
     ret.gasMaxV = [2., 2., 2., 2., 2.]
     ret.brakeMaxBP = [0., 5.]
     ret.brakeMaxV = [4.0, 4.0]
-
-    ret.steerMaxV = [LqrSteerMaxV]
-    ret.steerMaxBP = [0.]
 
 
     # these cars require a special panda safety mode due to missing counters and checksums in the messages

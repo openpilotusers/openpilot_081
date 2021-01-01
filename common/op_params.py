@@ -111,10 +111,7 @@ class opParams:
                         'rsa_max_speed': Param(24.5, VT.number, 'Speed limit to ignore RSA in m/s'),
                         'smart_speed': Param(True, bool, 'Whether to use Smart Speed for drives above smart_speed_max_vego'),
                         'smart_speed_max_vego': Param(26.8, VT.number, 'Speed limit to ignore Smartspeed in m/s'),
-                        'speed_offset': Param(0, VT.number, 'Speed limit offset in m/s', live=True),
-                        'traffic_light_alerts': Param(False, bool, "Switch off the traffic light alerts"),
-                        'traffic_lights': Param(False, bool, "Should Openpilot stop for traffic lights"),
-                        'traffic_lights_without_direction': Param(False, bool, "Should Openpilot stop for traffic lights without a direction specified")}
+                        'speed_offset': Param(0, VT.number, 'Speed limit offset in m/s', live=True)}
 
 
 
