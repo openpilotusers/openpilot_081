@@ -76,7 +76,6 @@ class Controls:
     self.df_manager = dfManager(self.op_params)
     self.hide_auto_df_alerts = self.op_params.get('hide_auto_df_alerts')
     self.support_white_panda = self.op_params.get('support_white_panda')
-    self.traffic_light_alerts = self.op_params.get('traffic_light_alerts')
     self.last_model_long = False
 
     self.can_sock = can_sock
