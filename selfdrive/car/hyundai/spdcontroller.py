@@ -157,10 +157,10 @@ class SpdController():
         if CS.acc_active:
             delta_vsetdis = abs(int(CS.VSetDis) - self.prev_VSetDis)
             if self.prev_clu_CruiseSwState != CS.cruise_buttons:
-                if CS.cruise_buttons:
+                if CS.cruise_buttons == Buttons.RES_ACCEL or CS.cruise_buttons == Buttons.SET_DECEL:
                     self.prev_VSetDis = int(CS.VSetDis)
                 elif CS.driverOverride:
-                    set_speed_kph = int(CS.VSetDis)          
+                    set_speed_kph = int(CS.VSetDis)
                 elif self.prev_clu_CruiseSwState == Buttons.RES_ACCEL:   # up 
                     if self.curise_set_first:
                         self.curise_set_first = 0
@@ -179,7 +179,7 @@ class SpdController():
                         set_speed_kph -= 1
 
                 self.prev_clu_CruiseSwState = CS.cruise_buttons
-            elif CS.cruise_buttons and delta_vsetdis > 0:
+            elif (CS.cruise_buttons == Buttons.RES_ACCEL or CS.cruise_buttons == Buttons.SET_DECEL) and delta_vsetdis > 0:
                 self.curise_sw_check = True
                 set_speed_kph = int(CS.VSetDis)
         else:
@@ -322,7 +322,8 @@ class SpdController():
 
     def update(self, CS, sm, CC ):
         self.cruise_set_mode = CS.out.cruiseState.modeSel
-        self.cruise_set_speed_kph = int(round(CS.out.cruiseState.speed * CV.MS_TO_KPH))
+        #self.cruise_set_speed_kph = int(round(CS.out.cruiseState.speed * CV.MS_TO_KPH))
+        self.cruise_set_speed_kph = int(round(CC.vCruiseSet))
         if CS.driverOverride == 2 or not CS.acc_active or CS.cruise_buttons == Buttons.RES_ACCEL or CS.cruise_buttons == Buttons.SET_DECEL:
             self.resume_cnt = 0
             self.btn_type = Buttons.NONE

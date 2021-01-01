@@ -167,6 +167,7 @@ typedef struct UIScene {
   int lateralControlMethod;
   float radarDistance;
   bool standStill;
+  float limitSpeedCamera;
 
   cereal::HealthData::HwType hwType;
   int satelliteCount;

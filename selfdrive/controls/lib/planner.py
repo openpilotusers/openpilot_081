@@ -98,6 +98,7 @@ class Planner():
     self.first_loop = True
     self.offset = 0
     self.last_time = 0
+    self.v_speedlimit_ahead = 0
     self.speed_ahead_distance_prev = 1000
 
   def choose_solution(self, v_cruise_setpoint, enabled):
@@ -160,7 +161,6 @@ class Planner():
     speed_ahead_distance = default_brake_distance
     v_speedlimit = NO_CURVATURE_SPEED
     v_curvature_map = NO_CURVATURE_SPEED
-    v_speedlimit_ahead = 0
     now = datetime.now()
     try:
       if sm['liveMapData'].speedLimitValid and osm and self.osm and (sm['liveMapData'].lastGps.timestamp -time.mktime(now.timetuple()) * 1000) < 10000 and (smart_speed or smart_speed_max_vego > v_ego):
@@ -229,31 +229,31 @@ class Planner():
       #  v_speedlimit_ahead = v_ego
 
       if (v_ego*3.6) <= 50:
-        if sm['liveMapData'].speedLimitAhead and sm['liveMapData'].speedLimitAheadDistance < (v_ego*3.6*2.5):
-          if self.speed_ahead_distance_prev > sm['liveMapData'].speedLimitAheadDistance:
+        if sm['liveMapData'].speedLimitAhead > 29 and 0 < sm['liveMapData'].speedLimitAheadDistance < (v_ego*3.6*2.5):
+          if self.speed_ahead_distance_prev >= sm['liveMapData'].speedLimitAheadDistance - 5:
             self.speed_ahead_distance_prev = sm['liveMapData'].speedLimitAheadDistance
-            v_speedlimit_ahead = sm['liveMapData'].speedLimitAhead
+            self.v_speedlimit_ahead = sm['liveMapData'].speedLimitAhead
           else:
-            v_speedlimit_ahead = 0
-        elif not sm['liveMapData'].speedLimitAhead:
+            self.v_speedlimit_ahead = 0
+        elif sm['liveMapData'].speedLimitAhead <= 29:
           self.speed_ahead_distance_prev = 1000
       elif (v_ego*3.6) <= 70:
-        if sm['liveMapData'].speedLimitAhead and sm['liveMapData'].speedLimitAheadDistance < (v_ego*3.6*3.5):
-          if self.speed_ahead_distance_prev > sm['liveMapData'].speedLimitAheadDistance:
+        if sm['liveMapData'].speedLimitAhead > 29 and 0 < sm['liveMapData'].speedLimitAheadDistance < (v_ego*3.6*3.5):
+          if self.speed_ahead_distance_prev >= sm['liveMapData'].speedLimitAheadDistance - 5:
             self.speed_ahead_distance_prev = sm['liveMapData'].speedLimitAheadDistance
-            v_speedlimit_ahead = sm['liveMapData'].speedLimitAhead
+            self.v_speedlimit_ahead = sm['liveMapData'].speedLimitAhead
           else:
-            v_speedlimit_ahead = 0
-        elif not sm['liveMapData'].speedLimitAhead:
+            self.v_speedlimit_ahead = 0
+        elif sm['liveMapData'].speedLimitAhead <= 29:
           self.speed_ahead_distance_prev = 1000
       elif (v_ego*3.6) > 70:
-        if sm['liveMapData'].speedLimitAhead and sm['liveMapData'].speedLimitAheadDistance < (v_ego*3.6*4.5):
-          if self.speed_ahead_distance_prev > sm['liveMapData'].speedLimitAheadDistance:
+        if sm['liveMapData'].speedLimitAhead > 29 and 0 < sm['liveMapData'].speedLimitAheadDistance < (v_ego*3.6*4.5):
+          if self.speed_ahead_distance_prev >= sm['liveMapData'].speedLimitAheadDistance - 5:
             self.speed_ahead_distance_prev = sm['liveMapData'].speedLimitAheadDistance
-            v_speedlimit_ahead = sm['liveMapData'].speedLimitAhead
+            self.v_speedlimit_ahead = sm['liveMapData'].speedLimitAhead
           else:
-            v_speedlimit_ahead = 0
-        elif not sm['liveMapData'].speedLimitAhead:
+            self.v_speedlimit_ahead = 0
+        elif sm['liveMapData'].speedLimitAhead <= 29:
           self.speed_ahead_distance_prev = 1000
 
       #v_cruise_setpoint = min([v_cruise_setpoint, v_curvature_map, v_speedlimit, v_speedlimit_ahead])
@@ -348,7 +348,7 @@ class Planner():
     plan_send.plan.vRel2 = lead_2.vRel
     plan_send.plan.status2 = lead_2.status
     plan_send.plan.targetSpeed = v_cruise_setpoint * CV.MS_TO_KPH
-    plan_send.plan.targetSpeedCamera = v_speedlimit_ahead * CV.MS_TO_KPH
+    plan_send.plan.targetSpeedCamera = self.v_speedlimit_ahead * CV.MS_TO_KPH
 
     pm.send('plan', plan_send)
 

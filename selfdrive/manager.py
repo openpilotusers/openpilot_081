@@ -448,7 +448,11 @@ def manager_thread():
 
   params = Params()
 
-  EnableLogger = int(params.get('OpkrEnableLogger'))     
+  EnableLogger = int(params.get('OpkrEnableLogger'))
+  EnableMap = int(params.get('OpkrEnableMap'))
+
+  if not EnableMap:
+    car_started_processes.remove( 'mapd' )
 
   if not EnableLogger:
     car_started_processes.remove( 'loggerd' )
@@ -632,6 +636,7 @@ def main():
     ("FingerprintTwoSet", "1"),
     ("OpkrVariableCruiseProfile", "0"),
     ("OpkrLiveTune", "0"),
+    ("OpkrEnableMap", "1"),
   ]
 
   # set unset params

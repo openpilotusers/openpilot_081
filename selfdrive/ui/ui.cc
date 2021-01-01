@@ -147,6 +147,8 @@ void update_sockets(UIState *s) {
     s->scene.alertTextMsg1 = scene.controls_state.getAlertTextMsg1(); //debug1
     s->scene.alertTextMsg2 = scene.controls_state.getAlertTextMsg2(); //debug2
 
+    s->scene.limitSpeedCamera = scene.controls_state.getLimitSpeedCamera();
+
     // TODO: the alert stuff shouldn't be handled here
     auto alert_sound = scene.controls_state.getAlertSound();
     if (scene.alert_type.compare(scene.controls_state.getAlertType()) != 0) {

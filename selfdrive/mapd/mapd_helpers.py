@@ -247,7 +247,7 @@ class Way:
 
     speed_ahead = None
     speed_ahead_dist = None
-    lookahead_ways = 5
+    lookahead_ways = 2
     way = self
     for i in range(lookahead_ways):
       way_pts = way.points_in_car_frame(lat, lon, heading, True)
@@ -282,7 +282,7 @@ class Way:
             is_opposite = abs(car_direction - camera_direction)
             if 225 > is_opposite > 135:
               speed_ahead = int(n.tags['maxspeed']) / 3.6
-              speed_ahead_dist = max(0. , way_pts[count, 0] - 5.0)
+              speed_ahead_dist = max(0., way_pts[count, 0] - 5.0)
               loop_must_break = True
               break
           count += 1

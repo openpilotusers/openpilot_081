@@ -119,6 +119,7 @@ class CarState(CarStateBase):
       ret.cruiseState.speed = 0
     self.cruise_main_button = cp.vl["CLU11"]["CF_Clu_CruiseSwMain"]
     self.cruise_buttons = cp.vl["CLU11"]["CF_Clu_CruiseSwState"]
+    ret.cruiseButtons = self.cruise_buttons
 
     # TODO: Find brake pressure
     ret.brake = 0

@@ -120,10 +120,10 @@ class QueryThread(LoggerThread):
         start = time.time()
         radius = 3000
         while True:
-            if time.time() - start > 2.0:
+            if time.time() - start > 2.5:
                 print("Mapd QueryThread lagging by: %s" % str(time.time() - start - 1.0))
-            if time.time() - start < 1.0:
-                time.sleep(0.1)
+            if time.time() - start < 1.5:
+                time.sleep(1.0)
                 continue
             else:
                 start = time.time()
@@ -256,10 +256,10 @@ class MapsdThread(LoggerThread):
         max_speed_prev = 0
         start = time.time()
         while True:
-            if time.time() - start > 0.2:
+            if time.time() - start > 2.5:
                 print("Mapd MapsdThread lagging by: %s" % str(time.time() - start - 0.1))
-            if time.time() - start < 0.1:
-                time.sleep(0.01)
+            if time.time() - start < 1.5:
+                time.sleep(1.0)
                 continue
             else:
                 start = time.time()
@@ -419,10 +419,10 @@ class MessagedGPSThread(LoggerThread):
         gps = None
         start = time.time()
         while True:
-            if time.time() - start > 0.2:
+            if time.time() - start > 2.5:
                 print("Mapd MessagedGPSThread lagging by: %s" % str(time.time() - start - 0.1))
-            if time.time() - start < 0.1:
-                time.sleep(0.01)
+            if time.time() - start < 1.5:
+                time.sleep(1.0)
                 continue
             else:
                 start = time.time()

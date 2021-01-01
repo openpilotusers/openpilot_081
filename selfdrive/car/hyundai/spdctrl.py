@@ -28,8 +28,8 @@ class Spdctrl(SpdController):
         self.target_speed_camera = 0
 
     def update_lead(self, sm, CS, dRel, yRel, vRel):
-        self.osm_enable = Params().get("LimitSetSpeed", encoding='utf8') == "1"
-        self.osm_enable_camera = Params().get("LimitSetSpeedCamera", encoding='utf8') == "1"
+        self.osm_enable = int(Params().get("LimitSetSpeed", encoding='utf8')) == 1
+        self.osm_enable_camera = int(Params().get("LimitSetSpeedCamera", encoding='utf8')) == 1
         self.osm_spdlimit_offset = int(Params().get("OpkrSpeedLimitOffset", encoding='utf8'))
         plan = sm['plan']
         dRele = plan.dRel1 #EON Lead
@@ -44,10 +44,10 @@ class Spdctrl(SpdController):
         
         if self.osm_enable:
             self.target_speed = self.target_speed_road
-        elif self.target_speed_camera < 30:
+        elif self.target_speed_camera <= 29:
             self.osm_enable_camera = False
             self.target_speed = 0
-        elif self.osm_enable_camera and self.target_speed_camera >= 30:
+        elif self.osm_enable_camera and self.target_speed_camera > 29:
             self.target_speed = self.target_speed_camera
         else:
             self.target_speed = 0
@@ -96,8 +96,8 @@ class Spdctrl(SpdController):
         else:
             d_delta2 = 0
  
-        if CS.driverAcc_time: #운전자가 가속페달 밟으면 크루즈 설정속도를 현재속도+5으로 동기화
-            lead_set_speed = int(round(CS.clu_Vanz)) + 5
+        if CS.driverAcc_time: #운전자가 가속페달 밟으면 크루즈 설정속도를 현재속도로 동기화
+            lead_set_speed = int(round(CS.clu_Vanz))
             self.seq_step_debug = "운전자가속"
             lead_wait_cmd = 15
         elif int(round(self.target_speed)) < int(CS.VSetDis) and (self.osm_enable or self.osm_enable_camera) and ((int(round(self.target_speed)) < int(round(self.cruise_set_speed_kph))) and self.target_speed != 0):

@@ -560,6 +560,7 @@ struct ControlsState @0x97ff69c53601abf1 {
   alertTextMsg1  @60 :Text;
   alertTextMsg2  @61 :Text;
   lateralControlMethod  @62 :UInt8;
+  limitSpeedCamera @63 :Float32;
 
   lateralControlState :union {
     indiState @52 :LateralINDIState;

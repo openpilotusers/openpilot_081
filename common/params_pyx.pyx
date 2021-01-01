@@ -135,6 +135,7 @@ keys = {
   b"FingerprintTwoSet": [TxType.PERSISTENT],
   b"OpkrVariableCruiseProfile": [TxType.PERSISTENT],
   b"OpkrLiveTune": [TxType.PERSISTENT],
+  b"OpkrEnableMap": [TxType.PERSISTENT],
 }
 
 def ensure_bytes(v):
