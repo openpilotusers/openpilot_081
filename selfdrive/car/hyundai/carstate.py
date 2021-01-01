@@ -11,6 +11,8 @@ from opendbc.can.parser import CANParser
 from selfdrive.config import Conversions as CV
 from common.params import Params
 
+GearShifter = car.CarState.GearShifter
+
 class CarState(CarStateBase):
   def __init__(self, CP):
     super().__init__(CP)
