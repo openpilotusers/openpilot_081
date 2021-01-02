@@ -299,9 +299,9 @@ class Controls:
     if not self.CP.enableCruise:
       self.v_cruise_kph = update_v_cruise(self.v_cruise_kph, CS.buttonEvents, self.enabled, self.is_metric)
     elif self.CP.enableCruise and CS.cruiseState.enabled:
-      if CS.cruiseButtons == Buttons.RES_ACCEL and int(Params().get('OpkrVariableCruise')) == 1 and CS.cruiseState.modeSel != 0 and CS.vSetDis < self.v_cruise_kph_last:
+      if CS.cruiseButtons == Buttons.RES_ACCEL and int(Params().get('OpkrVariableCruise')) == 1 and CS.cruiseState.modeSel != 0 and CS.vSetDis < (self.v_cruise_kph_last - 1):
         self.v_cruise_kph = self.v_cruise_kph_last
-      elif CS.cruiseButtons == Buttons.RES_ACCEL and int(Params().get('OpkrVariableCruise')) == 1 and CS.cruiseState.modeSel != 0 and self.v_cruise_kph_last <= round(CS.vEgo*CV.MS_TO_KPH):
+      elif CS.cruiseButtons == Buttons.RES_ACCEL and int(Params().get('OpkrVariableCruise')) == 1 and CS.cruiseState.modeSel != 0 and 30 <= self.v_cruise_kph_last <= round(CS.vEgo*CV.MS_TO_KPH):
         self.v_cruise_kph = round(CS.vEgo*CV.MS_TO_KPH)
         self.v_cruise_kph_last = self.v_cruise_kph
       elif CS.cruiseButtons == Buttons.RES_ACCEL or CS.cruiseButtons == Buttons.SET_DECEL:
@@ -364,7 +364,9 @@ class Controls:
           else:
             self.state = State.enabled
           self.current_alert_types.append(ET.ENABLE)
-          self.v_cruise_kph = initialize_v_cruise(CS.vEgo, CS.buttonEvents, self.v_cruise_kph_last)
+          #self.v_cruise_kph = initialize_v_cruise(CS.vEgo, CS.buttonEvents, self.v_cruise_kph_last)
+          self.v_cruise_kph = 0
+          self.v_cruise_kph_last = 0
 
     # Check if actuators are enabled
     self.active = self.state == State.enabled or self.state == State.softDisabling

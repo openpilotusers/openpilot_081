@@ -28,8 +28,8 @@ class SpdctrlRelaxed(SpdController):
         self.target_speed_camera = 0
 
     def update_lead(self, sm, CS, dRel, yRel, vRel):
-        self.osm_enable = Params().get("LimitSetSpeed", encoding='utf8') == "1"
-        self.osm_enable_camera = Params().get("LimitSetSpeedCamera", encoding='utf8') == "1"
+        self.osm_enable = int(Params().get("LimitSetSpeed", encoding='utf8')) == 1
+        self.osm_enable_camera = int(Params().get("LimitSetSpeedCamera", encoding='utf8')) == 1
         self.osm_spdlimit_offset = int(Params().get("OpkrSpeedLimitOffset", encoding='utf8'))
         plan = sm['plan']
         dRele = plan.dRel1 #EON Lead
@@ -44,10 +44,10 @@ class SpdctrlRelaxed(SpdController):
         
         if self.osm_enable:
             self.target_speed = self.target_speed_road
-        elif self.target_speed_camera < 30:
+        elif self.target_speed_camera <= 29:
             self.osm_enable_camera = False
             self.target_speed = 0
-        elif self.osm_enable_camera and self.target_speed_camera >= 30:
+        elif self.osm_enable_camera and self.target_speed_camera > 29:
             self.target_speed = self.target_speed_camera
         else:
             self.target_speed = 0
@@ -96,10 +96,11 @@ class SpdctrlRelaxed(SpdController):
         else:
             d_delta2 = 0
  
-        if CS.driverAcc_time: #운전자가 가속페달 밟으면 크루즈 설정속도를 현재속도+5으로 동기화
-            lead_set_speed = int(round(CS.clu_Vanz)) + 5
-            self.seq_step_debug = "운전자가속"
-            lead_wait_cmd = 15
+        if CS.driverAcc_time: #운전자가 가속페달 밟으면 크루즈 설정속도를 현재속도+1로 동기화
+            if int(CS.VSetDis) < int(round(CS.clu_Vanz)):
+              lead_set_speed = int(round(CS.clu_Vanz)) + 1
+              self.seq_step_debug = "운전자가속"
+              lead_wait_cmd = 15
         elif int(round(self.target_speed)) < int(CS.VSetDis) and (self.osm_enable or self.osm_enable_camera) and ((int(round(self.target_speed)) < int(round(self.cruise_set_speed_kph))) and self.target_speed != 0):
             self.seq_step_debug = "맵기반감속"
             lead_wait_cmd, lead_set_speed = self.get_tm_speed(CS, 10, -1)
@@ -175,7 +176,7 @@ class SpdctrlRelaxed(SpdController):
                 lead_wait_cmd, lead_set_speed = self.get_tm_speed( CS, 15, 1)
             elif lead_objspd > 0 and int(CS.clu_Vanz)+lead_objspd >= int(CS.VSetDis) and int(CS.clu_Vanz*0.4) < dRel < 149 and ((int(round(self.target_speed)) > int(CS.VSetDis) and self.target_speed != 0) or self.target_speed == 0):
                 self.seq_step_debug = "SS>VS,+1"
-                lead_wait_cmd, lead_set_speed = self.get_tm_speed( CS, 40, 1)
+                lead_wait_cmd, lead_set_speed = self.get_tm_speed( CS, 20, 1)
             elif CS.clu_Vanz > 80 and lead_objspd < 0 and (int(CS.clu_Vanz)-1) <= int(CS.VSetDis) and int(CS.clu_Vanz) >= dRel*1.5 and 1 < dRel < 149: # 유지거리 범위 외 감속 조건 앞차 감속중 현재속도/2 아래로 거리 좁혀졌을 때 상대속도에 따라 점진적 감소
                 self.seq_step_debug = "SS>VS,v>80,-1"
                 lead_wait_cmd, lead_set_speed = self.get_tm_speed( CS, max(15, 50+(lead_objspd*2)), -1)
@@ -196,7 +197,7 @@ class SpdctrlRelaxed(SpdController):
                 lead_wait_cmd, lead_set_speed = self.get_tm_speed( CS, 15, 5)
             elif d_delta == 0 and lead_objspd == 0 and self.cruise_set_speed_kph > int(CS.VSetDis) and dRel > 149 and ((int(round(self.target_speed)) > int(CS.VSetDis) and self.target_speed != 0) or self.target_speed == 0):
                 self.seq_step_debug = "점진가속"
-                lead_wait_cmd, lead_set_speed = self.get_tm_speed( CS, 40, 1)
+                lead_wait_cmd, lead_set_speed = self.get_tm_speed( CS, 20, 1)
             elif lead_objspd == 0 and int(CS.clu_Vanz) == 0 and dRel <= 6:
                 self.seq_step_debug = "출발대기"
             else:

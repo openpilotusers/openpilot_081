@@ -98,8 +98,8 @@ class Planner():
     self.first_loop = True
     self.offset = 0
     self.last_time = 0
-    self.v_speedlimit_ahead = 0
-    self.speed_ahead_distance_prev = 1000
+    self.v_speedlimit_ahead = 0.0
+    self.v_speedlimit_ahead_timer = 0
 
   def choose_solution(self, v_cruise_setpoint, enabled):
     if enabled:
@@ -228,33 +228,23 @@ class Planner():
       #  self.a_acc_start = required_decel
       #  v_speedlimit_ahead = v_ego
 
+      tspeed = 0
       if (v_ego*3.6) <= 50:
-        if 0 < sm['liveMapData'].speedLimitAheadDistance < (v_ego*3.6*2.5):
-          if self.speed_ahead_distance_prev > sm['liveMapData'].speedLimitAheadDistance:
-            self.speed_ahead_distance_prev = sm['liveMapData'].speedLimitAheadDistance
-            self.v_speedlimit_ahead = sm['liveMapData'].speedLimitAhead
-          elif sm['liveMapData'].speedLimitAhead == 0:
-            self.v_speedlimit_ahead = 0
-        elif sm['liveMapData'].speedLimitAhead == 0:
-          self.speed_ahead_distance_prev = 1000
+        tspeed = v_ego*3.6*2.5
       elif (v_ego*3.6) <= 70:
-        if 0 < sm['liveMapData'].speedLimitAheadDistance < (v_ego*3.6*3.5):
-          if self.speed_ahead_distance_prev > sm['liveMapData'].speedLimitAheadDistance:
-            self.speed_ahead_distance_prev = sm['liveMapData'].speedLimitAheadDistance
-            self.v_speedlimit_ahead = sm['liveMapData'].speedLimitAhead
-          elif sm['liveMapData'].speedLimitAhead == 0:
-            self.v_speedlimit_ahead = 0
-        elif sm['liveMapData'].speedLimitAhead == 0:
-          self.speed_ahead_distance_prev = 1000
+        tspeed = v_ego*3.6*3.5
       elif (v_ego*3.6) > 70:
-        if 0 < sm['liveMapData'].speedLimitAheadDistance < (v_ego*3.6*4.5):
-          if self.speed_ahead_distance_prev > sm['liveMapData'].speedLimitAheadDistance:
-            self.speed_ahead_distance_prev = sm['liveMapData'].speedLimitAheadDistance
-            self.v_speedlimit_ahead = sm['liveMapData'].speedLimitAhead
-          elif sm['liveMapData'].speedLimitAhead == 0:
-            self.v_speedlimit_ahead = 0
-        elif sm['liveMapData'].speedLimitAhead == 0:
-          self.speed_ahead_distance_prev = 1000
+        tspeed = v_ego*3.6*4.5
+
+      if sm['liveMapData'].speedLimitValid and 0 < sm['liveMapData'].speedLimitAheadDistance < tspeed:
+        self.v_speedlimit_ahead = sm['liveMapData'].speedLimitAhead
+        self.v_speedlimit_ahead_timer = 0
+      else:
+        self.v_speedlimit_ahead_timer += 1
+        if self.v_speedlimit_ahead_timer > (v_ego*3.6*2):
+          self.v_speedlimit_ahead = 0
+          self.v_speedlimit_ahead_timer = 0
+
       #v_cruise_setpoint = min([v_cruise_setpoint, v_curvature_map, v_speedlimit, v_speedlimit_ahead])
       v_cruise_setpoint = min([v_cruise_setpoint, v_curvature_map, v_speedlimit])
 
