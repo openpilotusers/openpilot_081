@@ -229,31 +229,31 @@ class Planner():
       #  v_speedlimit_ahead = v_ego
 
       if (v_ego*3.6) <= 50:
-        if sm['liveMapData'].speedLimitAhead > 29 and 0 < sm['liveMapData'].speedLimitAheadDistance < (v_ego*3.6*2.5):
-          if self.speed_ahead_distance_prev >= sm['liveMapData'].speedLimitAheadDistance - 5:
+        if 0 < sm['liveMapData'].speedLimitAheadDistance < (v_ego*3.6*2.5):
+          if self.speed_ahead_distance_prev > sm['liveMapData'].speedLimitAheadDistance:
             self.speed_ahead_distance_prev = sm['liveMapData'].speedLimitAheadDistance
             self.v_speedlimit_ahead = sm['liveMapData'].speedLimitAhead
-          else:
+          elif sm['liveMapData'].speedLimitAhead == 0:
             self.v_speedlimit_ahead = 0
-        elif sm['liveMapData'].speedLimitAhead <= 29:
+        elif sm['liveMapData'].speedLimitAhead == 0:
           self.speed_ahead_distance_prev = 1000
       elif (v_ego*3.6) <= 70:
-        if sm['liveMapData'].speedLimitAhead > 29 and 0 < sm['liveMapData'].speedLimitAheadDistance < (v_ego*3.6*3.5):
-          if self.speed_ahead_distance_prev >= sm['liveMapData'].speedLimitAheadDistance - 5:
+        if 0 < sm['liveMapData'].speedLimitAheadDistance < (v_ego*3.6*3.5):
+          if self.speed_ahead_distance_prev > sm['liveMapData'].speedLimitAheadDistance:
             self.speed_ahead_distance_prev = sm['liveMapData'].speedLimitAheadDistance
             self.v_speedlimit_ahead = sm['liveMapData'].speedLimitAhead
-          else:
+          elif sm['liveMapData'].speedLimitAhead == 0:
             self.v_speedlimit_ahead = 0
-        elif sm['liveMapData'].speedLimitAhead <= 29:
+        elif sm['liveMapData'].speedLimitAhead == 0:
           self.speed_ahead_distance_prev = 1000
       elif (v_ego*3.6) > 70:
-        if sm['liveMapData'].speedLimitAhead > 29 and 0 < sm['liveMapData'].speedLimitAheadDistance < (v_ego*3.6*4.5):
-          if self.speed_ahead_distance_prev >= sm['liveMapData'].speedLimitAheadDistance - 5:
+        if 0 < sm['liveMapData'].speedLimitAheadDistance < (v_ego*3.6*4.5):
+          if self.speed_ahead_distance_prev > sm['liveMapData'].speedLimitAheadDistance:
             self.speed_ahead_distance_prev = sm['liveMapData'].speedLimitAheadDistance
             self.v_speedlimit_ahead = sm['liveMapData'].speedLimitAhead
-          else:
+          elif sm['liveMapData'].speedLimitAhead == 0:
             self.v_speedlimit_ahead = 0
-        elif sm['liveMapData'].speedLimitAhead <= 29:
+        elif sm['liveMapData'].speedLimitAhead == 0:
           self.speed_ahead_distance_prev = 1000
       #v_cruise_setpoint = min([v_cruise_setpoint, v_curvature_map, v_speedlimit, v_speedlimit_ahead])
       v_cruise_setpoint = min([v_cruise_setpoint, v_curvature_map, v_speedlimit])

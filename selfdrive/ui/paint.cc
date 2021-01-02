@@ -700,7 +700,7 @@ static void ui_draw_vision_event(UIState *s) {
   else if ((s->scene.controls_state.getVEgo()*3.6) <= 70) {tspeed = s->scene.controls_state.getVEgo()*3.6*4;}
   else if ((s->scene.controls_state.getVEgo()*3.6) > 70) {tspeed = s->scene.controls_state.getVEgo()*3.6*5;}
   //if (s->scene.speedlimitahead_valid && s->scene.speedlimitaheaddistance < 300 && s->scene.controls_state.getEnabled() && s->limit_set_speed) {
-  if (s->scene.speedlimitahead_valid && s->scene.limitSpeedCamera > 29 && s->scene.speedlimitaheaddistance < tspeed && s->scene.speedlimitaheaddistance > 0 && s->scene.controls_state.getEnabled()) {
+  if (s->scene.speedlimitahead_valid && s->scene.speedlimitaheaddistance < tspeed && s->scene.speedlimitaheaddistance > 0 && s->scene.controls_state.getEnabled()) {
     const int img_turn_size = 160;
     const int img_turn_x = viz_event_x-(img_turn_size/4)+80;
     const int img_turn_y = viz_event_y+bdr_s-25;
