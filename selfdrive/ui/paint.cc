@@ -476,7 +476,7 @@ static void ui_draw_debug(UIState *s)
   if (s->nDebugUi2 == 1) {
     if (scene.gpsAccuracyUblox != 0.00) {
       nvgFontSize(s->vg, 34);
-      ui_print(s, 0, 28, "LAT/LON:%.5f/%.5f", scene.latitudeUblox, scene.longitudeUblox);
+      ui_print(s, 28, 28, "LAT／LON: %.5f／%.5f", scene.latitudeUblox, scene.longitudeUblox);
     }
     nvgFontSize(s->vg, 42);
     //ui_print(s, ui_viz_rx, ui_viz_ry, "Live Parameters");
