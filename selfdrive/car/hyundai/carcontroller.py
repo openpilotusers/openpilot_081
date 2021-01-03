@@ -356,6 +356,15 @@ class CarController():
       can_sends.append(create_clu11(self.packer, frame, CS.mdps_bus, CS.clu11, Buttons.NONE, enabled_speed))
 
     str_log1 = 'CV={:03.0f}  TQ={:03.0f}  R={:03.0f}  ST={:03.0f}/{:01.0f}/{:01.0f}'.format(abs(self.model_speed), abs(new_steer), self.timer1.sampleTime(), self.steerMax, self.steerDeltaUp, self.steerDeltaDown)
+
+    if int(self.params.get('OpkrLiveTune')) == 1:
+      if int(self.params.get('LateralControlMethod')) == 0:
+        self.str_log2 = 'T={:0.2f}/{:0.3f}/{:0.2f}/{:0.5f}'.format(float(int(self.params.get('PidKp')) * 0.01), float(int(self.params.get('PidKi')) * 0.001), float(int(self.params.get('PidKd')) * 0.01), float(int(self.params.get('PidKf')) * 0.00001))
+      elif int(self.params.get('LateralControlMethod')) == 1:
+        self.str_log2 = 'T={:03.1f}/{:03.1f}/{:03.1f}/{:03.1f}'.format(float(int(params.get('InnerLoopGain')) * 0.1), float(int(params.get('OuterLoopGain')) * 0.1), float(int(params.get('TimeConstant')) * 0.1), float(int(params.get('ActuatorEffectiveness')) * 0.1))
+      elif int(self.params.get('LateralControlMethod')) == 2:
+        self.str_log2 = 'T={:04.0f}/{:05.3f}/{:06.4f}'.format(float(int(params.get('Scale')) * 1.0), float(int(params.get('LqrKi')) * 0.001), float(int(params.get('DcGain')) * 0.0001))
+
     trace1.printf1('{}  {}'.format(str_log1, self.str_log2))
 
     if CS.out.cruiseState.modeSel == 0 and self.mode_change_switch == 3:
