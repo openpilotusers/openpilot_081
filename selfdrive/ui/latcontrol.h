@@ -1,3 +1,5 @@
+#include <stdlib.h>
+#include <time.h>
 #include <dirent.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -51,6 +53,14 @@ bool control_button_clicked5(int touch_x, int touch_y) {
   return false;
 }
 
+bool control_button_screenshot(int touch_x, int touch_y) {
+  if (touch_x >= 0 && touch_x <= 800) {
+    if (touch_y >= 600 && touch_y <= 1080) {
+      return true;
+    }
+  }
+  return false;
+}
 
 static void draw_control_button1(UIState *s, int touch_x, int touch_y) {
   if (s->vision_connected){
@@ -271,6 +281,12 @@ bool latcontrol( UIState *s, int touch_x, int touch_y ) {
       s->limit_set_speed = false;
       Params().write_db_value("LimitSetSpeed", "0", 1);
     }
+    touched = true;
+  }
+
+  if ((control_button_screenshot(touch_x,touch_y)) && (s->scene.uilayout_sidebarcollapsed == true)) {
+    system("su -c 'mkdir -p /data/screenshots; screencap -p /data/screenshots/sc_$(date '+%Y-%m-%d_%H%M%S').png'");
+    s->sound->play(AudibleAlert::CHIME_WARNING1);
     touched = true;
   }
   
