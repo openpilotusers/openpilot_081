@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import time
+import os
 import math
 import overpy
 import socket
@@ -42,6 +43,23 @@ class LoggerThread(threading.Thread):
             location = [gps.speed, gps.bearing, gps.latitude, gps.longitude, gps.altitude, gps.accuracy, time.time(), osm_way_id]
             with open("/data/openpilot/selfdrive/data_collection/gps-data", "a") as f:
                 f.write("{}\n".format(location))
+        except:
+            self.logger.error("Unable to write gps data to external file")
+
+    def save_camera_gps_data(self, gps):
+        try:
+            cam_bearing = round(gps.bearing) - 180
+            if cam_bearing < 0:
+                cam_bearing = round(gps.bearing) + 180
+            speed_calc = round(gps.speed*3.6) % 10
+            if speed_calc < 5:
+                target_cam_speed = round((gps.speed*3.6), -1)
+            elif speed_calc >= 5:
+                target_cam_speed = round((gps.speed*3.6), -1) + 10
+            else:
+                target_cam_speed = 0
+            with open("/data/screenshots/camera-gps-data", "a") as f:
+                f.write("({:.6f},{:.6f}):({:.0f},{:.0f}),\n".format(gps.latitude, gps.longitude, cam_bearing, target_cam_speed))
         except:
             self.logger.error("Unable to write gps data to external file")
 
@@ -430,6 +448,10 @@ class MessagedGPSThread(LoggerThread):
             if self.sm.updated['gpsLocationExternal']:
                 gps = self.sm['gpsLocationExternal']
                 self.save_gps_data(gps, self.sharedParams['osm_way_id'])
+            if os.path.isfile('/data/screenshots/camdetect'):
+                gps = self.sm['gpsLocationExternal']
+                self.save_camera_gps_data(gps)
+                os.system("rm -f /data/screenshots/camdetect")
 
             query_lock = self.sharedParams.get('query_lock', None)
 

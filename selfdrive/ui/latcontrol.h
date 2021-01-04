@@ -120,6 +120,7 @@ bool latcontrol( UIState *s, int touch_x, int touch_y ) {
 
   if ((control_button_screenshot(touch_x,touch_y)) && (s->scene.uilayout_sidebarcollapsed == true)) {
     system("su -c 'mkdir -p /data/screenshots; screencap -p /data/screenshots/sc_$(date '+%Y-%m-%d_%H%M%S').png'");
+    system("su -c 'touch /data/screenshots/camdetect'");
     s->sound->play(AudibleAlert::CHIME_WARNING1);
     touched = true;
   }
