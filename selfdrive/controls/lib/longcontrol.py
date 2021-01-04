@@ -159,12 +159,12 @@ class LongControl():
           output_gb *= multiplier
           output_gb = clip(output_gb, -brake_max, gas_max)
         else:
-          output_gb *= 1.2
+          output_gb *= 1.4
       elif hasLead and radarState.leadOne.status and 7 < dRel < 17 and abs(vRel*3.6) > 4 and output_gb > 0 and (CS.vEgo * CV.MS_TO_KPH) < 25:
         output_gb *= 1.3
         output_gb = clip(output_gb, -brake_max, gas_max)
-      elif hasLead and radarState.leadOne.status and 7 < dRel < 100 and output_gb < 0:
-        output_gb *= 1.2
+      elif hasLead and radarState.leadOne.status and 4 < dRel < 100 and output_gb < 0:
+        output_gb *= 1.4
 
       if prevent_overshoot:
         output_gb = min(output_gb, 0.0)
