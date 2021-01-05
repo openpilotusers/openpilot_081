@@ -87,11 +87,11 @@ class DynamicFollow:
     self._setup_changing_variables()
 
   def _setup_collector(self):
-    self.sm_collector = SubMaster(['liveTracks', 'laneSpeed'])
+    self.sm_collector = SubMaster(['liveTracks'])
     self.log_auto_df = self.op_params.get('log_auto_df')
     if not isinstance(self.log_auto_df, bool):
       self.log_auto_df = False
-    self.data_collector = DataCollector(file_path='/data/df_data', keys=['v_ego', 'a_ego', 'a_lead', 'v_lead', 'x_lead', 'left_lane_speeds', 'middle_lane_speeds', 'right_lane_speeds', 'left_lane_distances', 'middle_lane_distances', 'right_lane_distances', 'profile', 'time'], log_data=self.log_auto_df)
+    self.data_collector = DataCollector(file_path='/data/df_data', keys=['v_ego', 'a_ego', 'a_lead', 'v_lead', 'x_lead', 'profile', 'time'], log_data=self.log_auto_df)
 
   def _setup_changing_variables(self):
     self.TR = self.default_TR
@@ -147,13 +147,6 @@ class DynamicFollow:
                                   self.lead_data.a_lead,
                                   self.lead_data.v_lead,
                                   self.lead_data.x_lead,
-                                  list(self.sm_collector['laneSpeed'].leftLaneSpeeds),
-                                  list(self.sm_collector['laneSpeed'].middleLaneSpeeds),
-                                  list(self.sm_collector['laneSpeed'].rightLaneSpeeds),
-
-                                  list(self.sm_collector['laneSpeed'].leftLaneDistances),
-                                  list(self.sm_collector['laneSpeed'].middleLaneDistances),
-                                  list(self.sm_collector['laneSpeed'].rightLaneDistances),
                                   self.user_profile,
                                   sec_since_boot()])
 
