@@ -80,15 +80,15 @@ class opParams:
                         'upload_on_hotspot': Param(False, bool, 'If False, openpilot will not upload driving data while connected to your phone\'s hotspot'),
                         'enable_long_derivative': Param(False, bool, 'If you have longitudinal overshooting, enable this! This enables derivative-based\n'
                                                                      'integral wind-down to help reduce overshooting within the long PID loop'),
-                        'disengage_on_gas': Param(True, bool, 'Whether you want openpilot to disengage on gas input or not'),
+                        'disengage_on_gas': Param(False, bool, 'Whether you want openpilot to disengage on gas input or not'),
                         'update_behavior': Param('auto', str, 'Can be: (\'off\', \'alert\', \'auto\') without quotes\n'
                                                               'off will never update, alert shows an alert on-screen\n'
                                                               'auto will reboot the device when an update is seen'),
                         'dynamic_gas': Param(True, bool, 'Whether to use dynamic gas if your car is supported'),
                         'hide_auto_df_alerts': Param(False, bool, 'Hides the alert that shows what profile the model has chosen'),
                         'log_auto_df': Param(False, bool, 'Logs dynamic follow data for auto-df'),
-                        'dynamic_camera_offset': Param(True, bool, 'Whether to automatically keep away from oncoming traffic.\n'
-                                                                   'Works from 35 to ~60 mph (requires radar)'),
+                        'dynamic_camera_offset': Param(False, bool, 'Whether to automatically keep away from oncoming traffic.\n'
+                                                                    'Works from 35 to ~60 mph (requires radar)'),
                         'dynamic_camera_offset_time': Param(3.5, VT.number, 'How long to keep away from oncoming traffic in seconds after losing lead'),
                         'support_white_panda': Param(False, bool, 'Enable this to allow engagement with the deprecated white panda.\n'
                                                                   'localizer might not work correctly'),
@@ -119,7 +119,7 @@ class opParams:
     self._params_file = '/data/op_params.json'
     self._backup_file = '/data/op_params_corrupt.json'
     self._last_read_time = sec_since_boot()
-    self.read_frequency = 2.5  # max frequency to read with self.get(...) (sec)
+    self.read_frequency = 3  # max frequency to read with self.get(...) (sec)
     self._to_delete = ['no_ota_updates', 'auto_update']  # a list of unused params you want to delete
     self._run_init()  # restores, reads, and updates params
 

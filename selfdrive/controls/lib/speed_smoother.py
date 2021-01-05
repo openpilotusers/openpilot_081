@@ -18,7 +18,7 @@ def speed_smoother(vEgo, aEgo, vT, aMax, aMin, jMax, jMin, ts):
 
   # recover quickly if dV is positive and aEgo is negative or viceversa
   if dV > 0. and aEgo < 0.:
-    jMax *= 50.
+    jMax *= 5.
   elif dV < 0. and aEgo > 0.:
     jMin *= 5.
 

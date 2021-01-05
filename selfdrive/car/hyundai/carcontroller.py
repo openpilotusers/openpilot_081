@@ -23,11 +23,11 @@ import common.CTime1000 as tm
 
 VisualAlert = car.CarControl.HUDControl.VisualAlert
 
-# Accel Hard limits
-ACCEL_HYST_GAP = 0.1  # don't change accel command for small oscillations within this value
-ACCEL_MAX = 2.  # 2.0 m/s2
-ACCEL_MIN = -3.5  # 3.5   m/s2
-ACCEL_SCALE = 1.
+# Accel limits
+ACCEL_HYST_GAP = 0.02  # don't change accel command for small oscillations within this value
+ACCEL_MAX = 1.5  # 1.5 m/s2
+ACCEL_MIN = -3.0 # 3   m/s2
+ACCEL_SCALE = max(ACCEL_MAX, -ACCEL_MIN)
 
 def accel_hysteresis(accel, accel_steady):
 

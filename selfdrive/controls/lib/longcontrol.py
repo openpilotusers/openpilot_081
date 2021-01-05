@@ -11,12 +11,12 @@ import common.CTime1000 as tm
 
 LongCtrlState = log.ControlsState.LongControlState
 
-STOPPING_EGO_SPEED = 0.3
+STOPPING_EGO_SPEED = 0.5
 STOPPING_TARGET_SPEED_OFFSET = 0.01
 STARTING_TARGET_SPEED = 0.5
 BRAKE_THRESHOLD_TO_PID = 0.2
 
-BRAKE_STOPPING_TARGET = 0.7  # apply at least this amount of brake to maintain the vehicle stationary
+BRAKE_STOPPING_TARGET = 0.5  # apply at least this amount of brake to maintain the vehicle stationary
 
 RATE = 100.0
 
@@ -25,7 +25,7 @@ def long_control_state_trans(active, long_control_state, v_ego, v_target, v_pid,
                              output_gb, brake_pressed, cruise_standstill, stop, gas_pressed, min_speed_can):
   """Update longitudinal control state machine"""
   stopping_target_speed = min_speed_can + STOPPING_TARGET_SPEED_OFFSET
-  stopping_condition = stop or (v_ego < 0.3 and cruise_standstill) or \
+  stopping_condition = stop or (v_ego < 2.0 and cruise_standstill) or \
                        (v_ego < STOPPING_EGO_SPEED and \
                         ((v_pid < stopping_target_speed and v_target < stopping_target_speed) or
                         brake_pressed))
@@ -60,9 +60,9 @@ def long_control_state_trans(active, long_control_state, v_ego, v_target, v_pid,
 class LongControl():
   def __init__(self, CP, compute_gb, candidate):
     self.long_control_state = LongCtrlState.off  # initialized to off
-    kdBP = [0., 2.237, 33, 55., 78]
-    kdBP = [i * CV.MPH_TO_MS for i in kdBP]
-    kdV = [1.5, 0.05, 0.4, 0.8, 1.2]
+    kdBP = [0., 16., 35.]
+    kdV = [0.05, 1.0285 * 1.45, 1.8975 * 0.8]
+
     self.pid = LongPIDController((CP.longitudinalTuning.kpBP, CP.longitudinalTuning.kpV),
                                  (CP.longitudinalTuning.kiBP, CP.longitudinalTuning.kiV),
                                  (kdBP, kdV),
@@ -154,17 +154,14 @@ class LongControl():
       if hasLead and radarState.leadOne.status and 4 < dRel <= 35 and output_gb < 0 and vRel < 0 and (CS.vEgo*CV.MS_TO_KPH) <= 65:
         vd_r = (CS.vEgo*CV.MS_TO_KPH)/dRel
         multiplier = max((self.v_pid/(max(v_target_future, 1))), 1)
-        multiplier = min(multiplier, 4)
+        multiplier = min(1.3, multiplier, 4)
         if vd_r >= 1.5:
           output_gb *= multiplier
           output_gb = clip(output_gb, -brake_max, gas_max)
         else:
-          output_gb *= 1.5
-      elif hasLead and radarState.leadOne.status and 7 < dRel < 17 and abs(vRel*3.6) > 5 and output_gb > 0 and (CS.vEgo * CV.MS_TO_KPH) < 25:
-        output_gb *= 1.3
-        output_gb = clip(output_gb, -brake_max, gas_max)
+          output_gb *= 1.3
       elif hasLead and radarState.leadOne.status and 4 < dRel < 100 and output_gb < 0:
-        output_gb *= 1.4
+        output_gb *= 1.3
 
       if prevent_overshoot:
         output_gb = min(output_gb, 0.0)
