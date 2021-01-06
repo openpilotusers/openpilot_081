@@ -54,8 +54,8 @@ bool control_button_clicked5(int touch_x, int touch_y) {
 }
 
 bool control_button_screenshot(int touch_x, int touch_y) {
-  if (touch_x >= 0 && touch_x <= 800) {
-    if (touch_y >= 600 && touch_y <= 1080) {
+  if (touch_x >= 0 && touch_x <= 700) {
+    if (touch_y >= 700 && touch_y <= 1080) {
       return true;
     }
   }
