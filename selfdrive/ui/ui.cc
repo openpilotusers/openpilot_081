@@ -49,6 +49,7 @@ void ui_init(UIState *s) {
   read_param(&s->nOpkrBlindSpotDetect, "OpkrBlindSpotDetect");
   read_param(&s->lat_control, "LateralControlMethod");
   read_param(&s->driving_record, "OpkrDrivingRecord");
+  read_param(&s->acc_mode, "OpkrAccMode");
 
   s->fb = framebuffer_init("ui", 0, true, &s->fb_w, &s->fb_h);
   assert(s->fb);
