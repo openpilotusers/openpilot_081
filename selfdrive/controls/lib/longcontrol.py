@@ -156,6 +156,8 @@ class LongControl():
         multiplier = clip(multiplier, 1.1, 3)
         output_gb *= multiplier
         output_gb = clip(output_gb, -brake_max, gas_max)
+      elif hasLead and radarState.leadOne.status and 4 < dRel <= 35 and output_gb > 0 and vRel < 0 and (CS.vEgo*CV.MS_TO_KPH) <= 65:
+        output_gb = 0.0
       elif hasLead and radarState.leadOne.status and 4 < dRel < 100 and output_gb < 0:
         output_gb *= 1.1
 
