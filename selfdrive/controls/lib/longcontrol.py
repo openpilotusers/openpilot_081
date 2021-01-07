@@ -89,13 +89,15 @@ class LongControl():
     gas_max = interp(CS.vEgo, CP.gasMaxBP, CP.gasMaxV)
     brake_max = interp(CS.vEgo, CP.brakeMaxBP, CP.brakeMaxV)
 
+    multiplier = 0
+    vRel = 0
+
     if self.enable_dg:
       gas_max = self.dynamic_gas.update(CS, extras)
 
     # Update state machine
     output_gb = self.last_output_gb
 
-    vRel = 0
     if radarState is None:
       dRel = 200
       vRel = 0
@@ -153,7 +155,6 @@ class LongControl():
 
       output_gb = self.pid.update(self.v_pid, v_ego_pid, speed=v_ego_pid, deadzone=deadzone, feedforward=a_target, freeze_integrator=prevent_overshoot)
 
-      multiplier = 0
       if hasLead and radarState.leadOne.status and 4 < dRel <= 35 and output_gb < 0 and vRel < 0 and (CS.vEgo*CV.MS_TO_KPH) <= 65:
         multiplier = max((self.v_pid/(max(v_target_future, 1))), 1)
         multiplier = clip(multiplier, 1.1, 3)
