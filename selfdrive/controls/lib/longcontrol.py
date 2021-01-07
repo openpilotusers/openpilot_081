@@ -61,7 +61,7 @@ class LongControl():
   def __init__(self, CP, compute_gb, candidate):
     self.long_control_state = LongCtrlState.off  # initialized to off
     kdBP = [0., 16., 35.]
-    kdV = [0.05, 1.0285 * 1.45, 1.8975 * 0.8]
+    kdV = [0.3, 1.7, 1.5]
 
     self.pid = LongPIDController((CP.longitudinalTuning.kpBP, CP.longitudinalTuning.kpV),
                                  (CP.longitudinalTuning.kiBP, CP.longitudinalTuning.kiV),
@@ -155,12 +155,12 @@ class LongControl():
 
       output_gb = self.pid.update(self.v_pid, v_ego_pid, speed=v_ego_pid, deadzone=deadzone, feedforward=a_target, freeze_integrator=prevent_overshoot)
 
-      if hasLead and radarState.leadOne.status and 4 < dRel <= 35 and output_gb < 0 and vRel < 0 and (CS.vEgo*CV.MS_TO_KPH) <= 65:
+      if hasLead and radarState.leadOne.status and 4 < dRel <= 45 and output_gb < 0 and vRel < 0 and (CS.vEgo*CV.MS_TO_KPH) <= 65:
         multiplier = max((self.v_pid/(max(v_target_future, 1))), 1)
-        multiplier = clip(multiplier, 1.1, 3)
+        multiplier = clip(multiplier, 1.1, 2.5)
         output_gb *= multiplier
         output_gb = clip(output_gb, -brake_max, gas_max)
-      elif hasLead and radarState.leadOne.status and 4 < dRel <= 35 and output_gb > 0 and vRel < 0 and (CS.vEgo*CV.MS_TO_KPH) <= 65:
+      elif hasLead and radarState.leadOne.status and 4 < dRel <= 45 and output_gb > 0 and vRel < 0 and (CS.vEgo*CV.MS_TO_KPH) <= 65:
         output_gb = 0.0
       elif hasLead and radarState.leadOne.status and 4 < dRel < 100 and output_gb < 0:
         output_gb *= 1.1
@@ -173,7 +173,7 @@ class LongControl():
       # Keep applying brakes until the car is stopped
       factor = 1
       if hasLead:
-        factor = interp(dRel,[2.0,3.0,4.0,5.0,6.0,7.0,8.0], [5,3,1.3,0.7,0.5,0.3,0.0])
+        factor = interp(dRel,[2.0,3.0,4.0,5.0,6.0,7.0,8.0], [5,3,1.2,0.7,0.5,0.3,0.0])
       if not CS.standstill or output_gb > -BRAKE_STOPPING_TARGET:
         output_gb -= CP.stoppingBrakeRate / RATE * factor
       output_gb = clip(output_gb, -brake_max, gas_max)
