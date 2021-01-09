@@ -165,7 +165,7 @@ class LongControl():
       elif hasLead and radarState.leadOne.status and 4 < dRel < 100 and output_gb < 0:
         output_gb *= 1.1
 
-      if hasLead and radarState.leadOne.status and dRel*2 < (CS.vEgo*CV.MS_TO_KPH) and output_gb < 0 and vRel < 0 and (CS.vEgo*CV.MS_TO_KPH) <= 70:
+      if hasLead and radarState.leadOne.status and dRel*2 < (CS.vEgo*CV.MS_TO_KPH) and output_gb < 0 and vRel < 0 and (CS.vEgo*CV.MS_TO_KPH) <= 100:
         multiplier2 = interp(abs(vRel*3.6), [1, 20], [1.1, 2.5])
         output_gb *= multiplier2
 
