@@ -361,9 +361,9 @@ class CarController():
       if int(self.params.get('LateralControlMethod')) == 0:
         self.str_log2 = 'T={:0.2f}/{:0.3f}/{:0.2f}/{:0.5f}'.format(float(int(self.params.get('PidKp')) * 0.01), float(int(self.params.get('PidKi')) * 0.001), float(int(self.params.get('PidKd')) * 0.01), float(int(self.params.get('PidKf')) * 0.00001))
       elif int(self.params.get('LateralControlMethod')) == 1:
-        self.str_log2 = 'T={:03.1f}/{:03.1f}/{:03.1f}/{:03.1f}'.format(float(int(params.get('InnerLoopGain')) * 0.1), float(int(params.get('OuterLoopGain')) * 0.1), float(int(params.get('TimeConstant')) * 0.1), float(int(params.get('ActuatorEffectiveness')) * 0.1))
+        self.str_log2 = 'T={:03.1f}/{:03.1f}/{:03.1f}/{:03.1f}'.format(float(int(self.params.get('InnerLoopGain')) * 0.1), float(int(self.params.get('OuterLoopGain')) * 0.1), float(int(self.params.get('TimeConstant')) * 0.1), float(int(self.params.get('ActuatorEffectiveness')) * 0.1))
       elif int(self.params.get('LateralControlMethod')) == 2:
-        self.str_log2 = 'T={:04.0f}/{:05.3f}/{:06.4f}'.format(float(int(params.get('Scale')) * 1.0), float(int(params.get('LqrKi')) * 0.001), float(int(params.get('DcGain')) * 0.0001))
+        self.str_log2 = 'T={:04.0f}/{:05.3f}/{:06.4f}'.format(float(int(self.params.get('Scale')) * 1.0), float(int(self.params.get('LqrKi')) * 0.001), float(int(self.params.get('DcGain')) * 0.0001))
 
     trace1.printf1('{}  {}'.format(str_log1, self.str_log2))
 
