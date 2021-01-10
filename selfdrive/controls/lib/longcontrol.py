@@ -104,6 +104,7 @@ class LongControl():
     else:
       dRel = radarState.leadOne.dRel
       vRel = radarState.leadOne.vRel
+    # 앞차와 거리가 4m이하일때 상태를 강제로 STOP으로 만듬
     if hasLead:
       stop = True if (dRel < 4.0 and radarState.leadOne.status) else False
     else:
@@ -155,16 +156,21 @@ class LongControl():
 
       output_gb = self.pid.update(self.v_pid, v_ego_pid, speed=v_ego_pid, deadzone=deadzone, feedforward=a_target, freeze_integrator=prevent_overshoot)
 
-      if hasLead and radarState.leadOne.status and 4 < dRel <= 50 and output_gb < 0 and vRel < 0 and (CS.vEgo*CV.MS_TO_KPH) <= 70:
+      # 감속 보충을 위해 out_gb -값일 때 임의의 값을 더 곱해줌
+      if hasLead and radarState.leadOne.status and 4 < dRel <= 55 and output_gb < 0 and vRel < 0:
         multiplier = max((self.v_pid/(max(v_target_future, 1))), 1)
         multiplier = clip(multiplier, 1.2, 4)
         output_gb *= multiplier
+        #20m 간격 이하에서 거리보다 속도가 2배 이상인경우 조금더 감속 보충
+        if dRel*2 < CS.vEgo*3.6 and dRel <= 20:
+          multiplier3 = interp(dRel, [4, 20], [2, 1])
+          output_gb *= multiplier3
         output_gb = clip(output_gb, -brake_max, gas_max)
-      elif hasLead and radarState.leadOne.status and 4 < dRel <= 50 and output_gb > 0 and vRel < 0 and (CS.vEgo*CV.MS_TO_KPH) <= 70:
-        multiplier3 = interp(abs(vRel*3.6), [0, 1, 3], [1.0, 0.5, 0.0])
+      # 앞차 감속시 가속하는것을 완화해줌
+      elif hasLead and radarState.leadOne.status and 4 < dRel <= 55 and output_gb > 0 and vRel < 0:
+        multiplier3 = interp(abs(vRel*3.6), [0, 1, 2], [1.0, 0.5, 0.0])
         output_gb *= multiplier3
-      elif hasLead and radarState.leadOne.status and 4 < dRel < 100 and output_gb < 0:
-        output_gb *= 1.2
+        output_gb = clip(output_gb, -brake_max, gas_max)
 
       if prevent_overshoot:
         output_gb = min(output_gb, 0.0)
