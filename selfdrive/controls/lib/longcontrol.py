@@ -159,11 +159,11 @@ class LongControl():
       # 감속 보충을 위해 out_gb -값일 때 임의의 값을 더 곱해줌
       if hasLead and radarState.leadOne.status and 4 < dRel <= 55 and output_gb < 0 and vRel < 0:
         multiplier = max((self.v_pid/(max(v_target_future, 1))), 1)
-        multiplier = clip(multiplier, 1.2, 4)
+        multiplier = clip(multiplier, 1.2, 3.5)
         output_gb *= multiplier
         #20m 간격 이하에서 거리보다 속도가 2배 이상인경우 조금더 감속 보충
         if dRel*2 < CS.vEgo*3.6 and dRel <= 20:
-          multiplier3 = interp(dRel, [4, 20], [2, 1])
+          multiplier3 = interp(dRel, [4, 20], [1.5, 1])
           output_gb *= multiplier3
         output_gb = clip(output_gb, -brake_max, gas_max)
       # 앞차 감속시 가속하는것을 완화해줌
