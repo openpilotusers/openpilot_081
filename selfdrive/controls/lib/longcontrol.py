@@ -164,6 +164,8 @@ class LongControl():
         #20m 간격 이하에서 거리보다 속도가 2배 이상인경우 조금더 감속 보충
         if dRel*2 < CS.vEgo*3.6 and dRel <= 20:
           multiplier3 = interp(dRel, [4, 20], [2, 1])
+        elif dRel*1.5 < CS.vEgo*3.6 and dRel <= 20:
+          multiplier3 = interp(dRel, [4, 20], [1.5, 1])
           output_gb *= multiplier3
         output_gb = clip(output_gb, -brake_max, gas_max)
       # 앞차 감속시 가속하는것을 완화해줌
