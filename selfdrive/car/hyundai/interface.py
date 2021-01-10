@@ -183,8 +183,8 @@ class CarInterface(CarInterfaceBase):
 
     ret.gasMaxBP = [0., 9., 35]
     ret.gasMaxV = [0.4, 0.5, 0.7]
-    ret.longitudinalTuning.kpV = [1.2, 1.0, 0.6]
-    ret.longitudinalTuning.kiV = [0.2, 0.15]
+    ret.longitudinalTuning.kpV = [1.5, 1.2, 0.65]
+    ret.longitudinalTuning.kiV = [0.4, 0.3]
 
 
     # these cars require a special panda safety mode due to missing counters and checksums in the messages
