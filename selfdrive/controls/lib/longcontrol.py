@@ -90,6 +90,8 @@ class LongControl():
     brake_max = interp(CS.vEgo, CP.brakeMaxBP, CP.brakeMaxV)
 
     multiplier = 0
+    multiplier2 = 0
+    multiplier3 = 0
     vRel = 0
 
     if self.enable_dg:
@@ -163,9 +165,9 @@ class LongControl():
         output_gb *= multiplier
         #20m 간격 이하에서 거리보다 속도가 2배 이상인경우 조금더 감속 보충
         if dRel*2 < CS.vEgo*3.6 and dRel <= 20:
-          multiplier3 = interp(dRel, [4, 20], [2, 1])
+          multiplier2 = interp(dRel, [4, 20], [2, 1])
         elif dRel*1.5 < CS.vEgo*3.6 and dRel <= 20:
-          multiplier3 = interp(dRel, [4, 20], [1.5, 1])
+          multiplier2 = interp(dRel, [4, 20], [1.5, 1])
           output_gb *= multiplier3
         output_gb = clip(output_gb, -brake_max, gas_max)
       # 앞차 감속시 가속하는것을 완화해줌
@@ -214,7 +216,7 @@ class LongControl():
     else:
       self.long_stat = "---"
 
-    str_log3 = 'LS={:s}  GS={:01.2f}/{:01.2f}  BK={:01.2f}/{:01.2f}  GB={:+04.2f}  TG=P:{:05.2f}/F:{:05.2f}/m:{:.1f}/vr:{:+04.1f}'.format(self.long_stat, final_gas, gas_max, abs(final_brake), abs(brake_max), output_gb, abs(self.v_pid), abs(v_target_future), multiplier, vRel)
+    str_log3 = 'LS={:s}  GS={:01.2f}/{:01.2f}  BK={:01.2f}/{:01.2f}  GB={:+04.2f}  TG=P:{:05.2f}/F:{:05.2f}/m:{:.1f}/m2:{:.1f}/m3:{:.1f}/vr:{:+04.1f}'.format(self.long_stat, final_gas, gas_max, abs(final_brake), abs(brake_max), output_gb, abs(self.v_pid), abs(v_target_future), multiplier, multiplier2, multiplier3, vRel)
     trace1.printf2('{}'.format(str_log3))
 
     return final_gas, final_brake
