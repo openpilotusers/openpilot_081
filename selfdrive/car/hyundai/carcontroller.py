@@ -107,6 +107,8 @@ class CarController():
     self.opkr_autoresume = int(self.params.get('OpkrAutoResume'))
     self.opkr_autoresumeoption = int(self.params.get('OpkrAutoResumeOption'))
 
+    self.opkr_turnsteeringdisable = int(self.params.get('OpkrTurnSteeringDisable')) == 1
+
     self.opkr_maxanglelimit = int(self.params.get('OpkrMaxAngleLimit'))
 
     self.steer_mode = ""
@@ -267,7 +269,7 @@ class CarController():
     else:
       lkas_active = enabled and not spas_active
 
-    if (( CS.out.leftBlinker and not CS.out.rightBlinker) or ( CS.out.rightBlinker and not CS.out.leftBlinker)) and CS.out.vEgo < LANE_CHANGE_SPEED_MIN:
+    if (( CS.out.leftBlinker and not CS.out.rightBlinker) or ( CS.out.rightBlinker and not CS.out.leftBlinker)) and CS.out.vEgo < LANE_CHANGE_SPEED_MIN and self.opkr_turnsteeringdisable:
       self.lanechange_manual_timer = 50
     if CS.out.leftBlinker and CS.out.rightBlinker:
       self.emergency_manual_timer = 50
