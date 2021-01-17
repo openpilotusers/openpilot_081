@@ -638,6 +638,8 @@ def main():
     ("OpkrLiveTune", "0"),
     ("OpkrEnableMap", "1"),
     ("OpkrDrivingRecord", "0"),
+    ("OpkrTurnSteeringDisable", "0"),
+    ("CarModel", ""),
   ]
 
   # set unset params
