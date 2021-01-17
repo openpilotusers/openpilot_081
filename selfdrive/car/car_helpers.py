@@ -179,9 +179,11 @@ def get_car(logcan, sendcan):
   if candidate is None:
     cloudlog.warning("car doesn't match any fingerprints: %r", fingerprints)
     candidate = "mock"
-
-  if Params().get("CarModel", encoding="utf8") != "":
-    candidate = Params().get("CarModel", encoding="utf8", end='')
+  
+  car_name = Params().get("CarModel", encoding="utf8")
+  car_name.rstrip('\n')
+  if car_name != "":
+    candidate = car_name
 
   CarInterface, CarController, CarState = interfaces[candidate]
   car_params = CarInterface.get_params(candidate, fingerprints, car_fw)
