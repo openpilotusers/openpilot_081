@@ -181,7 +181,7 @@ def get_car(logcan, sendcan):
     candidate = "mock"
 
   if Params().get("CarModel", encoding="utf8") != "":
-    candidate = Params().get("CarModel", encoding="utf8")
+    candidate = Params().get("CarModel", encoding="utf8", end='')
 
   CarInterface, CarController, CarState = interfaces[candidate]
   car_params = CarInterface.get_params(candidate, fingerprints, car_fw)
