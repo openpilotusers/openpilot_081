@@ -181,7 +181,7 @@ def get_car(logcan, sendcan):
     candidate = "mock"
   
   car_name = Params().get("CarModel", encoding="utf8")
-  car_name.rstrip('\n')
+  car_name = car_name.rstrip('\n')
   if car_name != "":
     candidate = car_name
 
