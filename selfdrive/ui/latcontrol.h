@@ -96,7 +96,7 @@ bool latcontrol( UIState *s, int touch_x, int touch_y ) {
   draw_control_button1(s, touch_x, touch_y);
   draw_control_button2(s, touch_x, touch_y);
 
-  if ((control_button_clicked1(touch_x,touch_y)) && (s->scene.uilayout_sidebarcollapsed == true)) {
+  if ((control_button_clicked1(touch_x,touch_y)) && (s->scene.uilayout_sidebarcollapsed == true) && (s->status != STATUS_OFFROAD)) {
     if (s->limit_set_speed_camera == false) {
       s->limit_set_speed_camera = true;
       Params().write_db_value("LimitSetSpeedCamera", "1", 1);
@@ -107,7 +107,7 @@ bool latcontrol( UIState *s, int touch_x, int touch_y ) {
     touched = true;
   }
 
-  if ((control_button_clicked2(touch_x,touch_y)) && (s->scene.uilayout_sidebarcollapsed == true)) {
+  if ((control_button_clicked2(touch_x,touch_y)) && (s->scene.uilayout_sidebarcollapsed == true) && (s->status != STATUS_OFFROAD)) {
     if (s->limit_set_speed == false) {
       s->limit_set_speed = true;
       Params().write_db_value("LimitSetSpeed", "1", 1);
@@ -118,7 +118,7 @@ bool latcontrol( UIState *s, int touch_x, int touch_y ) {
     touched = true;
   }
 
-  if ((control_button_screenshot(touch_x,touch_y)) && (s->scene.uilayout_sidebarcollapsed == true)) {
+  if ((control_button_screenshot(touch_x,touch_y)) && (s->scene.uilayout_sidebarcollapsed == true) && (s->status != STATUS_OFFROAD)) {
     system("su -c 'touch /data/screenshots/camdetect'");
     system("su -c 'mkdir -p /data/screenshots; screencap -p /data/screenshots/sc_$(date '+%Y-%m-%d_%H%M%S').png'");
     s->sound->play(AudibleAlert::CHIME_WARNING1);
