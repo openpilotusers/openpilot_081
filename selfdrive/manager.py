@@ -71,8 +71,8 @@ if __name__ == "__main__":
 from common.spinner import Spinner
 from common.text_window import TextWindow
 
-if not (os.system("python3 -m pip list | grep 'scipy' ") == 0):
-  os.system("cd /data/openpilot/installer/scipy_installer/ && ./scipy_installer")
+#if not (os.system("python3 -m pip list | grep 'scipy' ") == 0):
+#  os.system("cd /data/openpilot/installer/scipy_installer/ && ./scipy_installer")
 
 
 
@@ -192,7 +192,7 @@ managed_processes = {
   "updated": "selfdrive.updated",
   "dmonitoringmodeld": ("selfdrive/modeld", ["./dmonitoringmodeld"]),
   "modeld": ("selfdrive/modeld", ["./modeld"]),
-  "mapd": ("selfdrive/mapd", ["./mapd.py"]),
+  #"mapd": ("selfdrive/mapd", ["./mapd.py"]),
   "rtshield": "selfdrive.rtshield",
 }
 
@@ -240,7 +240,7 @@ car_started_processes = [
   'modeld',
   'proclogd',
   'ubloxd',
-  'mapd',
+  #'mapd',
   'locationd',
   'clocksd',
 ]
@@ -451,14 +451,14 @@ def manager_thread():
   EnableLogger = int(params.get('OpkrEnableLogger'))
   EnableMap = int(params.get('OpkrEnableMap'))
 
-  if not EnableMap:
-    car_started_processes.remove( 'mapd' )
+  #if not EnableMap:
+  #  car_started_processes.remove( 'mapd' )
 
   if not EnableLogger:
     car_started_processes.remove( 'loggerd' )
     persistent_processes.remove( 'logmessaged' )
     persistent_processes.remove( 'uploader' )
-    persistent_processes.remove( 'logcatd' )
+    #persistent_processes.remove( 'logcatd' )
     persistent_processes.remove( 'updated' )
     persistent_processes.remove( 'deleter' )
     persistent_processes.remove( 'tombstoned' )
