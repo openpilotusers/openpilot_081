@@ -458,7 +458,7 @@ def manager_thread():
     car_started_processes.remove( 'loggerd' )
     persistent_processes.remove( 'logmessaged' )
     persistent_processes.remove( 'uploader' )
-    #persistent_processes.remove( 'logcatd' )
+    persistent_processes.remove( 'logcatd' )
     persistent_processes.remove( 'updated' )
     persistent_processes.remove( 'deleter' )
     persistent_processes.remove( 'tombstoned' )
