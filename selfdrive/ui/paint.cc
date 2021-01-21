@@ -596,6 +596,8 @@ static void ui_draw_vision_speedlimit(UIState *s) {
     speedlim_calc = speedlimit * 3.6 + 0.5;
   }
 
+  speedlim_calc = s->scene.vSetDis; //show cruise set speed on cluster
+
   bool is_speedlim_valid = s->scene.speedlimit_valid;
   float hysteresis_offset = 0.5;
   if (s->is_ego_over_limit) {
@@ -632,7 +634,7 @@ static void ui_draw_vision_speedlimit(UIState *s) {
   // Draw "Speed Limit" Text
   nvgTextAlign(s->vg, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE);
   color = is_speedlim_valid && s->is_ego_over_limit ? COLOR_WHITE : COLOR_BLACK;
-  ui_draw_text(s->vg, text_x, 142, "제한속도", 26 * 2.2, color, s->font_sans_regular);
+  ui_draw_text(s->vg, text_x, 142, "크루즈", 26 * 2.2, color, s->font_sans_regular);
   
   // Draw Speed Text
   color = s->is_ego_over_limit ? COLOR_WHITE : COLOR_BLACK;
