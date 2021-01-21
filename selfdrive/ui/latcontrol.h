@@ -53,7 +53,7 @@ bool latcontrol( UIState *s, int touch_x, int touch_y ) {
 
   if ((control_button_clicked1(touch_x,touch_y)) && (s->status != STATUS_OFFROAD)) {
     system("su -c 'am start -n com.gmd.hidesoftkeys/com.gmd.hidesoftkeys.MainActivity'");
-    system("su -c 'am start --activity-task-on-home -D -n com.skt.tmap.ku/com.skt.tmap.activity.TmapNaviActivity'");
+    system("su -c 'am start --activity-task-on-home com.skt.tmap.ku/com.skt.tmap.activity.TmapNaviActivity'");
     touched = true;
   }
 
