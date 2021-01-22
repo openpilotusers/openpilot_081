@@ -70,6 +70,7 @@ if __name__ == "__main__":
 
 from common.spinner import Spinner
 from common.text_window import TextWindow
+from common.params import Params
 
 if int(Params().get('OpkrEnableMap')) == 1:
   if not (os.system("python3 -m pip list | grep 'scipy' ") == 0):
