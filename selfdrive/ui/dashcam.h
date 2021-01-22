@@ -327,9 +327,8 @@ void screen_toggle_lock() {
 bool dashcam( UIState *s, int touch_x, int touch_y ) {
 
   bool touched = false;
-  
   screen_draw_button(s, touch_x, touch_y);
-  if ((screen_button_clicked(touch_x,touch_y)) && (s->scene.uilayout_sidebarcollapsed == true)) {
+  if ((screen_button_clicked(touch_x,touch_y)) && (s->scene.uilayout_sidebarcollapsed == true) && (s->limit_set_speed == 0)) {
     click_elapsed_time = get_time() - click_time;
 
     if (click_elapsed_time > 0) {
