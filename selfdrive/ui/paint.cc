@@ -590,12 +590,13 @@ static void ui_draw_vision_maxspeed(UIState *s) {
 
 static void ui_draw_vision_speedlimit(UIState *s) {
   char speedlim_str[32];
-  //float speedlimit = s->scene.speedlimit;
-  float speedlimit = s->scene.cruiseSetSpeed; // to show cruise set speed on cluster
+  float speedlimit = s->scene.speedlimit;
   int speedlim_calc = speedlimit * 2.2369363 + 0.5;
   if (s->is_metric) {
     speedlim_calc = speedlimit * 3.6 + 0.5;
   }
+
+  speedlim_calc = s->scene.vSetDis; //show cruise set speed on cluster
 
   bool is_speedlim_valid = s->scene.speedlimit_valid;
   float hysteresis_offset = 0.5;
