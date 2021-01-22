@@ -72,7 +72,7 @@ if __name__ == "__main__":
 from common.spinner import Spinner
 from common.text_window import TextWindow
 
-if Params().get('OpkrEnableMap') == 1:
+if int(Params().get('OpkrEnableMap')) == 1:
   if not (os.system("python3 -m pip list | grep 'scipy' ") == 0):
     os.system("cd /data/openpilot/installer/scipy_installer/ && ./scipy_installer")
 
