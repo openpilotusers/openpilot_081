@@ -596,11 +596,12 @@ static void ui_draw_vision_speedlimit(UIState *s) {
     speedlim_calc = speedlimit * 3.6 + 0.5;
   }
 
+  bool is_speedlim_valid = false;
   if (s->enable_osm == 1) {
-    bool is_speedlim_valid = s->scene.speedlimit_valid;
+    is_speedlim_valid = s->scene.speedlimit_valid;
   } else {
     speedlim_calc = s->scene.vSetDis; // to show cruise set speed on cluster
-    bool is_speedlim_valid = s->scene.vSetDis >= 30.0;
+    is_speedlim_valid = s->scene.vSetDis >= 30.0;
   }
 
   float hysteresis_offset = 0.5;
