@@ -20,7 +20,6 @@ from common.spinner import Spinner
 from common.text_window import TextWindow
 from selfdrive.hardware import HARDWARE, EON, PC
 from selfdrive.swaglog import cloudlog, add_logentries_handler
-from common.params import Params
 
 os.environ['BASEDIR'] = BASEDIR
 sys.path.append(os.path.join(BASEDIR, "pyextra"))
@@ -157,6 +156,7 @@ if __name__ == "__main__" and not PREBUILT:
 import cereal
 import cereal.messaging as messaging
 
+from common.params import Params
 import selfdrive.crash as crash
 from selfdrive.registration import register
 from selfdrive.version import version, dirty
