@@ -320,7 +320,8 @@ void update_sockets(UIState *s) {
     scene.tpmsPressureRr = data.getTpmsPressureRr();
     scene.radarDistance = data.getRadarDistance();
     scene.standStill = data.getStandStill();
-    scene.vSetDis = data.getVSetDis();
+    scene.cruiseSetSpeed = data.getCruiseState().getSpeed();
+
   }
 
   if (sm.updated("sensorEvents")) {

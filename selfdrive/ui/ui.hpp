@@ -169,7 +169,7 @@ typedef struct UIScene {
   bool standStill;
   float limitSpeedCamera;
   float v_ego;
-  float vSetDis;
+  float cruiseSetSpeed;
 
   cereal::HealthData::HwType hwType;
   int satelliteCount;
