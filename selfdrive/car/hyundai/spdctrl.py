@@ -1,5 +1,6 @@
 import os
-import subprocess
+import sys
+import subprocess as sb
 import math
 import numpy as np
 from cereal import car, log
@@ -30,21 +31,15 @@ class Spdctrl(SpdController):
         self.target_speed_road = 0
         self.target_speed_camera = 0
         self.target_speed_map = 0
+        self.target_speed_map_counter = 0
 
     def update_lead(self, sm, CS, dRel, yRel, vRel):
-        logcat = "logcat -d -s opkrspdlimit"
-        tail = "tail -1"
-        awk = "awk '{{print $7}}'"
-        logcat_data = subprocess.Popen(logcat.split(), stdout=subprocess.PIPE)         
-        tail_data = subprocess.Popen(tail.split(), stdin=logcat_data.stdout, stdout=subprocess.PIPE)
-        logcat_data.stdout.close()
-        awk_data = subprocess.Popen(awk.split(), stdin=tail_data.stdout, stdout=subprocess.PIPE)
-        tail_data.stdout.close()
-        limitspeed = awk_data.stdout.read()
-        awk_data.stdout.close()
-
-        #os.system("logcat -d -s "opkrspdlimit" | grep -e "opkrspdlimit" | tail -n 1")
-        #opkrspdlimit = subprocess.check_output(["logcat", "-d", "-s", "opkrspdlimit", "|", "grep", "-e", "opkrspdlimit", "|", "tail", "-n", "1"], encoding='utf8')
+        self.target_speed_map_counter += 1
+        limitspeed = ""
+        if self.target_speed_map_counter > 50:
+          limitspeed = "logcat -d -s opkrspdlimit | tail -n 1 | awk '{print $7}'"
+          output = sb.check_output(limitspeed, stderr=sb.STDOUT, shell=True)
+          self.target_speed_map_counter = 0
         self.osm_enable = int(Params().get("LimitSetSpeed", encoding='utf8')) == 1
         self.osm_enable_camera = int(Params().get("LimitSetSpeedCamera", encoding='utf8')) == 1
         self.osm_spdlimit_offset = int(Params().get("OpkrSpeedLimitOffset", encoding='utf8'))
