@@ -1,3 +1,4 @@
+import os
 import subprocess
 import math
 import numpy as np
@@ -63,6 +64,7 @@ class Spdctrl(SpdController):
         self.target_speed_camera = plan.targetSpeedCamera + self.osm_spdlimit_offset
         
         if self.map_enable:
+            limitspeed = limitspeed.rstrip('\n')
             self.target_speed_map = float(limitspeed)
             self.target_speed = int(self.target_speed_map)
         elif self.osm_enable:
