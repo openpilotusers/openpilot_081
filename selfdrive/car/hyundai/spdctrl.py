@@ -36,7 +36,7 @@ class Spdctrl(SpdController):
     def update_lead(self, sm, CS, dRel, yRel, vRel):
         if not self.osm_enable_map:
             self.target_speed_map_counter += 1
-            if self.target_speed_map_counter >= 150:
+            if self.target_speed_map_counter >= 100:
                 self.target_speed_map_counter = 0
                 os.system("logcat -d -s opkrspdlimit | grep opkrspdlimit | tail -n 1 | awk \'{print $7}\' > /data/params/d/LimitSetSpeedCamera &")
                 mapspeed = Params().get("LimitSetSpeedCamera", encoding="utf8")
