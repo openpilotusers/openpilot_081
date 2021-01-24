@@ -29,7 +29,7 @@ class Spdctrl(SpdController):
         self.target_speed = 0
         self.target_speed_road = 0
         self.target_speed_camera = 0
-        self.target_speed_map = 0
+        self.target_speed_map = 0.0
         self.target_speed_map_counter = 0
         self.osm_enable_map = int(Params().get("OpkrEnableMap", encoding='utf8')) == 1
 
