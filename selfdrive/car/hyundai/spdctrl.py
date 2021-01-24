@@ -1,6 +1,4 @@
 import os
-import sys
-import subprocess as sb
 import math
 import numpy as np
 from cereal import car, log
@@ -25,6 +23,7 @@ class Spdctrl(SpdController):
         self.cruise_gap = 0.0
         self.cut_in = False
         self.osm_enable = False
+        self.osm_enable_camera = False
         self.map_enable = False
         self.osm_spdlimit_offset = 0
         self.target_speed = 0
@@ -32,20 +31,30 @@ class Spdctrl(SpdController):
         self.target_speed_camera = 0
         self.target_speed_map = 0
         self.target_speed_map_counter = 0
+        self.osm_enable_map = int(Params().get("OpkrEnableMap", encoding='utf8')) == 1
 
     def update_lead(self, sm, CS, dRel, yRel, vRel):
-        self.target_speed_map_counter += 1
-        limitspeed_output = "0"
-        if self.target_speed_map_counter > 50:
-          limitspeed = "logcat -d -s opkrspdlimit | tail -n 1 | awk '{print $7}'"
-          limitspeed_output = sb.check_output(limitspeed, stderr=sb.STDOUT, shell=True)
-          self.target_speed_map_counter = 0
-        self.osm_enable = int(Params().get("LimitSetSpeed", encoding='utf8')) == 1
-        self.osm_enable_camera = int(Params().get("LimitSetSpeedCamera", encoding='utf8')) == 1
-        self.osm_spdlimit_offset = int(Params().get("OpkrSpeedLimitOffset", encoding='utf8'))
-        self.map_enable = limitspeed_output != "0"
+        if not self.osm_enable_map:
+            self.target_speed_map_counter += 1
+            if self.target_speed_map_counter >= 100:
+                self.target_speed_map_counter = 0
+                os.system('logcat -d -v raw -s opkrspdlimit | grep opkrspdlimit | tail -n 1 | awk \'{print $2}\' > /data/params/d/LimitSetSpeedCamera')
+                mapspeed = Params().get("LimitSetSpeedCamera", encoding="utf8")
+                if mapspeed is not None:
+                    self.target_speed_map = int(mapspeed.rstrip('\n'))
+                    self.map_enable = self.target_speed_map > 0
+                else:
+                    self.map_enable = False
+                    self.target_speed_map = 0
 
-        print('speed={} map_enable={}'.format(limitspeed_output, self.map_enable))
+        if self.osm_enable_map:
+            self.osm_enable = int(Params().get("LimitSetSpeed", encoding='utf8')) == 1
+            self.osm_enable_camera = int(Params().get("LimitSetSpeedCamera", encoding='utf8')) == 1
+        else:
+            self.osm_enable = False
+            self.osm_enable_camera = False
+
+        self.osm_spdlimit_offset = int(Params().get("OpkrSpeedLimitOffset", encoding='utf8'))
 
         plan = sm['plan']
         dRele = plan.dRel1 #EON Lead
@@ -58,10 +67,9 @@ class Spdctrl(SpdController):
         self.target_speed_road = plan.targetSpeed + self.osm_spdlimit_offset
         self.target_speed_camera = plan.targetSpeedCamera + self.osm_spdlimit_offset
         
-        #if self.map_enable:
-        #    self.target_speed_map = float(limitspeed)
-        #    self.target_speed = int(self.target_speed_map)
-        if self.osm_enable:
+        if self.map_enable:
+            self.target_speed = self.target_speed_map + self.osm_spdlimit_offset
+        elif self.osm_enable:
             self.target_speed = self.target_speed_road
         elif self.target_speed_camera <= 29:
             self.osm_enable_camera = False
