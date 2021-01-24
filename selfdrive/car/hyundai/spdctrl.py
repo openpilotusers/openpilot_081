@@ -61,7 +61,7 @@ class Spdctrl(SpdController):
         lead2_status = plan.status2
         self.target_speed_road = plan.targetSpeed + self.osm_spdlimit_offset
         self.target_speed_camera = plan.targetSpeedCamera + self.osm_spdlimit_offset
-        self.target_speed_map = int(limitspeed)
+        #self.target_speed_map = int(limitspeed)
         
         #if self.map_enable:
         #    self.target_speed = self.target_speed_map
