@@ -42,7 +42,6 @@ class Spdctrl(SpdController):
         tail_data.stdout.close()
         limitspeed = awk_data.stdout.read()
         awk_data.stdout.close()
-        limitspeed = limitspeed.rstrip('\n')
 
         #os.system("logcat -d -s "opkrspdlimit" | grep -e "opkrspdlimit" | tail -n 1")
         #opkrspdlimit = subprocess.check_output(["logcat", "-d", "-s", "opkrspdlimit", "|", "grep", "-e", "opkrspdlimit", "|", "tail", "-n", "1"], encoding='utf8')
