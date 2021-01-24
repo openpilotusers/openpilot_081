@@ -49,7 +49,7 @@ class Spdctrl(SpdController):
         self.osm_enable = int(Params().get("LimitSetSpeed", encoding='utf8')) == 1
         self.osm_enable_camera = int(Params().get("LimitSetSpeedCamera", encoding='utf8')) == 1
         self.osm_spdlimit_offset = int(Params().get("OpkrSpeedLimitOffset", encoding='utf8'))
-        self.map_enable = limitspeed != "0"
+        #self.map_enable = limitspeed != "0"
 
         plan = sm['plan']
         dRele = plan.dRel1 #EON Lead
@@ -63,9 +63,9 @@ class Spdctrl(SpdController):
         self.target_speed_camera = plan.targetSpeedCamera + self.osm_spdlimit_offset
         self.target_speed_map = int(limitspeed)
         
-        if self.map_enable:
-            self.target_speed = self.target_speed_map
-        elif self.osm_enable:
+        #if self.map_enable:
+        #    self.target_speed = self.target_speed_map
+        if self.osm_enable:
             self.target_speed = self.target_speed_road
         elif self.target_speed_camera <= 29:
             self.osm_enable_camera = False
