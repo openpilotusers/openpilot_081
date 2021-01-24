@@ -38,10 +38,11 @@ class Spdctrl(SpdController):
             self.target_speed_map_counter += 1
             if self.target_speed_map_counter >= 100:
                 self.target_speed_map_counter = 0
-                os.system('logcat -d -v raw -s opkrspdlimit | grep opkrspdlimit | tail -n 1 | awk \'{print $2}\' > /data/params/d/LimitSetSpeedCamera')
+                os.system("logcat -d -s opkrspdlimit | grep opkrspdlimit | tail -n 1 | awk \'{print $7}\' > /data/params/d/LimitSetSpeedCamera")
                 mapspeed = Params().get("LimitSetSpeedCamera", encoding="utf8")
                 if mapspeed is not None:
-                    self.target_speed_map = int(mapspeed.rstrip('\n'))
+                    self.target_speed_map = float(mapspeed.rstrip('\n'))
+                    print('limitspeed={}'.format(self.target_speed_map))
                     self.map_enable = self.target_speed_map > 0
                 else:
                     self.map_enable = False
@@ -68,7 +69,7 @@ class Spdctrl(SpdController):
         self.target_speed_camera = plan.targetSpeedCamera + self.osm_spdlimit_offset
         
         if self.map_enable:
-            self.target_speed = self.target_speed_map + self.osm_spdlimit_offset
+            self.target_speed = int(self.target_speed_map) + self.osm_spdlimit_offset
         elif self.osm_enable:
             self.target_speed = self.target_speed_road
         elif self.target_speed_camera <= 29:
