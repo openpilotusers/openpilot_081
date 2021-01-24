@@ -42,7 +42,6 @@ class Spdctrl(SpdController):
                 mapspeed = Params().get("LimitSetSpeedCamera", encoding="utf8")
                 if mapspeed is not None:
                     self.target_speed_map = float(mapspeed.rstrip('\n'))
-                    print('limitspeed={}'.format(self.target_speed_map))
                     self.map_enable = self.target_speed_map > 0
                 else:
                     self.map_enable = False
