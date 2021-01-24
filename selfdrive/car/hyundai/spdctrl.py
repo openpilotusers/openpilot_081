@@ -35,17 +35,18 @@ class Spdctrl(SpdController):
 
     def update_lead(self, sm, CS, dRel, yRel, vRel):
         self.target_speed_map_counter += 1
-        limitspeed = ""
+        limitspeed_output = ""
         if self.target_speed_map_counter > 50:
           limitspeed = "logcat -d -s opkrspdlimit | tail -n 1 | awk '{print $7}'"
-          output = sb.check_output(limitspeed, stderr=sb.STDOUT, shell=True)
+          limitspeed_output = sb.check_output(limitspeed, stderr=sb.STDOUT, shell=True)
+          print limitspeed_output
           self.target_speed_map_counter = 0
         self.osm_enable = int(Params().get("LimitSetSpeed", encoding='utf8')) == 1
         self.osm_enable_camera = int(Params().get("LimitSetSpeedCamera", encoding='utf8')) == 1
         self.osm_spdlimit_offset = int(Params().get("OpkrSpeedLimitOffset", encoding='utf8'))
         self.map_enable = limitspeed != "0"
 
-        print('speed={} map_enable={}'.format(limitspeed, self.map_enable))
+        print('speed={} map_enable={}'.format(limitspeed_output, self.map_enable))
 
         plan = sm['plan']
         dRele = plan.dRel1 #EON Lead
