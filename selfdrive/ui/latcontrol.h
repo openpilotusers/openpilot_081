@@ -55,6 +55,7 @@ bool latcontrol( UIState *s, int touch_x, int touch_y ) {
     Params().write_db_value("LimitSetSpeed", "1", 1);
     //system("su -c 'am start -n com.gmd.hidesoftkeys/com.gmd.hidesoftkeys.MainActivity'");
     system("su -c 'am start --activity-task-on-home com.skt.tmap.ku/com.skt.tmap.activity.TmapNaviActivity'");
+    s->sound->play(AudibleAlert::CHIME_WARNING1);
     touched = true;
   }
 
