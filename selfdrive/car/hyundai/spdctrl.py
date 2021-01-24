@@ -39,7 +39,6 @@ class Spdctrl(SpdController):
         if self.target_speed_map_counter > 50:
           limitspeed = "logcat -d -s opkrspdlimit | tail -n 1 | awk '{print $7}'"
           limitspeed_output = sb.check_output(limitspeed, stderr=sb.STDOUT, shell=True)
-          print limitspeed_output
           self.target_speed_map_counter = 0
         self.osm_enable = int(Params().get("LimitSetSpeed", encoding='utf8')) == 1
         self.osm_enable_camera = int(Params().get("LimitSetSpeedCamera", encoding='utf8')) == 1
