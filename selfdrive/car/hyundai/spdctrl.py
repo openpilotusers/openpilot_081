@@ -55,12 +55,12 @@ class Spdctrl(SpdController):
                     self.mapspeed_count = int(float(mapspdcount.rstrip('\n')))
                     if self.mapspeed_count > self.mapspeed_count2:
                         self.mapspeed_count2 = self.mapspeed_count
-                    elif self.mapspeed_count = self.mapspeed_count2 and self.mapspeed_count != 0:
+                    elif self.mapspeed_count == self.mapspeed_count2 and self.mapspeed_count != 0:
                         self.target_speed_map_counter2 += 1
                 else:
                     self.mapspeed_count = 0
             
-            if self.target_speed_map_counter2 >= 3:
+            if self.target_speed_map_counter2 >= 4:
                 self.target_speed_map_counter2 = 0
                 self.mapspeed_count = 0
                 self.mapspeed_count2 = 0
