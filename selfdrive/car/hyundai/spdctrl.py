@@ -30,40 +30,33 @@ class Spdctrl(SpdController):
         self.target_speed_road = 0
         self.target_speed_camera = 0
         self.target_speed_map = 0.0
-        self.mapspeed_count = 0
-        self.mapspeed_count2 = 0
         self.target_speed_map_counter = 0
+        self.target_speed_map_counter1 = 150
         self.target_speed_map_counter2 = 0
         self.osm_enable_map = int(Params().get("OpkrEnableMap", encoding='utf8')) == 1
 
     def update_lead(self, sm, CS, dRel, yRel, vRel):
         if not self.osm_enable_map and int(CS.clu_Vanz) > 20:
             self.target_speed_map_counter += 1
-            if self.target_speed_map_counter >= 150:
+            if self.target_speed_map_counter >= self.target_speed_map_counter1:
+                self.target_speed_map_counter1 = 150
                 self.target_speed_map_counter = 0
-                os.system("logcat -d -s opkrspdlimit | grep opkrspdlimit | wc -l > /data/params/d/LimitSetSpeedNeural &")
-                os.system("logcat -d -s opkrspdlimit | grep opkrspdlimit | tail -n 1 | awk \'{print $7}\' > /data/params/d/LimitSetSpeedCamera &")
+                if int(Params().get("LimitSetSpeed", encoding='utf8')) == 1:
+                    os.system("logcat -d -s opkrspdlimit | grep opkrspdlimit | tail -n 1 | awk \'{print $7}\' > /data/params/d/LimitSetSpeedCamera &")
+                elif int(Params().get("LimitSetSpeed", encoding='utf8')) == 0:
+                    os.system("logcat -d -s opkrspdlimit5 | grep opkrspdlimit5 | tail -n 1 | awk \'{print $7}\' > /data/params/d/LimitSetSpeedCamera &")
                 mapspeed = Params().get("LimitSetSpeedCamera", encoding="utf8")
-                mapspdcount = Params().get("LimitSetSpeedNeural", encoding="utf8")
                 if mapspeed is not None:
                     self.target_speed_map = float(mapspeed.rstrip('\n'))
                     self.map_enable = self.target_speed_map > 29
+                    if self.map_enable:
+                        self.target_speed_map_counter2 += 1
                 else:
                     self.map_enable = False
                     self.target_speed_map = 0
-                if mapspdcount is not None:
-                    self.mapspeed_count = int(float(mapspdcount.rstrip('\n')))
-                    if self.mapspeed_count > self.mapspeed_count2:
-                        self.mapspeed_count2 = self.mapspeed_count
-                    elif self.mapspeed_count == self.mapspeed_count2 and self.mapspeed_count != 0:
-                        self.target_speed_map_counter2 += 1
-                else:
-                    self.mapspeed_count = 0
-            
-            if self.target_speed_map_counter2 >= 4:
+            if self.map_enable and self.target_speed_map_counter2 >= 3:
+                self.target_speed_map_counter1 = 450
                 self.target_speed_map_counter2 = 0
-                self.mapspeed_count = 0
-                self.mapspeed_count2 = 0
                 os.system("logcat -c &")
 
         if self.osm_enable_map:
