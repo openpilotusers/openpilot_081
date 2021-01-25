@@ -44,7 +44,7 @@ class Spdctrl(SpdController):
                 if int(Params().get("LimitSetSpeed", encoding='utf8')) == 1:
                     os.system("logcat -d -s opkrspdlimit | grep opkrspdlimit | tail -n 1 | awk \'{print $7}\' > /data/params/d/LimitSetSpeedCamera &")
                 elif int(Params().get("LimitSetSpeed", encoding='utf8')) == 0:
-                    os.system("logcat -d -s opkrspdlimit5 | grep opkrspdlimit5 | tail -n 1 | awk \'{print $7}\' > /data/params/d/LimitSetSpeedCamera &")
+                    os.system("logcat -d -s opkrspd5limit | grep opkrspd5limit | tail -n 1 | awk \'{print $7}\' > /data/params/d/LimitSetSpeedCamera &")
                 mapspeed = Params().get("LimitSetSpeedCamera", encoding="utf8")
                 if mapspeed is not None:
                     self.target_speed_map = float(mapspeed.rstrip('\n'))
