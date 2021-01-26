@@ -36,7 +36,7 @@ class Spdctrl(SpdController):
         self.osm_enable_map = int(Params().get("OpkrEnableMap", encoding='utf8')) == 1
 
     def update_lead(self, sm, CS, dRel, yRel, vRel):
-        if not self.osm_enable_map and int(CS.clu_Vanz) > 20:
+        if not self.osm_enable_map:
             self.target_speed_map_counter += 1
             if self.target_speed_map_counter >= self.target_speed_map_counter1:
                 self.target_speed_map_counter1 = 150
@@ -48,11 +48,11 @@ class Spdctrl(SpdController):
                     self.map_enable = self.target_speed_map > 29
                     if self.map_enable:
                         self.target_speed_map_counter2 += 1
+                        self.target_speed_map_counter1 = 450
                 else:
                     self.map_enable = False
                     self.target_speed_map = 0
             if self.map_enable and self.target_speed_map_counter2 >= 3:
-                self.target_speed_map_counter1 = 450
                 self.target_speed_map_counter2 = 0
                 os.system("logcat -c &")
 
