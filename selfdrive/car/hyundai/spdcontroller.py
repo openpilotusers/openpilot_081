@@ -295,16 +295,19 @@ class SpdController():
         dec_step_cmd = 1
 
         if self.osm_spd_enable_map:
-          self.osm_spd_enable = int(Params().get("LimitSetSpeed", encoding='utf8')) == 1
-          self.osm_spd_enable_camera = int(Params().get("LimitSetSpeedCamera", encoding='utf8')) == 1
+            self.osm_spd_enable = int(Params().get("LimitSetSpeed", encoding='utf8')) == 1
+            self.osm_spd_enable_camera = int(Params().get("LimitSetSpeedCamera", encoding='utf8')) == 1
         elif not self.osm_spd_enable_map:
-          camspeed = Params().get("LimitSetSpeedCamera", encoding="utf8")
-          if camspeed is not None:
-            self.map_spd_camera = int(float(camspeed.rstrip('\n')))
-            self.map_spd_enable = self.map_spd_camera > 29
-          else:
-            self.map_spd_enable = False
-            self.map_spd_camera = 0
+            try:
+                camspeed = int(os.environ.get('tsv'))
+            except:
+                camspeed = 0
+            if camspeed > 29:
+                self.map_spd_camera = camspeed
+                self.map_spd_enable = True
+            else:
+                self.map_spd_enable = False
+                self.map_spd_camera = 0
           
         self.osm_spd_limit_offset = int(Params().get("OpkrSpeedLimitOffset", encoding='utf8'))
 

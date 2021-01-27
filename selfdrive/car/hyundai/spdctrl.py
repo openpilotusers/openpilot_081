@@ -29,11 +29,11 @@ class Spdctrl(SpdController):
         self.target_speed = 0
         self.target_speed_road = 0
         self.target_speed_camera = 0
-        self.target_speed_map = 0.0
+        self.target_speed_map = 0
         self.target_speed_map_counter = 0
         self.target_speed_map_counter1 = 150
-        self.target_speed_map_counter2 = 0
         self.osm_enable_map = int(Params().get("OpkrEnableMap", encoding='utf8')) == 1
+        os.system("logcat -c &")
 
     def update_lead(self, sm, CS, dRel, yRel, vRel):
         if not self.osm_enable_map:
@@ -41,20 +41,22 @@ class Spdctrl(SpdController):
             if self.target_speed_map_counter >= self.target_speed_map_counter1:
                 self.target_speed_map_counter1 = 150
                 self.target_speed_map_counter = 0
-                os.system("logcat -d -s opkrspdlimit,opkrspd2limit,opkrspd5limit | grep opkrspd | tail -n 1 | awk \'{print $7}\' > /data/params/d/LimitSetSpeedCamera &")
-                mapspeed = Params().get("LimitSetSpeedCamera", encoding="utf8")
-                if mapspeed is not None:
-                    self.target_speed_map = float(mapspeed.rstrip('\n'))
-                    self.map_enable = self.target_speed_map > 29
-                    if self.map_enable:
-                        self.target_speed_map_counter2 += 1
-                        self.target_speed_map_counter1 = 450
+                #os.system("logcat -d -s opkrspdlimit,opkrspd2limit,opkrspd5limit | grep opkrspd | tail -n 1 | awk \'{print $7}\' > /data/params/d/LimitSetSpeedCamera &")
+                os.system("export tsv=`logcat -d -s opkrspdlimit,opkrspd2limit,opkrspd5limit | grep opkrspd | tail -n 1 | awk \'{print $7}\' &`")
+                try:
+                    mapspeed = int(os.environ.get('tsv'))
+                except:
+                    mapspeed = 0
+                #mapspeed = Params().get("LimitSetSpeedCamera", encoding="utf8")
+                if mapspeed > 29:
+                    self.map_enable = True
+                    self.target_speed_map = mapspeed
+                    self.target_speed_map_counter1 = 400
+                    os.system("logcat -c &")
                 else:
                     self.map_enable = False
                     self.target_speed_map = 0
-            if self.map_enable and self.target_speed_map_counter2 >= 3:
-                self.target_speed_map_counter2 = 0
-                os.system("logcat -c &")
+                    self.target_speed_map_counter1 = 150
 
         if self.osm_enable_map:
             self.osm_enable = int(Params().get("LimitSetSpeed", encoding='utf8')) == 1
