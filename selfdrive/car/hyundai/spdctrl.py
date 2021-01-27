@@ -13,9 +13,6 @@ from selfdrive.controls.lib.events import Events
 
 EventName = car.CarEvent.EventName
 
-global SAFETY_CAM_SPEED
-SAFETY_CAM_SPEED = 0
-
 class Spdctrl(SpdController):
     def __init__(self, CP=None):
         super().__init__( CP )
