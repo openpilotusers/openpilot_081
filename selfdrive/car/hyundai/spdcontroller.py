@@ -298,11 +298,11 @@ class SpdController():
         elif not self.osm_spd_enable_map:
             if int(Params().get("LimitSetSpeedCamera", encoding='utf8')) == 1:
                 try:
-                    maxspeed_temp = (subprocess.check_output("logcat -d -s opkrspdlimit,opkrspd2limit,opkrspd5limit | grep opkrspd | tail -n 1 | awk '{print $7}' &",shell=True)).strip()
-                    mapspeed = int(maxspeed_temp)
+                    maxspeed_temp_ = (subprocess.check_output("logcat -d -s opkrspdlimit,opkrspd2limit,opkrspd5limit | grep opkrspd | tail -n 1 | awk '{print $7}' &",shell=True)).strip()
+                    mapspeed_ = int(maxspeed_temp_)
                 except:
-                    mapspeed = 0
-                self.map_spd_camera = mapspeed
+                    mapspeed_ = 0
+                self.map_spd_camera = mapspeed_
                 self.map_spd_enable = True
             else:
                 self.map_spd_enable = False
