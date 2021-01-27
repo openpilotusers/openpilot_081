@@ -33,7 +33,6 @@ class Spdctrl(SpdController):
         self.target_speed_map_counter = 0
         self.target_speed_map_counter1 = 150
         self.osm_enable_map = int(Params().get("OpkrEnableMap", encoding='utf8')) == 1
-        os.system("logcat -c &")
 
     def update_lead(self, sm, CS, dRel, yRel, vRel):
         if not self.osm_enable_map:
@@ -43,6 +42,7 @@ class Spdctrl(SpdController):
                 self.target_speed_map_counter = 0
                 #os.system("logcat -d -s opkrspdlimit,opkrspd2limit,opkrspd5limit | grep opkrspd | tail -n 1 | awk \'{print $7}\' > /data/params/d/LimitSetSpeedCamera &")
                 os.system("export tsv=`logcat -d -s opkrspdlimit,opkrspd2limit,opkrspd5limit | grep opkrspd | tail -n 1 | awk \'{print $7}\' &`")
+                mapspeed = 0
                 try:
                     mapspeed = int(os.environ.get('tsv'))
                 except:
