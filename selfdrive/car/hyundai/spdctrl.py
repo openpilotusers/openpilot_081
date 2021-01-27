@@ -43,8 +43,8 @@ class Spdctrl(SpdController):
             elif self.target_speed_map_counter >= (150+self.target_speed_map_counter1):
                 self.target_speed_map_counter1 = 0
                 mapspeed = Params().get("LimitSetSpeedCamera", encoding="utf8")
-                if maxspeed is not None:
-                    mapspeed = int(float(maxspeed.rstrip('\n')))
+                if mapspeed is not None:
+                    mapspeed = int(float(mapspeed.rstrip('\n')))
                 else:
                     mapspeed = 0
                 self.target_speed_map_counter = 0
