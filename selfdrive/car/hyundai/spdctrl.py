@@ -32,6 +32,7 @@ class Spdctrl(SpdController):
         self.target_speed_map = 0
         self.target_speed_map_counter = 0
         self.target_speed_map_counter1 = 150
+        self.osm_enable_map = int(Params().get("OpkrEnableMap", encoding='utf8')) == 1
         subprocess.call("echo -n 0 > /data/params/d/LimitSetSpeedCamera &",shell=True)
         subprocess.call("logcat -c &",shell=True)
 
