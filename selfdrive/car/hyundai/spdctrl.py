@@ -5,7 +5,7 @@ from cereal import car, log
 from common.numpy_fast import clip, interp
 from common.params import Params
 
-from selfdrive.car.hyundai.spdcontroller  import SpdController
+from selfdrive.car.hyundai.spdcontroller import SpdController
 
 import common.log as trace1
 
