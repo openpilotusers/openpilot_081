@@ -1,3 +1,4 @@
+import subprocess
 import math
 import numpy as np
 
@@ -295,8 +296,13 @@ class SpdController():
             self.osm_spd_enable = int(Params().get("LimitSetSpeed", encoding='utf8')) == 1
             self.osm_spd_enable_camera = int(Params().get("LimitSetSpeedCamera", encoding='utf8')) == 1
         elif not self.osm_spd_enable_map:
-            if 1 > 29:
-                self.map_spd_camera = 1
+            if int(Params().get("LimitSetSpeedCamera", encoding='utf8')) == 1:
+                try:
+                    maxspeed_temp = (subprocess.check_output("logcat -d -s opkrspdlimit,opkrspd2limit,opkrspd5limit | grep opkrspd | tail -n 1 | awk '{print $7}' &",shell=True)).strip()
+                    mapspeed = int(maxspeed_temp)
+                except:
+                    mapspeed = 0
+                self.map_spd_camera = mapspeed
                 self.map_spd_enable = True
             else:
                 self.map_spd_enable = False

@@ -32,6 +32,7 @@ class Spdctrl(SpdController):
         self.target_speed_map = 0
         self.target_speed_map_counter = 0
         self.target_speed_map_counter1 = 150
+        subprocess.call("echo -n 0 > /data/params/d/LimitSetSpeedCamera &",shell=True)
         subprocess.call("logcat -c &",shell=True)
 
     def update_lead(self, sm, CS, dRel, yRel, vRel):
@@ -48,11 +49,15 @@ class Spdctrl(SpdController):
                     mapspeed = 0
                 #mapspeed = Params().get("LimitSetSpeedCamera", encoding="utf8")
                 if mapspeed > 29:
+                    if int(Params().get("LimitSetSpeedCamera", encoding='utf8')) == 0:
+                        subprocess.call("echo -n 1 > /data/params/d/LimitSetSpeedCamera &",shell=True)
                     self.map_enable = True
                     self.target_speed_map = mapspeed
                     self.target_speed_map_counter1 = 400
                     subprocess.call("logcat -c &",shell=True)
                 else:
+                    if int(Params().get("LimitSetSpeedCamera", encoding='utf8')) == 1:
+                        subprocess.call("echo -n 0 > /data/params/d/LimitSetSpeedCamera &",shell=True)
                     self.map_enable = False
                     self.target_speed_map = 0
                     self.target_speed_map_counter1 = 150
