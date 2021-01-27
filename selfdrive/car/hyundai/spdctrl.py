@@ -1,11 +1,11 @@
-import subprocess
+import os
 import math
 import numpy as np
 from cereal import car, log
 from common.numpy_fast import clip, interp
 from common.params import Params
 
-from selfdrive.car.hyundai.spdcontroller import SpdController
+from selfdrive.car.hyundai.spdcontroller  import SpdController
 
 import common.log as trace1
 
@@ -29,39 +29,33 @@ class Spdctrl(SpdController):
         self.target_speed = 0
         self.target_speed_road = 0
         self.target_speed_camera = 0
-        self.target_speed_map = 0
+        self.target_speed_map = 0.0
         self.target_speed_map_counter = 0
-        self.target_speed_map_counter1 = 150
+        self.target_speed_map_counter1 = 0
         self.osm_enable_map = int(Params().get("OpkrEnableMap", encoding='utf8')) == 1
-        subprocess.call("echo -n 0 > /data/params/d/LimitSetSpeedCamera &",shell=True)
-        subprocess.call("logcat -c &",shell=True)
+        os.system("logcat -c &")
 
     def update_lead(self, sm, CS, dRel, yRel, vRel):
         if not self.osm_enable_map:
             self.target_speed_map_counter += 1
-            if self.target_speed_map_counter >= self.target_speed_map_counter1:
-                self.target_speed_map_counter1 = 150
-                self.target_speed_map_counter = 0
-                #os.system("logcat -d -s opkrspdlimit,opkrspd2limit,opkrspd5limit | grep opkrspd | tail -n 1 | awk \'{print $7}\' > /data/params/d/LimitSetSpeedCamera &")
-                try:
-                    maxspeed_temp = (subprocess.check_output("logcat -d -s opkrspdlimit,opkrspd2limit,opkrspd5limit | grep opkrspd | tail -n 1 | awk '{print $7}' &",shell=True)).strip()
-                    mapspeed = int(maxspeed_temp)
-                except:
+            if self.target_speed_map_counter == (100+self.target_speed_map_counter1):
+                os.system("logcat -d -s opkrspdlimit,opkrspd2limit,opkrspd5limit | grep opkrspd | tail -n 1 | awk \'{print $7}\' > /data/params/d/LimitSetSpeedCamera &")
+            elif self.target_speed_map_counter >= (150+self.target_speed_map_counter1):
+                self.target_speed_map_counter1 = 0
+                mapspeed = Params().get("LimitSetSpeedCamera", encoding="utf8")
+                if maxspeed is not None:
+                    mapspeed = int(float(maxspeed.rstrip('\n')))
+                else:
                     mapspeed = 0
-                #mapspeed = Params().get("LimitSetSpeedCamera", encoding="utf8")
+                self.target_speed_map_counter = 0
                 if mapspeed > 29:
-                    if int(Params().get("LimitSetSpeedCamera", encoding='utf8')) == 0:
-                        subprocess.call("echo -n 1 > /data/params/d/LimitSetSpeedCamera &",shell=True)
                     self.map_enable = True
                     self.target_speed_map = mapspeed
-                    self.target_speed_map_counter1 = 400
-                    subprocess.call("logcat -c &",shell=True)
+                    self.target_speed_map_counter1 = 300
+                    os.system("logcat -c &")
                 else:
-                    if int(Params().get("LimitSetSpeedCamera", encoding='utf8')) == 1:
-                        subprocess.call("echo -n 0 > /data/params/d/LimitSetSpeedCamera &",shell=True)
                     self.map_enable = False
                     self.target_speed_map = 0
-                    self.target_speed_map_counter1 = 150
 
         if self.osm_enable_map:
             self.osm_enable = int(Params().get("LimitSetSpeed", encoding='utf8')) == 1
