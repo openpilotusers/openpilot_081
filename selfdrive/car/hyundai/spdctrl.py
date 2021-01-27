@@ -55,11 +55,11 @@ class Spdctrl(SpdController):
                     else:
                         self.map_enable = False
                         self.target_speed_map = 0
-                elif mapspeed is None and self.target_speed_map_counter2 < 8:
+                elif mapspeed is None and self.target_speed_map_counter2 < 4:
                     self.target_speed_map_counter2 += 1
                     self.target_speed_map_counter = 101
                 else:
-                    self.target_speed_map_counter = 0
+                    self.target_speed_map_counter = 99
                     self.target_speed_map_counter2 = 0
                     self.map_enable = False
                     self.target_speed_map = 0
