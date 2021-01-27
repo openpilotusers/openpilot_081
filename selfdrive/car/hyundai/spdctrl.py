@@ -50,7 +50,7 @@ class Spdctrl(SpdController):
                     if mapspeed > 29:
                         self.map_enable = True
                         self.target_speed_map = mapspeed
-                        self.target_speed_map_counter1 = 300
+                        self.target_speed_map_counter1 = 250
                         os.system("logcat -c &")
                     else:
                         self.map_enable = False
