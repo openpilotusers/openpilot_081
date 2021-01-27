@@ -19,8 +19,6 @@ import common.log as trace1
 import common.CTime1000 as tm
 import common.MoveAvg as moveavg1
 
-from selfdrive.car.hyundai.spdctrl import SAFETY_CAM_SPEED
-
 
 MAX_SPEED = 255.0
 
@@ -297,8 +295,8 @@ class SpdController():
             self.osm_spd_enable = int(Params().get("LimitSetSpeed", encoding='utf8')) == 1
             self.osm_spd_enable_camera = int(Params().get("LimitSetSpeedCamera", encoding='utf8')) == 1
         elif not self.osm_spd_enable_map:
-            if SAFETY_CAM_SPEED > 29:
-                self.map_spd_camera = SAFETY_CAM_SPEED
+            if 1 > 29:
+                self.map_spd_camera = 1
                 self.map_spd_enable = True
             else:
                 self.map_spd_enable = False

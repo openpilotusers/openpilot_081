@@ -13,6 +13,7 @@ from selfdrive.controls.lib.events import Events
 
 EventName = car.CarEvent.EventName
 
+
 class Spdctrl(SpdController):
     def __init__(self, CP=None):
         super().__init__( CP )
@@ -34,7 +35,6 @@ class Spdctrl(SpdController):
         subprocess.call("logcat -c &",shell=True)
 
     def update_lead(self, sm, CS, dRel, yRel, vRel):
-        global SAFETY_CAM_SPEED
         if not self.osm_enable_map:
             self.target_speed_map_counter += 1
             if self.target_speed_map_counter >= self.target_speed_map_counter1:
@@ -52,12 +52,10 @@ class Spdctrl(SpdController):
                     self.target_speed_map = mapspeed
                     self.target_speed_map_counter1 = 400
                     subprocess.call("logcat -c &",shell=True)
-                    SAFETY_CAM_SPEED = self.target_speed_map
                 else:
                     self.map_enable = False
                     self.target_speed_map = 0
                     self.target_speed_map_counter1 = 150
-                    SAFETY_CAM_SPEED = 0
 
         if self.osm_enable_map:
             self.osm_enable = int(Params().get("LimitSetSpeed", encoding='utf8')) == 1
