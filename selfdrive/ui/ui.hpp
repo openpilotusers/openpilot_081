@@ -54,8 +54,7 @@ typedef struct Rect {
 } Rect;
 
 const int sbr_w = 300;
-const int bdr_s = 30;
-const int bdr_is = 30;
+const int bdr_s = 15;
 const int vwp_h = 1080;
 const int header_h = 420;
 const int footer_h = 280;

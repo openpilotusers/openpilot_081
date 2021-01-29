@@ -615,8 +615,8 @@ static void ui_draw_vision_speedlimit(UIState *s) {
 
   int viz_speedlim_w = 180;
   int viz_speedlim_h = 202;
-  int viz_speedlim_x = (s->scene.viz_rect.x + (bdr_is));
-  int viz_speedlim_y = (s->scene.viz_rect.y + (bdr_is));
+  int viz_speedlim_x = (s->scene.viz_rect.x + (bdr_s));
+  int viz_speedlim_y = (s->scene.viz_rect.y + (bdr_s));
   if (!is_speedlim_valid) {
     viz_speedlim_w -= 5;
     viz_speedlim_h -= 10;
@@ -640,8 +640,8 @@ static void ui_draw_vision_speedlimit(UIState *s) {
   float text_x = viz_speedlim_x + viz_speedlim_w / 2;
   float text_y = viz_speedlim_y + 65;
   if (!is_speedlim_valid) {
-    text_x = (s->scene.viz_rect.x + (bdr_is)) + (180 / 2);
-    text_y = (s->scene.viz_rect.y + (bdr_is)) + 65;
+    text_x = (s->scene.viz_rect.x + (bdr_s)) + (180 / 2);
+    text_y = (s->scene.viz_rect.y + (bdr_s)) + 65;
   }
   //const float text_y = viz_speedlim_y + (is_speedlim_valid ? 50 : 45);
   // Draw "Speed Limit" Text
