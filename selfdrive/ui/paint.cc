@@ -461,7 +461,7 @@ static void ui_draw_debug(UIState *s)
 {
   UIScene &scene = s->scene;
 
-  int ui_viz_rx = scene.viz_rect.x + bdr_s + 190;
+  int ui_viz_rx = scene.viz_rect.x + bdr_s + 192;
   int ui_viz_ry = bdr_s+32;
   int ui_viz_rx_center = scene.viz_rect.centerX();
   
