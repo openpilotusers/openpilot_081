@@ -355,7 +355,7 @@ static void ui_draw_tpms(UIState *s) {
   char tpmsRr[32];
   int viz_tpms_w = 250;
   int viz_tpms_h = 160;
-  int viz_tpms_x = s->scene.viz_rect.x + s->scene.viz_rect.w - 500;
+  int viz_tpms_x = s->scene.viz_rect.x + s->scene.viz_rect.w - (bdr_s+450);
   int viz_tpms_y = s->scene.viz_rect.y + (bdr_s);
   float maxv = 0;
   float minv = 300;
@@ -461,8 +461,8 @@ static void ui_draw_debug(UIState *s)
 {
   UIScene &scene = s->scene;
 
-  int ui_viz_rx = scene.viz_rect.x + 500;
-  int ui_viz_ry = 70;
+  int ui_viz_rx = scene.viz_rect.x + bdr_s + 100;
+  int ui_viz_ry = bdr_s+40;
   int ui_viz_rx_center = scene.viz_rect.centerX();
   
   nvgTextAlign(s->vg, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE);
@@ -517,7 +517,7 @@ static void ui_draw_gear( UIState *s )
 {
   UIScene &scene = s->scene;  
   NVGcolor nColor = COLOR_WHITE;
-  int x_pos = s->scene.viz_rect.right() - (50 + bdr_s);
+  int x_pos = s->scene.viz_rect.right() - (90 + bdr_s);
   int y_pos = s->scene.viz_rect.y + (bdr_s) + 140;
   int  ngetGearShifter = int(scene.getGearShifter);
   //int  x_pos = 1795;
@@ -761,9 +761,9 @@ static void ui_draw_vision_event(UIState *s) {
     if (true) {
       const int img_x_size = 172*1.7;
       const int img_y_size = 271*1.7;
-      const int img_x = s->scene.viz_rect.x + 1150;
+      const int img_x = s->scene.viz_rect.x + bdr_s + 400;
       const int img_y = viz_event_y;
-      float img_turn_alpha = 0.8f;
+      float img_turn_alpha = 0.7f;
       nvgBeginPath(s->vg);
       NVGpaint imgPaint = nvgImagePattern(s->vg, img_x, img_y, img_x_size, img_y_size, 0, s->img_safetycam, img_turn_alpha);
       nvgRect(s->vg, img_x, img_y, img_x_size, img_y_size);
