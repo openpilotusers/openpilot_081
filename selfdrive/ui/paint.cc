@@ -617,7 +617,10 @@ static void ui_draw_vision_speedlimit(UIState *s) {
   int viz_speedlim_h = 202;
   int viz_speedlim_x = (s->scene.viz_rect.x + (bdr_is));
   int viz_speedlim_y = (s->scene.viz_rect.y + (bdr_is));
-
+  if (!is_speedlim_valid) {
+    viz_speedlim_w -= 5;
+    viz_speedlim_h -= 10;
+  }
   // Draw Background
   NVGcolor color = COLOR_WHITE_ALPHA(100);
   if (is_speedlim_valid && s->is_ego_over_limit) {
