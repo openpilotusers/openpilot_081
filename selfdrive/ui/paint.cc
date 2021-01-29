@@ -461,7 +461,7 @@ static void ui_draw_debug(UIState *s)
 {
   UIScene &scene = s->scene;
 
-  int ui_viz_rx = scene.viz_rect.x + bdr_s + 100;
+  int ui_viz_rx = scene.viz_rect.x + bdr_s + 175;
   int ui_viz_ry = bdr_s+40;
   int ui_viz_rx_center = scene.viz_rect.centerX();
   
@@ -581,7 +581,7 @@ static void ui_draw_vision_maxspeed(UIState *s) {
 
   nvgTextAlign(s->vg, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE);
   const int text_x = viz_maxspeed_x + (viz_maxspeed_xo / 2) + (viz_maxspeed_w / 2);
-  const int text_y = viz_maxspeed_y + 80;
+  const int text_y = viz_maxspeed_y + 65;
   ui_draw_text(s->vg, text_x, text_y, "설정속도", 26 * 2.2, COLOR_WHITE_ALPHA(is_cruise_set ? 200 : 100), s->font_sans_regular);
 
   if (is_cruise_set && s->scene.controls_state.getEnabled()) {
@@ -639,7 +639,7 @@ static void ui_draw_vision_speedlimit(UIState *s) {
                  s->is_ego_over_limit ? COLOR_OCHRE : COLOR_WHITE, 20, 10);
   }
   const float text_x = viz_speedlim_x + viz_speedlim_w / 2;
-  const float text_y = viz_speedlim_y + 80;
+  const float text_y = viz_speedlim_y + 65;
   //const float text_y = viz_speedlim_y + (is_speedlim_valid ? 50 : 45);
   // Draw "Speed Limit" Text
   nvgTextAlign(s->vg, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE);
