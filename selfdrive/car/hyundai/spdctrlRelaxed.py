@@ -51,6 +51,7 @@ class SpdctrlRelaxed(SpdController):
                         self.map_enable = True
                         self.target_speed_map = mapspeed
                         self.target_speed_map_counter1 = 250
+                        os.system("echo -n 1 > /data/params/d/OpkrSafetyCamera &")
                         os.system("logcat -c &")
                     else:
                         self.map_enable = False
