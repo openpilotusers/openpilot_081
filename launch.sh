@@ -30,18 +30,5 @@ if [ ! -f "/data/KRSet" ]; then
     /usr/bin/touch /data/KRSet
 fi
 
-if [ ! -f "/data/openpilot/selfdrive/assets/addon/x2ab" ]; then
-    cp -f /data/openpilot/selfdrive/assets/addon/xab /data/openpilot/selfdrive/assets/addon/x2ab
-    cat /data/openpilot/selfdrive/assets/addon/xa* > /data/openpilot/selfdrive/assets/addon/com.locnall.KimGiSa.apk
-    cp -f /data/openpilot/selfdrive/assets/addon/com.locnall.KimGiSa.apk /data/openpilot/apk/
-elif [ -f "/data/openpilot/selfdrive/assets/addon/x2ab" ]; then
-    DIFF=$(diff -q xab x2ab)
-    if [ "$DIFF" != "" ]; then
-        cp -f /data/openpilot/selfdrive/assets/addon/xab /data/openpilot/selfdrive/assets/addon/x2ab
-        cat /data/openpilot/selfdrive/assets/addon/xa* > /data/openpilot/selfdrive/assets/addon/com.locnall.KimGiSa.apk
-        cp -f /data/openpilot/selfdrive/assets/addon/com.locnall.KimGiSa.apk /data/openpilot/apk/
-    fi
-fi
-
 export PASSIVE="0"
 exec ./launch_chffrplus.sh
