@@ -620,6 +620,8 @@ static void ui_draw_vision_speedlimit(UIState *s) {
   if (!is_speedlim_valid) {
     viz_speedlim_w -= 5;
     viz_speedlim_h -= 10;
+    viz_speedlim_x += 9;
+    viz_speedlim_y += 5;
   }
   // Draw Background
   NVGcolor color = COLOR_WHITE_ALPHA(100);
@@ -642,21 +644,21 @@ static void ui_draw_vision_speedlimit(UIState *s) {
   nvgTextAlign(s->vg, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE);
   color = is_speedlim_valid && s->is_ego_over_limit ? COLOR_WHITE : COLOR_BLACK;
   if (s->enable_osm == 1) {
-    ui_draw_text(s->vg, text_x, text_y, "제한속도", 26 * 2.2, color, s->font_sans_regular);
+    ui_draw_text(s->vg, (s->scene.viz_rect.x + (bdr_is)), (s->scene.viz_rect.y + (bdr_is)), "제한속도", 26 * 2.2, color, s->font_sans_regular);
   } else {
-    ui_draw_text(s->vg, text_x, text_y, "크루즈", 26 * 2.2, color, s->font_sans_regular);
+    ui_draw_text(s->vg, (s->scene.viz_rect.x + (bdr_is)), (s->scene.viz_rect.y + (bdr_is)), "크루즈", 26 * 2.2, color, s->font_sans_regular);
   }
   // Draw Speed Text
   color = s->is_ego_over_limit ? COLOR_WHITE : COLOR_BLACK;
   if (is_speedlim_valid) {
     if ((s->enable_osm == 1) || (s->scene.cruiseAccEnabled)) {
       snprintf(speedlim_str, sizeof(speedlim_str), "%d", speedlim_calc);
-      ui_draw_text(s->vg, text_x, text_y+100, speedlim_str, 48*2.3, color, s->font_sans_bold);
+      ui_draw_text(s->vg, (s->scene.viz_rect.x + (bdr_is)), (s->scene.viz_rect.y + (bdr_is))+100, speedlim_str, 48*2.3, color, s->font_sans_bold);
     } else {
-      ui_draw_text(s->vg, text_x, text_y+100, "-", 42*2.3, color, s->font_sans_semibold);  
+      ui_draw_text(s->vg, (s->scene.viz_rect.x + (bdr_is)), (s->scene.viz_rect.y + (bdr_is))+100, "-", 42*2.3, color, s->font_sans_semibold);  
     }
   } else {
-    ui_draw_text(s->vg, text_x, text_y+100, "-", 42*2.3, color, s->font_sans_semibold);
+    ui_draw_text(s->vg, (s->scene.viz_rect.x + (bdr_is)), (s->scene.viz_rect.y + (bdr_is))+100, "-", 42*2.3, color, s->font_sans_semibold);
   }
 }
 
