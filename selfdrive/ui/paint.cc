@@ -492,11 +492,11 @@ static void ui_draw_debug(UIState *s)
     nvgFontSize(s->vg, 40);
     nvgTextAlign(s->vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
     if (s->lat_control == 0) {
-      ui_print(s, ui_viz_rx_center, ui_viz_ry+285, "PID");
+      ui_print(s, ui_viz_rx_center, ui_viz_ry+290, "PID");
     } else if (s->lat_control == 1) {
-      ui_print(s, ui_viz_rx_center, ui_viz_ry+285, "INDI");
+      ui_print(s, ui_viz_rx_center, ui_viz_ry+290, "INDI");
     } else if (s->lat_control == 2) {
-      ui_print(s, ui_viz_rx_center, ui_viz_ry+285, "LQR");
+      ui_print(s, ui_viz_rx_center, ui_viz_ry+290, "LQR");
     }
     //ui_print(s, ui_viz_rx_center, ui_viz_ry+725, " 좌측간격(m)    차선폭(m)    우측간격(m)");
     //ui_print(s, ui_viz_rx_center, ui_viz_ry+775, "%.2f                    %.2f                    %.2f", scene.pathPlan.lPoly, scene.pathPlan.laneWidth, abs(scene.pathPlan.rPoly));
