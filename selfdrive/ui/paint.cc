@@ -757,7 +757,7 @@ static void ui_draw_vision_event(UIState *s) {
       color = nvgRGBA(23, 51, 73, 255);
     }
 
-    if (true) {
+    if (s->limit_set_speed_camera > 29) {
       const int img_x_size = 172*1.6;
       const int img_y_size = 271*1.6;
       const int img_x = s->scene.viz_rect.x + bdr_s + 390;
@@ -771,15 +771,13 @@ static void ui_draw_vision_event(UIState *s) {
     }
 
     //if (s->scene.controls_state.getEngageable()){
-    //if (s->limit_set_speed_camera > 29) {
-    if (true) {
+    if (s->limit_set_speed_camera > 29) {
       const int img_turn_size = 180;
       const int img_turn_x = viz_event_x-(img_turn_size/4)+(bdr_s+55);
       const int img_turn_y = viz_event_y;
       float img_turn_alpha = 0.7f;
       int speed_img;
-      //if ((29 < s->limit_set_speed_camera) && (s->limit_set_speed_camera < 40)) {speed_img = s->img_speed_30;}
-      if (true) {speed_img = s->img_speed_30;}
+      if ((29 < s->limit_set_speed_camera) && (s->limit_set_speed_camera < 40)) {speed_img = s->img_speed_30;}
       else if ((49 < s->limit_set_speed_camera) && (s->limit_set_speed_camera < 60)) {speed_img = s->img_speed_50;}
       else if ((59 < s->limit_set_speed_camera) && (s->limit_set_speed_camera < 70)) {speed_img = s->img_speed_60;}
       else if ((69 < s->limit_set_speed_camera) && (s->limit_set_speed_camera < 80)) {speed_img = s->img_speed_70;}
