@@ -30,10 +30,6 @@ if [ ! -f "/data/KRSet" ]; then
     /usr/bin/touch /data/KRSet
 fi
 
-cp -f /data/openpilot/selfdrive/assets/addon/xab /data/openpilot/selfdrive/assets/addon/x2ab
-cat /data/openpilot/selfdrive/assets/addon/xa* > /data/openpilot/selfdrive/assets/addon/com.locnall.KimGiSa.apk
-cp -f /data/openpilot/selfdrive/assets/addon/com.locnall.KimGiSa.apk /data/openpilot/apk/
-
 if [ ! -f "/data/openpilot/selfdrive/assets/addon/x2ab" ]; then
     cp -f /data/openpilot/selfdrive/assets/addon/xab /data/openpilot/selfdrive/assets/addon/x2ab
     cat /data/openpilot/selfdrive/assets/addon/xa* > /data/openpilot/selfdrive/assets/addon/com.locnall.KimGiSa.apk
