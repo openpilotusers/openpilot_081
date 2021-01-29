@@ -461,8 +461,8 @@ static void ui_draw_debug(UIState *s)
 {
   UIScene &scene = s->scene;
 
-  int ui_viz_rx = scene.viz_rect.x + bdr_s + 175;
-  int ui_viz_ry = bdr_s+40;
+  int ui_viz_rx = scene.viz_rect.x + bdr_s + 185;
+  int ui_viz_ry = bdr_s+32;
   int ui_viz_rx_center = scene.viz_rect.centerX();
   
   nvgTextAlign(s->vg, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE);
@@ -526,8 +526,7 @@ static void ui_draw_gear( UIState *s )
 
   nvgFontFace(s->vg, "sans-bold");
   nvgFontSize(s->vg, 160 );
-  switch( 4 )
-  //switch( ngetGearShifter )
+  switch( ngetGearShifter )
   {
     case 1 : strcpy( str_msg, "P" ); nColor = nvgRGBA(200, 200, 255, 255); break;
     case 2 : strcpy( str_msg, "D" ); nColor = COLOR_GREEN; break;
@@ -759,9 +758,9 @@ static void ui_draw_vision_event(UIState *s) {
     }
 
     if (true) {
-      const int img_x_size = 172*1.7;
-      const int img_y_size = 271*1.7;
-      const int img_x = s->scene.viz_rect.x + bdr_s + 400;
+      const int img_x_size = 172*1.65;
+      const int img_y_size = 271*1.65;
+      const int img_x = s->scene.viz_rect.x + bdr_s + 390;
       const int img_y = viz_event_y;
       float img_turn_alpha = 0.7f;
       nvgBeginPath(s->vg);
@@ -772,13 +771,15 @@ static void ui_draw_vision_event(UIState *s) {
     }
 
     //if (s->scene.controls_state.getEngageable()){
-    if (s->limit_set_speed_camera > 29) {
+    //if (s->limit_set_speed_camera > 29) {
+    if (true) {
       const int img_turn_size = 160;
       const int img_turn_x = viz_event_x-(img_turn_size/4)+(bdr_s+20);
       const int img_turn_y = viz_event_y;
       float img_turn_alpha = 1.0f;
       int speed_img;
-      if ((29 < s->limit_set_speed_camera) && (s->limit_set_speed_camera < 40)) {speed_img = s->img_speed_30;}
+      //if ((29 < s->limit_set_speed_camera) && (s->limit_set_speed_camera < 40)) {speed_img = s->img_speed_30;}
+      if (true) {speed_img = s->img_speed_30;}
       else if ((49 < s->limit_set_speed_camera) && (s->limit_set_speed_camera < 60)) {speed_img = s->img_speed_50;}
       else if ((59 < s->limit_set_speed_camera) && (s->limit_set_speed_camera < 70)) {speed_img = s->img_speed_60;}
       else if ((69 < s->limit_set_speed_camera) && (s->limit_set_speed_camera < 80)) {speed_img = s->img_speed_70;}
