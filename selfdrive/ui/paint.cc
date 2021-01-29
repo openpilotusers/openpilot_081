@@ -773,14 +773,14 @@ static void ui_draw_vision_event(UIState *s) {
       const int img_turn_y = viz_event_y+bdr_s;
       float img_turn_alpha = 1.0f;
       int speed_img;
-      if ((29 < s->scene.limit_set_speed_camera) && (s->limit_set_speed_camera < 40)) {speed_img = s->img_speed_30;}
-      else if ((49 < s->scene.limit_set_speed_camera) && (s->limit_set_speed_camera < 60)) {speed_img = s->img_speed_50;}
-      else if ((59 < s->scene.limit_set_speed_camera) && (s->limit_set_speed_camera < 70)) {speed_img = s->img_speed_60;}
-      else if ((69 < s->scene.limit_set_speed_camera) && (s->limit_set_speed_camera < 80)) {speed_img = s->img_speed_70;}
-      else if ((79 < s->scene.limit_set_speed_camera) && (s->limit_set_speed_camera < 90)) {speed_img = s->img_speed_80;}
-      else if ((89 < s->scene.limit_set_speed_camera) && (s->limit_set_speed_camera < 100)) {speed_img = s->img_speed_90;}
-      else if ((99 < s->scene.limit_set_speed_camera) && (s->limit_set_speed_camera < 110)) {speed_img = s->img_speed_100;}
-      else if ((109 < s->scene.limit_set_speed_camera) && (s->limit_set_speed_camera < 120)) {speed_img = s->img_speed_110;}
+      if ((29 < s->limit_set_speed_camera) && (s->limit_set_speed_camera < 40)) {speed_img = s->img_speed_30;}
+      else if ((49 < s->limit_set_speed_camera) && (s->limit_set_speed_camera < 60)) {speed_img = s->img_speed_50;}
+      else if ((59 < s->limit_set_speed_camera) && (s->limit_set_speed_camera < 70)) {speed_img = s->img_speed_60;}
+      else if ((69 < s->limit_set_speed_camera) && (s->limit_set_speed_camera < 80)) {speed_img = s->img_speed_70;}
+      else if ((79 < s->limit_set_speed_camera) && (s->limit_set_speed_camera < 90)) {speed_img = s->img_speed_80;}
+      else if ((89 < s->limit_set_speed_camera) && (s->limit_set_speed_camera < 100)) {speed_img = s->img_speed_90;}
+      else if ((99 < s->limit_set_speed_camera) && (s->limit_set_speed_camera < 110)) {speed_img = s->img_speed_100;}
+      else if ((109 < s->limit_set_speed_camera) && (s->limit_set_speed_camera < 120)) {speed_img = s->img_speed_110;}
       nvgBeginPath(s->vg);
       NVGpaint imgPaint = nvgImagePattern(s->vg, img_turn_x, img_turn_y,
         img_turn_size, img_turn_size, 0, speed_img, img_turn_alpha);
