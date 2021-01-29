@@ -355,7 +355,7 @@ static void ui_draw_tpms(UIState *s) {
   char tpmsRr[32];
   int viz_tpms_w = 250;
   int viz_tpms_h = 160;
-  int viz_tpms_x = s->scene.viz_rect.x + s->scene.viz_rect.w - 450;
+  int viz_tpms_x = s->scene.viz_rect.x + s->scene.viz_rect.w - 500;
   int viz_tpms_y = s->scene.viz_rect.y + (bdr_s);
   float maxv = 0;
   float minv = 300;
@@ -461,7 +461,7 @@ static void ui_draw_debug(UIState *s)
 {
   UIScene &scene = s->scene;
 
-  int ui_viz_rx = scene.viz_rect.x + 225;
+  int ui_viz_rx = scene.viz_rect.x + 500;
   int ui_viz_ry = 70;
   int ui_viz_rx_center = scene.viz_rect.centerX();
   
@@ -517,7 +517,7 @@ static void ui_draw_gear( UIState *s )
 {
   UIScene &scene = s->scene;  
   NVGcolor nColor = COLOR_WHITE;
-  int x_pos = s->scene.viz_rect.right() - (150 + bdr_s);
+  int x_pos = s->scene.viz_rect.right() - (50 + bdr_s);
   int y_pos = s->scene.viz_rect.y + (bdr_s) + 140;
   int  ngetGearShifter = int(scene.getGearShifter);
   //int  x_pos = 1795;
@@ -526,7 +526,7 @@ static void ui_draw_gear( UIState *s )
 
   nvgFontFace(s->vg, "sans-bold");
   nvgFontSize(s->vg, 160 );
-  switch( 1 )
+  switch( 4 )
   //switch( ngetGearShifter )
   {
     case 1 : strcpy( str_msg, "P" ); nColor = nvgRGBA(200, 200, 255, 255); break;
@@ -759,7 +759,7 @@ static void ui_draw_vision_event(UIState *s) {
     if (true) {
       const int img_x_size = 172*1.7;
       const int img_y_size = 271*1.7;
-      const int img_x = viz_event_x-1150;
+      const int img_x = s->scene.viz_rect.x + 1150;
       const int img_y = viz_event_y;
       float img_turn_alpha = 0.8f;
       nvgBeginPath(s->vg);
@@ -772,8 +772,8 @@ static void ui_draw_vision_event(UIState *s) {
     //if (s->scene.controls_state.getEngageable()){
     if (s->limit_set_speed_camera > 29) {
       const int img_turn_size = 160;
-      const int img_turn_x = viz_event_x-(img_turn_size/4)+80;
-      const int img_turn_y = viz_event_y+bdr_s;
+      const int img_turn_x = viz_event_x-(img_turn_size/4)+(bdr_s+20);
+      const int img_turn_y = viz_event_y;
       float img_turn_alpha = 1.0f;
       int speed_img;
       if ((29 < s->limit_set_speed_camera) && (s->limit_set_speed_camera < 40)) {speed_img = s->img_speed_30;}
