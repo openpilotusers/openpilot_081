@@ -526,7 +526,8 @@ static void ui_draw_gear( UIState *s )
 
   nvgFontFace(s->vg, "sans-bold");
   nvgFontSize(s->vg, 160 );
-  switch( ngetGearShifter )
+  switch( 1 )
+  //switch( ngetGearShifter )
   {
     case 1 : strcpy( str_msg, "P" ); nColor = nvgRGBA(200, 200, 255, 255); break;
     case 2 : strcpy( str_msg, "D" ); nColor = COLOR_GREEN; break;
