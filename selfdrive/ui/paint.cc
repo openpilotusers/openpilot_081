@@ -773,9 +773,9 @@ static void ui_draw_vision_event(UIState *s) {
     //if (s->scene.controls_state.getEngageable()){
     //if (s->limit_set_speed_camera > 29) {
     if (true) {
-      const int img_turn_size = 175;
-      const int img_turn_x = viz_event_x-(img_turn_size/4)+(bdr_s+50);
-      const int img_turn_y = viz_event_y+5;
+      const int img_turn_size = 180;
+      const int img_turn_x = viz_event_x-(img_turn_size/4)+(bdr_s+55);
+      const int img_turn_y = viz_event_y;
       float img_turn_alpha = 1.0f;
       int speed_img;
       //if ((29 < s->limit_set_speed_camera) && (s->limit_set_speed_camera < 40)) {speed_img = s->img_speed_30;}
