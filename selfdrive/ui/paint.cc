@@ -717,10 +717,10 @@ static void ui_draw_vision_event(UIState *s) {
   else if ((s->scene.controls_state.getVEgo()*3.6) > 70) {tspeed = s->scene.controls_state.getVEgo()*3.6*5;}
   //if (s->scene.speedlimitahead_valid && s->scene.speedlimitaheaddistance < 300 && s->scene.controls_state.getEnabled() && s->limit_set_speed) {
   if (s->scene.speedlimitahead_valid && s->scene.speedlimitaheaddistance < tspeed && s->scene.speedlimitaheaddistance > 0 && s->scene.controls_state.getEnabled()) {
-    const int img_turn_size = 160;
-    const int img_turn_x = viz_event_x-(img_turn_size/4)+80;
-    const int img_turn_y = viz_event_y+bdr_s;
-    float img_turn_alpha = 1.0f;
+    const int img_turn_size = 180;
+    const int img_turn_x = viz_event_x-(img_turn_size/4)+85;
+    const int img_turn_y = viz_event_y;
+    float img_turn_alpha = 0.7f;
     int speed_img;
     if ((29 < s->scene.speedlimitahead*3.6) && (s->scene.speedlimitahead*3.6 < 31)) {speed_img = s->img_speed_30;}
     else if ((49 < s->scene.speedlimitahead*3.6) && (s->scene.speedlimitahead*3.6 < 51)) {speed_img = s->img_speed_50;}
@@ -771,7 +771,7 @@ static void ui_draw_vision_event(UIState *s) {
     //if (s->scene.controls_state.getEngageable()){
     if (s->limit_set_speed_camera > 29) {
       const int img_turn_size = 180;
-      const int img_turn_x = viz_event_x-(img_turn_size/4)+(bdr_s+55);
+      const int img_turn_x = viz_event_x-(img_turn_size/4)+85;
       const int img_turn_y = viz_event_y;
       float img_turn_alpha = 0.7f;
       int speed_img;
