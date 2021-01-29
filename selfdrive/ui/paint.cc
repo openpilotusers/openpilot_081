@@ -461,7 +461,7 @@ static void ui_draw_debug(UIState *s)
 {
   UIScene &scene = s->scene;
 
-  int ui_viz_rx = scene.viz_rect.x + bdr_s + 185;
+  int ui_viz_rx = scene.viz_rect.x + bdr_s + 190;
   int ui_viz_ry = bdr_s+32;
   int ui_viz_rx_center = scene.viz_rect.centerX();
   
@@ -758,8 +758,8 @@ static void ui_draw_vision_event(UIState *s) {
     }
 
     if (true) {
-      const int img_x_size = 172*1.65;
-      const int img_y_size = 271*1.65;
+      const int img_x_size = 172*1.6;
+      const int img_y_size = 271*1.6;
       const int img_x = s->scene.viz_rect.x + bdr_s + 390;
       const int img_y = viz_event_y;
       float img_turn_alpha = 0.7f;
@@ -773,9 +773,9 @@ static void ui_draw_vision_event(UIState *s) {
     //if (s->scene.controls_state.getEngageable()){
     //if (s->limit_set_speed_camera > 29) {
     if (true) {
-      const int img_turn_size = 160;
-      const int img_turn_x = viz_event_x-(img_turn_size/4)+(bdr_s+20);
-      const int img_turn_y = viz_event_y;
+      const int img_turn_size = 175;
+      const int img_turn_x = viz_event_x-(img_turn_size/4)+(bdr_s+50);
+      const int img_turn_y = viz_event_y+5;
       float img_turn_alpha = 1.0f;
       int speed_img;
       //if ((29 < s->limit_set_speed_camera) && (s->limit_set_speed_camera < 40)) {speed_img = s->img_speed_30;}
