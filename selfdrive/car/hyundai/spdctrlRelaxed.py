@@ -1,3 +1,4 @@
+import os
 import math
 import numpy as np
 from cereal import car, log
@@ -22,15 +23,57 @@ class SpdctrlRelaxed(SpdController):
         self.cruise_gap = 0.0
         self.cut_in = False
         self.osm_enable = False
+        self.osm_enable_camera = False
+        self.map_enable = False
         self.osm_spdlimit_offset = 0
         self.target_speed = 0
         self.target_speed_road = 0
         self.target_speed_camera = 0
+        self.target_speed_map = 0.0
+        self.target_speed_map_counter = 0
+        self.target_speed_map_counter1 = 0
+        self.target_speed_map_counter2 = 0
+        self.osm_enable_map = int(Params().get("OpkrEnableMap", encoding='utf8')) == 1
+        os.system("logcat -c &")
 
     def update_lead(self, sm, CS, dRel, yRel, vRel):
-        self.osm_enable = int(Params().get("LimitSetSpeed", encoding='utf8')) == 1
-        self.osm_enable_camera = int(Params().get("LimitSetSpeedCamera", encoding='utf8')) == 1
+        if not self.osm_enable_map:
+            self.target_speed_map_counter += 1
+            if self.target_speed_map_counter == (100+self.target_speed_map_counter1):
+                os.system("logcat -d -s opkrspdlimit,opkrspd2limit,opkrspd5limit | grep opkrspd | tail -n 1 | awk \'{print $7}\' > /data/params/d/LimitSetSpeedCamera &")
+            elif self.target_speed_map_counter >= (150+self.target_speed_map_counter1):
+                self.target_speed_map_counter1 = 0
+                self.target_speed_map_counter = 0
+                mapspeed = Params().get("LimitSetSpeedCamera", encoding="utf8")
+                if mapspeed is not None:
+                    mapspeed = int(float(mapspeed.rstrip('\n')))
+                    if mapspeed > 29:
+                        self.map_enable = True
+                        self.target_speed_map = mapspeed
+                        self.target_speed_map_counter1 = 250
+                        os.system("logcat -c &")
+                    else:
+                        self.map_enable = False
+                        self.target_speed_map = 0
+                elif mapspeed is None and self.target_speed_map_counter2 < 4:
+                    self.target_speed_map_counter2 += 1
+                    self.target_speed_map_counter = 101
+                else:
+                    self.target_speed_map_counter = 99
+                    self.target_speed_map_counter2 = 0
+                    self.map_enable = False
+                    self.target_speed_map = 0
+
+
+        if self.osm_enable_map:
+            self.osm_enable = int(Params().get("LimitSetSpeed", encoding='utf8')) == 1
+            self.osm_enable_camera = int(Params().get("LimitSetSpeedCamera", encoding='utf8')) == 1
+        else:
+            self.osm_enable = False
+            self.osm_enable_camera = False
+
         self.osm_spdlimit_offset = int(Params().get("OpkrSpeedLimitOffset", encoding='utf8'))
+
         plan = sm['plan']
         dRele = plan.dRel1 #EON Lead
         yRele = plan.yRel1 #EON Lead
@@ -42,7 +85,9 @@ class SpdctrlRelaxed(SpdController):
         self.target_speed_road = plan.targetSpeed + self.osm_spdlimit_offset
         self.target_speed_camera = plan.targetSpeedCamera + self.osm_spdlimit_offset
         
-        if self.osm_enable:
+        if self.map_enable:
+            self.target_speed = int(self.target_speed_map) + self.osm_spdlimit_offset
+        elif self.osm_enable:
             self.target_speed = self.target_speed_road
         elif self.target_speed_camera <= 29:
             self.osm_enable_camera = False
@@ -101,7 +146,7 @@ class SpdctrlRelaxed(SpdController):
               lead_set_speed = int(round(CS.clu_Vanz)) + 1
               self.seq_step_debug = "운전자가속"
               lead_wait_cmd = 15
-        elif int(round(self.target_speed)) < int(CS.VSetDis) and (self.osm_enable or self.osm_enable_camera) and ((int(round(self.target_speed)) < int(round(self.cruise_set_speed_kph))) and self.target_speed != 0):
+        elif int(round(self.target_speed)) < int(CS.VSetDis) and (self.osm_enable or self.osm_enable_camera or self.map_enable) and ((int(round(self.target_speed)) < int(round(self.cruise_set_speed_kph))) and self.target_speed != 0):
             self.seq_step_debug = "맵기반감속"
             lead_wait_cmd, lead_set_speed = self.get_tm_speed(CS, 10, -1)
         # 거리 유지 조건
