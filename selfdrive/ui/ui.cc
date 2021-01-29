@@ -428,7 +428,7 @@ void ui_update(UIState *s) {
     read_param(&s->nOpkrUIBrightness, "OpkrUIBrightness");
     read_param(&s->nOpkrUIVolumeBoost, "OpkrUIVolumeBoost");
     read_param(&s->limit_set_speed, "LimitSetSpeed");
-    //read_param(&s->limit_set_speed_camera, "LimitSetSpeedCamera");
+    read_param(&s->limit_set_speed_camera, "LimitSetSpeedCamera");
     read_param(&s->lat_control, "LateralControlMethod");
   } else if ((s->sm)->frame % (6*UI_FREQ) == 0) {
     int param_read = read_param(&s->last_athena_ping, "LastAthenaPingTime");

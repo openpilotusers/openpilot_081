@@ -261,6 +261,7 @@ typedef struct UIState {
   int img_battery_charging;
   int img_network[6];
   int img_map;
+  int img_safetycam;
   int img_speed;
   int img_speed_30;
   int img_speed_50;
