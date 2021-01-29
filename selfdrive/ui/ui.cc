@@ -43,6 +43,7 @@ void ui_init(UIState *s) {
   read_param(&s->driving_record, "OpkrDrivingRecord");
   read_param(&s->enable_osm, "OpkrEnableMap");
   Params().write_db_value("LimitSetSpeedCamera", "0", 1);
+  Params().write_db_value("OpkrSafetyCamera", "0", 1);
 
   s->fb = framebuffer_init("ui", 0, true, &s->fb_w, &s->fb_h);
   assert(s->fb);
@@ -430,6 +431,7 @@ void ui_update(UIState *s) {
     read_param(&s->nOpkrUIVolumeBoost, "OpkrUIVolumeBoost");
     read_param(&s->limit_set_speed, "LimitSetSpeed");
     read_param(&s->limit_set_speed_camera, "LimitSetSpeedCamera");
+    read_param(&s->safety_camera, "OpkrSafetyCamera");
     read_param(&s->lat_control, "LateralControlMethod");
   } else if ((s->sm)->frame % (6*UI_FREQ) == 0) {
     int param_read = read_param(&s->last_athena_ping, "LastAthenaPingTime");

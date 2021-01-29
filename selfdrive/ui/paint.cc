@@ -761,7 +761,7 @@ static void ui_draw_vision_event(UIState *s) {
       color = nvgRGBA(23, 51, 73, 255);
     }
 
-    if (s->limit_set_speed_camera > 29) {
+    if (s->safety_camera == 1) {
       const int img_x_size = 172*1.6;
       const int img_y_size = 271*1.6;
       const int img_x = s->scene.viz_rect.x + bdr_s + 390;
@@ -775,7 +775,7 @@ static void ui_draw_vision_event(UIState *s) {
     }
 
     //if (s->scene.controls_state.getEngageable()){
-    if (s->limit_set_speed_camera > 29) {
+    if (s->safety_camera == 1) {
       const int img_turn_size = 180;
       const int img_turn_x = viz_event_x-(img_turn_size/4)+85;
       const int img_turn_y = viz_event_y;

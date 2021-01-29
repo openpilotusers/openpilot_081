@@ -640,6 +640,7 @@ def main():
     ("OpkrDrivingRecord", "0"),
     ("OpkrTurnSteeringDisable", "1"),
     ("CarModel", ""),
+    ("OpkrSafetyCamera", "0"),
   ]
 
   # set unset params
