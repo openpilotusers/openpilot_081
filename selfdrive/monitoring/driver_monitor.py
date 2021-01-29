@@ -19,17 +19,17 @@ EventName = car.CarEvent.EventName
 # ******************************************************************************************
 
 if not EnableLogger:
-  _AWARENESS_TIME = 3600.
+  _AWARENESS_TIME = 36000.
 else:
-  _AWARENESS_TIME = 35.  # one minute limit without user touching steering wheels make the car enter a terminal status
-_AWARENESS_PRE_TIME_TILL_TERMINAL = 12.  # a first alert is issued 15s before expiration
-_AWARENESS_PROMPT_TIME_TILL_TERMINAL = 6.  # a second alert is issued 6s before start decelerating the car
+  _AWARENESS_TIME = 3500.  # one minute limit without user touching steering wheels make the car enter a terminal status
+_AWARENESS_PRE_TIME_TILL_TERMINAL = 120.  # a first alert is issued 15s before expiration
+_AWARENESS_PROMPT_TIME_TILL_TERMINAL = 60.  # a second alert is issued 6s before start decelerating the car
 if not EnableDriverMonitoring and not EnableLogger:
-  _DISTRACTED_TIME = 3600.
+  _DISTRACTED_TIME = 36000.
 else:
-  _DISTRACTED_TIME = 11.
-_DISTRACTED_PRE_TIME_TILL_TERMINAL = 8.
-_DISTRACTED_PROMPT_TIME_TILL_TERMINAL = 6.
+  _DISTRACTED_TIME = 110.
+_DISTRACTED_PRE_TIME_TILL_TERMINAL = 80.
+_DISTRACTED_PROMPT_TIME_TILL_TERMINAL = 60.
 
 if not EnableLogger:
   _FACE_THRESHOLD = 0.99
