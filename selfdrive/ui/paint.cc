@@ -472,23 +472,23 @@ static void ui_draw_debug(UIState *s)
   UIScene &scene = s->scene;
 
   int ui_viz_rx = scene.viz_rect.x + bdr_s + 192;
-  int ui_viz_ry = bdr_s+32;
+  int ui_viz_ry = bdr_s+28;
   int ui_viz_rx_center = scene.viz_rect.centerX();
   
   nvgTextAlign(s->vg, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE);
 
   if (s->nDebugUi1 == 1) {
-    ui_draw_text(s->vg, 0, 1030, scene.alertTextMsg1.c_str(), 50, COLOR_WHITE_ALPHA(150), s->font_sans_semibold);
-    ui_draw_text(s->vg, 0, 1078, scene.alertTextMsg2.c_str(), 50, COLOR_WHITE_ALPHA(150), s->font_sans_semibold);
+    ui_draw_text(s->vg, 0, 1032, scene.alertTextMsg1.c_str(), 50, COLOR_WHITE_ALPHA(125), s->font_sans_semibold);
+    ui_draw_text(s->vg, 0, 1078, scene.alertTextMsg2.c_str(), 50, COLOR_WHITE_ALPHA(125), s->font_sans_semibold);
   }
 
   
-  nvgFillColor(s->vg, COLOR_WHITE_ALPHA(150));
+  nvgFillColor(s->vg, COLOR_WHITE_ALPHA(125));
   if (s->nDebugUi2 == 1) {
-    if (scene.gpsAccuracyUblox != 0.00) {
-      nvgFontSize(s->vg, 34);
-      ui_print(s, 28, 28, "LAT／LON: %.5f／%.5f", scene.latitudeUblox, scene.longitudeUblox);
-    }
+    //if (scene.gpsAccuracyUblox != 0.00) {
+    //  nvgFontSize(s->vg, 34);
+    //  ui_print(s, 28, 28, "LAT／LON: %.5f／%.5f", scene.latitudeUblox, scene.longitudeUblox);
+    //}
     nvgFontSize(s->vg, 40);
     //ui_print(s, ui_viz_rx, ui_viz_ry, "Live Parameters");
     ui_print(s, ui_viz_rx, ui_viz_ry+250, "SR:%.2f", scene.liveParams.steerRatio);
@@ -502,11 +502,11 @@ static void ui_draw_debug(UIState *s)
     nvgFontSize(s->vg, 40);
     nvgTextAlign(s->vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
     if (s->lat_control == 0) {
-      ui_print(s, ui_viz_rx_center, ui_viz_ry+290, "PID");
+      ui_print(s, ui_viz_rx_center, ui_viz_ry+310, "PID");
     } else if (s->lat_control == 1) {
-      ui_print(s, ui_viz_rx_center, ui_viz_ry+290, "INDI");
+      ui_print(s, ui_viz_rx_center, ui_viz_ry+310, "INDI");
     } else if (s->lat_control == 2) {
-      ui_print(s, ui_viz_rx_center, ui_viz_ry+290, "LQR");
+      ui_print(s, ui_viz_rx_center, ui_viz_ry+310, "LQR");
     }
     //ui_print(s, ui_viz_rx_center, ui_viz_ry+725, " 좌측간격(m)    차선폭(m)    우측간격(m)");
     //ui_print(s, ui_viz_rx_center, ui_viz_ry+775, "%.2f                    %.2f                    %.2f", scene.pathPlan.lPoly, scene.pathPlan.laneWidth, abs(scene.pathPlan.rPoly));
@@ -772,8 +772,8 @@ static void ui_draw_vision_event(UIState *s) {
     }
 
     if (s->safety_camera == 1) {
-      const int img_x_size = 172*1.6;
-      const int img_y_size = 271*1.6;
+      const int img_x_size = 172*1.5;
+      const int img_y_size = 271*1.5;
       const int img_x = s->scene.viz_rect.x + bdr_s + 390;
       const int img_y = viz_event_y;
       float img_turn_alpha = 0.7f;
@@ -807,7 +807,7 @@ static void ui_draw_vision_event(UIState *s) {
       nvgFill(s->vg);
     } else if (s->scene.controls_state.getEnabled()){
       float angleSteers = s->scene.controls_state.getAngleSteers();
-      ui_draw_circle_image(s->vg, bg_wheel_x, bg_wheel_y, bg_wheel_size, s->img_wheel, color, 1.0f, angleSteers );// bg_wheel_y - 25);
+      ui_draw_circle_image(s->vg, bg_wheel_x, bg_wheel_y+10, bg_wheel_size, s->img_wheel, color, 1.0f, angleSteers );// bg_wheel_y - 25);
     }
     else  
     {
