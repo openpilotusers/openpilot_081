@@ -797,7 +797,7 @@ static void ui_draw_vision_event(UIState *s) {
       nvgFill(s->vg);
     } else if (s->scene.controls_state.getEnabled()){
       float angleSteers = s->scene.controls_state.getAngleSteers();
-      ui_draw_circle_image(s->vg, bg_wheel_x, bg_wheel_y, bg_wheel_size, s->img_wheel, color, 1.0f, angleSteers );// bg_wheel_y - 25);
+      ui_draw_circle_image(s->vg, bg_wheel_x, bg_wheel_y+10, bg_wheel_size, s->img_wheel, color, 1.0f, angleSteers );// bg_wheel_y - 25);
     }
     else  
     {
