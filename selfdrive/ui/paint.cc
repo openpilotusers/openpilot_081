@@ -461,7 +461,7 @@ static void ui_draw_debug(UIState *s)
 {
   UIScene &scene = s->scene;
 
-  int ui_viz_rx = scene.viz_rect.x + 230;
+  int ui_viz_rx = scene.viz_rect.x + 225;
   int ui_viz_ry = 70;
   int ui_viz_rx_center = scene.viz_rect.centerX();
   
@@ -517,8 +517,8 @@ static void ui_draw_gear( UIState *s )
 {
   UIScene &scene = s->scene;  
   NVGcolor nColor = COLOR_WHITE;
-  int x_pos = s->scene.viz_rect.right() - (120 + bdr_s);
-  int y_pos = s->scene.viz_rect.y + (bdr_s) + 125;
+  int x_pos = s->scene.viz_rect.right() - (150 + bdr_s);
+  int y_pos = s->scene.viz_rect.y + (bdr_s) + 140;
   int  ngetGearShifter = int(scene.getGearShifter);
   //int  x_pos = 1795;
   //int  y_pos = 155;
@@ -757,8 +757,8 @@ static void ui_draw_vision_event(UIState *s) {
     }
 
     if (true) {
-      const int img_x_size = 172*1.5;
-      const int img_y_size = 271*1.5;
+      const int img_x_size = 172*1.7;
+      const int img_y_size = 271*1.7;
       const int img_x = viz_event_x-1150;
       const int img_y = viz_event_y;
       float img_turn_alpha = 0.8f;
