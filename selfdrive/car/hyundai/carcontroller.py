@@ -387,7 +387,7 @@ class CarController():
 
     run_speed_ctrl = self.opkr_variablecruise and CS.acc_active and (CS.out.cruiseState.modeSel == 1 or CS.out.cruiseState.modeSel == 2 or CS.out.cruiseState.modeSel == 3)
     if not run_speed_ctrl:
-      if Params().get("LimitSetSpeedCamera", encoding="utf8") is not None and Params().get("LimitSetSpeedCamera", encoding="utf8") != "0"
+      if Params().get("LimitSetSpeedCamera", encoding="utf8") is not None and Params().get("LimitSetSpeedCamera", encoding="utf8") != "0":
         os.system("echo -n 0 > /data/params/d/LimitSetSpeedCamera &")
       if CS.out.cruiseState.modeSel == 0:
         self.steer_mode = "오파모드"
