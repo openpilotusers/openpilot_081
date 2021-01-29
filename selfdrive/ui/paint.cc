@@ -762,8 +762,8 @@ static void ui_draw_vision_event(UIState *s) {
     }
 
     if (s->safety_camera == 1) {
-      const int img_x_size = 172*1.6;
-      const int img_y_size = 271*1.6;
+      const int img_x_size = 172*1.5;
+      const int img_y_size = 271*1.5;
       const int img_x = s->scene.viz_rect.x + bdr_s + 390;
       const int img_y = viz_event_y;
       float img_turn_alpha = 0.7f;
