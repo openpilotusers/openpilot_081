@@ -42,6 +42,7 @@ void ui_init(UIState *s) {
   read_param(&s->speed_lim_off, "OpkrSpeedLimitOffset");
   read_param(&s->driving_record, "OpkrDrivingRecord");
   read_param(&s->enable_osm, "OpkrEnableMap");
+  Params().write_db_value("LimitSetSpeedCamera", "0", 1);
 
   s->fb = framebuffer_init("ui", 0, true, &s->fb_w, &s->fb_h);
   assert(s->fb);
