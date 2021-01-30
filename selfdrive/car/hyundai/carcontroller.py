@@ -387,13 +387,13 @@ class CarController():
     if self.mode_change_timer > 0:
       self.mode_change_timer -= 1
 
-    if self.params.get('LimitSetSpeedCamera') is not None:
-      if int(self.params.get('LimitSetSpeedCamera')) > 29 and not CS.acc_active:
-        self.safety_camera_timer += 1
-        if self.safety_camera_timer > 500:
-          self.safety_camera_timer = 0
-          os.system("echo -n 0 > /data/params/d/OpkrSafetyCamera &")
-          os.system("echo -n 0 > /data/params/d/LimitSetSpeedCamera &")
+#    if self.params.get('LimitSetSpeedCamera') is not None:
+#      if int(self.params.get('LimitSetSpeedCamera')) > 29 and not CS.acc_active:
+#        self.safety_camera_timer += 1
+#        if self.safety_camera_timer > 300:
+#          self.safety_camera_timer = 0
+#          os.system("echo -n 0 > /data/params/d/OpkrSafetyCamera &")
+#          os.system("echo -n 0 > /data/params/d/LimitSetSpeedCamera &")
 
     run_speed_ctrl = self.opkr_variablecruise and CS.acc_active and (CS.out.cruiseState.modeSel == 1 or CS.out.cruiseState.modeSel == 2 or CS.out.cruiseState.modeSel == 3)
     if not run_speed_ctrl:
