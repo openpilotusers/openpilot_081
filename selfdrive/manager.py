@@ -72,7 +72,7 @@ from common.spinner import Spinner
 from common.text_window import TextWindow
 
 if not (os.system("python3 -m pip list | grep 'scipy' ") == 0):
-  os.system("cd /data/openpilot/installer/scipy_installer/ && ./scipy_installer")
+  os.system("osmstat=`cat /data/params/d/OpkrEnableMap`;if [[ $osmstat -eq 1 ]]; then cd /data/openpilot/installer/scipy_installer/ && ./scipy_installer; fi")
 
 
 
@@ -636,10 +636,11 @@ def main():
     ("FingerprintTwoSet", "1"),
     ("OpkrVariableCruiseProfile", "0"),
     ("OpkrLiveTune", "0"),
-    ("OpkrEnableMap", "1"),
+    ("OpkrEnableMap", "0"),
     ("OpkrDrivingRecord", "0"),
     ("OpkrTurnSteeringDisable", "1"),
     ("CarModel", ""),
+    ("OpkrSafetyCamera", "0"),
   ]
 
   # set unset params

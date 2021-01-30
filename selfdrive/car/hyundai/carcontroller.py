@@ -1,3 +1,4 @@
+import os
 from cereal import car, log
 from common.realtime import DT_CTRL
 from common.numpy_fast import clip
@@ -156,6 +157,8 @@ class CarController():
     self.longcontrol = CP.openpilotLongitudinalControl
     self.scc_live = not CP.radarOffCan
     self.accActive = False
+
+    self.safety_camera_timer = 0
 
     self.model_speed_range = [30, 90, 255, 300]
     self.steerMax_range = [SteerLimitParams.STEER_MAX, int(self.params.get('SteerMaxBaseAdj')), int(self.params.get('SteerMaxBaseAdj')), 0]
@@ -383,6 +386,14 @@ class CarController():
       self.mode_change_switch = 3
     if self.mode_change_timer > 0:
       self.mode_change_timer -= 1
+
+    if self.params.get('LimitSetSpeedCamera') is not None:
+      if int(self.params.get('LimitSetSpeedCamera')) > 29 and not CS.acc_active:
+        self.safety_camera_timer += 1
+        if self.safety_camera_timer > 500:
+          self.safety_camera_timer = 0
+          os.system("echo -n 0 > /data/params/d/OpkrSafetyCamera &")
+          os.system("echo -n 0 > /data/params/d/LimitSetSpeedCamera &")
 
     run_speed_ctrl = self.opkr_variablecruise and CS.acc_active and (CS.out.cruiseState.modeSel == 1 or CS.out.cruiseState.modeSel == 2 or CS.out.cruiseState.modeSel == 3)
     if not run_speed_ctrl:

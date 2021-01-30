@@ -2,6 +2,7 @@
 #include <dirent.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include "ui.hpp"
 
 #define CAPTURE_STATE_NONE 0
 #define CAPTURE_STATE_CAPTURING 1
@@ -293,7 +294,7 @@ static void screen_draw_button(UIState *s, int touch_x, int touch_y) {
   }
 
   if (captureState == CAPTURE_STATE_CAPTURING) {
-    draw_date_time(s);
+    //draw_date_time(s);
 
     elapsed_time = get_time() - start_time;
 
@@ -327,9 +328,8 @@ void screen_toggle_lock() {
 bool dashcam( UIState *s, int touch_x, int touch_y ) {
 
   bool touched = false;
-  
   screen_draw_button(s, touch_x, touch_y);
-  if ((screen_button_clicked(touch_x,touch_y)) && (s->scene.uilayout_sidebarcollapsed == true)) {
+  if ((screen_button_clicked(touch_x,touch_y)) && (s->scene.uilayout_sidebarcollapsed == true) && (s->limit_set_speed == 0)) {
     click_elapsed_time = get_time() - click_time;
 
     if (click_elapsed_time > 0) {

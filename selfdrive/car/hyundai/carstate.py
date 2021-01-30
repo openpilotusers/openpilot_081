@@ -135,24 +135,22 @@ class CarState(CarStateBase):
       ret.gas = cp.vl["EMS12"]['PV_AV_CAN'] / 100
       ret.gasPressed = bool(cp.vl["EMS16"]["CF_Ems_AclAct"])
 
-
-    #TPMS
-    if cp.vl["TPMS11"]['PRESSURE_FL'] > 43:
-      ret.tpmsPressureFl = cp.vl["TPMS11"]['PRESSURE_FL'] * 5 * 0.145
-    else:
+    # TPMS code added from OPKR
+    if cp.vl["TPMS11"]['UNIT'] == 0.0:
       ret.tpmsPressureFl = cp.vl["TPMS11"]['PRESSURE_FL']
-    if cp.vl["TPMS11"]['PRESSURE_FR'] > 43:
-      ret.tpmsPressureFr = cp.vl["TPMS11"]['PRESSURE_FR'] * 5 * 0.145
-    else:
       ret.tpmsPressureFr = cp.vl["TPMS11"]['PRESSURE_FR']
-    if cp.vl["TPMS11"]['PRESSURE_RL'] > 43:
-      ret.tpmsPressureRl = cp.vl["TPMS11"]['PRESSURE_RL'] * 5 * 0.145
-    else:
       ret.tpmsPressureRl = cp.vl["TPMS11"]['PRESSURE_RL']
-    if cp.vl["TPMS11"]['PRESSURE_RR'] > 43:
-      ret.tpmsPressureRr = cp.vl["TPMS11"]['PRESSURE_RR'] * 5 * 0.145
-    else:
       ret.tpmsPressureRr = cp.vl["TPMS11"]['PRESSURE_RR']
+    elif cp.vl["TPMS11"]['UNIT'] == 1.0:
+      ret.tpmsPressureFl = cp.vl["TPMS11"]['PRESSURE_FL'] * 5 * 0.145038
+      ret.tpmsPressureFr = cp.vl["TPMS11"]['PRESSURE_FR'] * 5 * 0.145038
+      ret.tpmsPressureRl = cp.vl["TPMS11"]['PRESSURE_RL'] * 5 * 0.145038
+      ret.tpmsPressureRr = cp.vl["TPMS11"]['PRESSURE_RR'] * 5 * 0.145038
+    elif cp.vl["TPMS11"]['UNIT'] == 2.0:
+      ret.tpmsPressureFl = cp.vl["TPMS11"]['PRESSURE_FL'] / 10 * 14.5038
+      ret.tpmsPressureFr = cp.vl["TPMS11"]['PRESSURE_FR'] / 10 * 14.5038
+      ret.tpmsPressureRl = cp.vl["TPMS11"]['PRESSURE_RL'] / 10 * 14.5038
+      ret.tpmsPressureRr = cp.vl["TPMS11"]['PRESSURE_RR'] / 10 * 14.5038
 
     self.cruiseGapSet = cp_scc.vl["SCC11"]['TauGapSet']
     ret.limitSpeedmanual = self.CP.limitSpeedmanual
@@ -341,6 +339,7 @@ class CarState(CarStateBase):
       ("Navi_SCC_Camera_Act", "SCC11", 0),
       ("Navi_SCC_Camera_Status", "SCC11", 2),
 
+      ("UNIT", "TPMS11", 0),
       ("PRESSURE_FL", "TPMS11", 0),
       ("PRESSURE_FR", "TPMS11", 0),
       ("PRESSURE_RL", "TPMS11", 0),
