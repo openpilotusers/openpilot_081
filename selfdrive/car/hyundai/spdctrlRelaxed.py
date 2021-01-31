@@ -92,11 +92,11 @@ class SpdctrlRelaxed(SpdController):
         yRelef = plan.yRel2 #EON Lead
         vRelef = plan.vRel2 * 3.6 + 0.5 #EON Lead
         lead2_status = plan.status2
-        self.target_speed_road = plan.targetSpeed + self.osm_spdlimit_offset
-        self.target_speed_camera = plan.targetSpeedCamera + self.osm_spdlimit_offset
+        self.target_speed_road = plan.targetSpeed + round(plan.targetSpeed*0.01*self.osm_spdlimit_offset)
+        self.target_speed_camera = plan.targetSpeedCamera + round(plan.targetSpeedCamera*0.01*self.osm_spdlimit_offset)
         
         if self.map_enable:
-            self.target_speed = int(self.target_speed_map) + self.osm_spdlimit_offset
+            self.target_speed = int(self.target_speed_map) + round(int(self.target_speed_map)*0.01*self.osm_spdlimit_offset)
         elif self.osm_enable:
             self.target_speed = self.target_speed_road
         elif self.target_speed_camera <= 29:

@@ -309,11 +309,11 @@ class SpdController():
         if self.long_curv_timer < long_wait_cmd:
             pass
         elif delta > 0:
-            if ((self.map_spd_camera+self.osm_spd_limit_offset) == int(CS.VSetDis)) and self.map_spd_enable:
+            if ((self.map_spd_camera+round(self.map_spd_camera*0.01*self.osm_spd_limit_offset)) == int(CS.VSetDis)) and self.map_spd_enable:
                 set_speed = int(CS.VSetDis) + 0
                 btn_type = Buttons.NONE
                 self.long_curv_timer = 0
-            elif (((int(round(CC.target_map_speed))+self.osm_spd_limit_offset) == int(CS.VSetDis)) or ((int(round(CC.target_map_speed_camera))+self.osm_spd_limit_offset) == int(CS.VSetDis))) and (self.osm_spd_enable or self.osm_spd_enable_camera) and self.osm_spd_enable_map:
+            elif (((int(round(CC.target_map_speed))+(int(round(CC.target_map_speed))*0.01*self.osm_spd_limit_offset)) == int(CS.VSetDis)) or ((int(round(CC.target_map_speed_camera))+(int(round(CC.target_map_speed_camera))*0.01*self.osm_spd_limit_offset)) == int(CS.VSetDis))) and (self.osm_spd_enable or self.osm_spd_enable_camera) and self.osm_spd_enable_map:
                 set_speed = int(CS.VSetDis) + 0
                 btn_type = Buttons.NONE
                 self.long_curv_timer = 0
