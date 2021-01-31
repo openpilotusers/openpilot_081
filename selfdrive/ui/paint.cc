@@ -348,6 +348,7 @@ static void ui_draw_world(UIState *s) {
   nvgRestore(s->vg);
 }
 
+// TPMS code added from OPKR
 static void ui_draw_tpms(UIState *s) {
   char tpmsFl[32];
   char tpmsFr[32];
@@ -611,7 +612,11 @@ static void ui_draw_vision_speedlimit(UIState *s) {
   if (s->is_ego_over_limit) {
     hysteresis_offset = 0.0;
   }
-  s->is_ego_over_limit = is_speedlim_valid && s->scene.controls_state.getVEgo() > (speedlimit + s->speed_lim_off + hysteresis_offset);
+  if (s->enable_osm == 1) {
+    s->is_ego_over_limit = is_speedlim_valid && s->scene.controls_state.getVEgo() > (speedlimit + (speedlimit*0.01*s->speed_lim_off) + hysteresis_offset);
+  } else {
+    s->is_ego_over_limit = is_speedlim_valid && ((s->limit_set_speed_camera+round(s->limit_set_speed_camera*0.01*s->speed_lim_off)) < s->scene.vSetDis);
+  }
 
   int viz_speedlim_w = 180;
   int viz_speedlim_h = 202;
