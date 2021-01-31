@@ -390,7 +390,7 @@ class CarController():
     if self.params.get('LimitSetSpeedCamera') is not None:
       if int(self.params.get('LimitSetSpeedCamera')) > 29 and not CS.acc_active:
         self.safety_camera_timer += 1
-        if self.safety_camera_timer > 300:
+        if self.safety_camera_timer > 100:
           self.safety_camera_timer = 0
           os.system("echo -n 0 > /data/params/d/OpkrSafetyCamera &")
           os.system("echo -n 0 > /data/params/d/LimitSetSpeedCamera &")
