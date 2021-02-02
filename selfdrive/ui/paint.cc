@@ -734,6 +734,7 @@ static void ui_draw_vision_event(UIState *s) {
     float img_turn_alpha = 0.7f;
     int speed_img;
     if ((29 < s->scene.speedlimitahead*3.6) && (s->scene.speedlimitahead*3.6 < 31)) {speed_img = s->img_speed_30;}
+    else if ((39 < s->scene.speedlimitahead*3.6) && (s->scene.speedlimitahead*3.6 < 41)) {speed_img = s->img_speed_40;}
     else if ((49 < s->scene.speedlimitahead*3.6) && (s->scene.speedlimitahead*3.6 < 51)) {speed_img = s->img_speed_50;}
     else if ((59 < s->scene.speedlimitahead*3.6) && (s->scene.speedlimitahead*3.6 < 61)) {speed_img = s->img_speed_60;}
     else if ((69 < s->scene.speedlimitahead*3.6) && (s->scene.speedlimitahead*3.6 < 71)) {speed_img = s->img_speed_70;}
@@ -787,6 +788,7 @@ static void ui_draw_vision_event(UIState *s) {
       float img_turn_alpha = 0.7f;
       int speed_img;
       if ((29 < s->limit_set_speed_camera) && (s->limit_set_speed_camera < 40)) {speed_img = s->img_speed_30;}
+      else if ((39 < s->limit_set_speed_camera) && (s->limit_set_speed_camera < 50)) {speed_img = s->img_speed_40;}
       else if ((49 < s->limit_set_speed_camera) && (s->limit_set_speed_camera < 60)) {speed_img = s->img_speed_50;}
       else if ((59 < s->limit_set_speed_camera) && (s->limit_set_speed_camera < 70)) {speed_img = s->img_speed_60;}
       else if ((69 < s->limit_set_speed_camera) && (s->limit_set_speed_camera < 80)) {speed_img = s->img_speed_70;}
@@ -1520,6 +1522,8 @@ void ui_nvg_init(UIState *s) {
   assert(s->img_safetycam != 0);
   s->img_speed_30 = nvgCreateImage(s->vg, "../assets/img_30_speedahead.png", 1);
   assert(s->img_speed_30 != 0);
+  s->img_speed_40 = nvgCreateImage(s->vg, "../assets/img_40_speedahead.png", 1);
+  assert(s->img_speed_40 != 0);
   s->img_speed_50 = nvgCreateImage(s->vg, "../assets/img_50_speedahead.png", 1);
   assert(s->img_speed_50 != 0);
   s->img_speed_60 = nvgCreateImage(s->vg, "../assets/img_60_speedahead.png", 1);

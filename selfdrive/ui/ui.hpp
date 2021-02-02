@@ -263,6 +263,7 @@ typedef struct UIState {
   int img_safetycam;
   int img_speed;
   int img_speed_30;
+  int img_speed_40;
   int img_speed_50;
   int img_speed_60;
   int img_speed_70;
