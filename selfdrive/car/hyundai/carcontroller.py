@@ -387,7 +387,7 @@ class CarController():
     if self.mode_change_timer > 0:
       self.mode_change_timer -= 1
 
-    if ((self.params.get('LimitSetSpeedCamera') is not None and self.params.get('LimitSetSpeedCamera') != "0") or self.params.get('OpkrSafetyCamera') == "1" and not CS.acc_active:
+    if ((self.params.get('LimitSetSpeedCamera') is not None and self.params.get('LimitSetSpeedCamera') != "0") or self.params.get('OpkrSafetyCamera') == "1") and not CS.acc_active:
       self.safety_camera_timer += 1
       if self.safety_camera_timer > 100:
         self.safety_camera_timer = 0
