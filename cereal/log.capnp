@@ -558,6 +558,7 @@ struct ControlsState @0x97ff69c53601abf1 {
   alertTextMsg2  @59 :Text;
   lateralControlMethod  @60 :UInt8;
   longPlanSource  @61 :UInt8;
+  targetSpeedCamera @62 :Float32;
 
   lateralControlState :union {
     indiState @52 :LateralINDIState;

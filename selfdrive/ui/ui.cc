@@ -164,6 +164,7 @@ void update_sockets(UIState *s) {
     s->scene.alertTextMsg2 = scene.controls_state.getAlertTextMsg2(); //debug2
 
     s->scene.long_plan_source = scene.controls_state.getLongPlanSource();
+    s->scene.target_speed_camera = scene.controls_state.getTargetSpeedCamera();
 
     // TODO: the alert stuff shouldn't be handled here
     auto alert_sound = scene.controls_state.getAlertSound();

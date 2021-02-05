@@ -490,6 +490,7 @@ static void ui_draw_debug(UIState *s)
     ui_print(s, ui_viz_rx, ui_viz_ry+400, "AD:%.2f", scene.pathPlan.steerActuatorDelay);
     ui_print(s, ui_viz_rx, ui_viz_ry+450, "SC:%.2f", scene.pathPlan.steerRateCost);
     ui_print(s, ui_viz_rx, ui_viz_ry+500, "OS:%.2f", abs(scene.output_scale));
+    ui_print(s, ui_viz_rx, ui_viz_ry+600, "TS:%.0f", scene.target_speed_camera);
     if (scene.long_plan_source == 0) {
       ui_print(s, ui_viz_rx, ui_viz_ry+550, "LP:none");
     } else if (scene.long_plan_source == 1) {

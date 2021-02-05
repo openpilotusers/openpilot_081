@@ -456,6 +456,7 @@ class Planner():
     plan_send.plan.yRel2 = lead_2.yRel
     plan_send.plan.vRel2 = lead_2.vRel
     plan_send.plan.status2 = lead_2.status
+    plan_send.plan.targetSpeedCamera = self.target_speed_map
 
     pm.send('plan', plan_send)
 
