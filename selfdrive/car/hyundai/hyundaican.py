@@ -178,8 +178,8 @@ def create_scc14(packer, enabled, usestockscc, aebcmdact, accel, scc14, objgap, 
           values["ComfortBandUpper"] = 2.
           values["ComfortBandLower"] = 0.
       else:
-        values["ComfortBandUpper"] = 0.24 # stock usually is 0 but sometimes uses higher values
-        values["ComfortBandLower"] = 0.24 # stock usually is 0 but sometimes uses higher values
+        values["ComfortBandUpper"] = 0 # stock usually is 0 but sometimes uses higher values
+        values["ComfortBandLower"] = 0 # stock usually is 0 but sometimes uses higher values
         values["JerkUpperLimit"] = 12.7 if enabled else 0 # stock usually is 1.0 but sometimes uses higher values
         values["JerkLowerLimit"] = 12.7 if enabled else 0 # stock usually is 0.5 but sometimes uses higher values
 
