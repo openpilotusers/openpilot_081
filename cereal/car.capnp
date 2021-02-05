@@ -205,6 +205,8 @@ struct CarState {
   cruiseGapSet @43 :UInt8;
   standStill @44 :Bool;
   limitSpeedmanual @45 :Bool;
+  vSetDis @46 :Float32;
+  cruiseButtons @47 :Float32;
 
   struct WheelSpeeds {
     # optional wheel speeds
