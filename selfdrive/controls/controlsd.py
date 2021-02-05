@@ -431,7 +431,9 @@ class Controls:
     extras_loc = {'lead_one': self.sm['radarState'].leadOne, 'mpc_TR': self.sm['dynamicFollowData'].mpcTR,
                   'live_tracks': self.sm['liveTracks'], 'has_lead': plan.hasLead}
     # Gas/Brake PID loop
-    actuators.gas, actuators.brake = self.LoC.update(self.active, CS, v_acc_sol, plan.vTargetFuture, a_acc_sol, self.CP, plan.hasLead, self.sm['radarState'], plan.decelForTurn, plan.longitudinalPlanSource, extras_loc)
+    self.LoC.update(self.active, CS, v_acc_sol, plan.vTargetFuture, a_acc_sol, self.CP, plan.hasLead, self.sm['radarState'], plan.decelForTurn, plan.longitudinalPlanSource, extras_loc)
+    actuators.gas = plan.aTarget if plan.aTarget > 0 else 0.
+    actuators.brake = -plan.aTarget if plan.aTarget < 0 else 0.
     # Steering PID loop and lateral MPC
     actuators.steer, actuators.steerAngle, lac_log = self.LaC.update(self.active, CS, self.CP, path_plan)
 

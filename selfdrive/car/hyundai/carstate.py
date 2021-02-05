@@ -5,7 +5,7 @@ import math
 from cereal import car
 from common.numpy_fast import mean
 import cereal.messaging as messaging
-from selfdrive.car.hyundai.values import DBC, STEER_THRESHOLD, FEATURES, EV_HYBRID
+from selfdrive.car.hyundai.values import DBC, STEER_THRESHOLD, FEATURES, ELEC_VEH, HYBRID_VEH
 from selfdrive.car.interfaces import CarStateBase
 from opendbc.can.parser import CANParser
 from selfdrive.config import Conversions as CV
@@ -164,12 +164,16 @@ class CarState(CarStateBase):
     # TODO: Check this
     ret.brakeLights = bool(cp.vl["TCS13"]['BrakeLight'] or ret.brakePressed)
 
-    if self.CP.carFingerprint in EV_HYBRID:
+    if self.CP.carFingerprint in ELEC_VEH:
       ret.gas = cp.vl["E_EMS11"]['Accel_Pedal_Pos'] / 256.
-      ret.gasPressed = ret.gas > 0
-    else:
+    elif self.CP.carFingerprint in HYBRID_VEH:
+      ret.gas = cp.vl["EV_PC4"]['CR_Vcu_AccPedDep_Pc']
+    elif self.CP.emsAvailable:
       ret.gas = cp.vl["EMS12"]['PV_AV_CAN'] / 100
-      ret.gasPressed = bool(cp.vl["EMS16"]["CF_Ems_AclAct"])
+
+    ret.gasPressed = (cp.vl["TCS13"]["DriverOverride"] == 1)
+    if self.CP.emsAvailable:
+      ret.gasPressed = ret.gasPressed or bool(cp.vl["EMS16"]["CF_Ems_AclAct"])
 
     ret.espDisabled = (cp.vl["TCS15"]['ESC_Off_Step'] != 0)
 
@@ -419,14 +423,21 @@ class CarState(CarStateBase):
       ]
       checks += [("LCA11", 50)]
 
-    if CP.carFingerprint in EV_HYBRID:
+    if CP.carFingerprint in ELEC_VEH:
       signals += [
         ("Accel_Pedal_Pos", "E_EMS11", 0),
       ]
       checks += [
         ("E_EMS11", 50),
       ]
-    else:
+    elif CP.carFingerprint in HYBRID_VEH:
+      signals += [
+        ("CR_Vcu_AccPedDep_Pc", "EV_PC4", 0),
+      ]
+      checks += [
+        ("EV_PC4", 50),
+      ]
+    elif CP.emsAvailable:
       signals += [
         ("PV_AV_CAN", "EMS12", 0),
         ("CF_Ems_AclAct", "EMS16", 0),
