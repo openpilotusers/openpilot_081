@@ -298,11 +298,17 @@ class Controls:
     self.CP.enableCruise = self.CI.CP.enableCruise
     if not self.CP.enableCruise:
       self.v_cruise_kph = update_v_cruise(self.v_cruise_kph, CS.buttonEvents, self.enabled, self.is_metric)
+      if int(CS.vSetDis)-1 > self.v_cruise_kph:
+        self.v_cruise_kph = int(CS.vSetDis)
     elif self.CP.enableCruise and CS.cruiseState.enabled:
       if CS.cruiseButtons == Buttons.RES_ACCEL and int(Params().get('OpkrVariableCruise')) == 1 and CS.cruiseState.modeSel != 0 and CS.vSetDis < (self.v_cruise_kph_last - 1):
         self.v_cruise_kph = self.v_cruise_kph_last
+        if int(CS.vSetDis)-1 > self.v_cruise_kph:
+          self.v_cruise_kph = int(CS.vSetDis)
       elif CS.cruiseButtons == Buttons.RES_ACCEL and int(Params().get('OpkrVariableCruise')) == 1 and CS.cruiseState.modeSel != 0 and 30 <= self.v_cruise_kph_last <= round(CS.vEgo*CV.MS_TO_KPH):
         self.v_cruise_kph = round(CS.vEgo*CV.MS_TO_KPH)
+        if int(CS.vSetDis)-1 > self.v_cruise_kph:
+          self.v_cruise_kph = int(CS.vSetDis)
         self.v_cruise_kph_last = self.v_cruise_kph
       elif CS.cruiseButtons == Buttons.RES_ACCEL or CS.cruiseButtons == Buttons.SET_DECEL:
         self.v_cruise_kph = round(CS.cruiseState.speed * CV.MS_TO_KPH)
