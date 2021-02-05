@@ -136,7 +136,6 @@ class CarState(CarStateBase):
       ret.cruiseState.enabled = (cp_scc.vl["SCC12"]['ACCMode'] != 0)
 
     self.acc_active = ret.cruiseState.enabled
-    self.lead_distance = cp_scc.vl["SCC11"]['ACC_ObjDist']
     self.vrelative = cp_scc.vl["SCC11"]['ACC_ObjRelSpd']
     self.radar_obj_valid = cp_scc.vl["SCC11"]['ObjValid']
     ret.cruiseState.standstill = cp_scc.vl["SCC11"]['SCCInfoDisplay'] == 4.
@@ -271,8 +270,8 @@ class CarState(CarStateBase):
     self.lkas11 = copy.copy(cp_cam.vl["LKAS11"])
     self.clu11 = copy.copy(cp.vl["CLU11"])
     self.park_brake = cp.vl["TCS13"]['PBRAKE_ACT'] == 1
-    self.steer_state = cp.vl["MDPS12"]['CF_Mdps_ToiActive']  # 0 NOT ACTIVE, 1 ACTIVE
-    self.lead_distance = cp.vl["SCC11"]['ACC_ObjDist']
+    self.steer_state = cp_mdps.vl["MDPS12"]['CF_Mdps_ToiActive']  # 0 NOT ACTIVE, 1 ACTIVE
+    self.lead_distance = cp_scc.vl["SCC11"]['ACC_ObjDist']
     self.brake_hold = cp.vl["TCS15"]['AVH_LAMP'] == 2 # 0 OFF, 1 ERROR, 2 ACTIVE, 3 READY
     self.brake_error = cp.vl["TCS13"]['ACCEnable'] != 0 # 0 ACC CONTROL ENABLED, 1-3 ACC CONTROL DISABLED
     self.prev_cruise_buttons = self.cruise_buttons
@@ -536,5 +535,83 @@ class CarState(CarStateBase):
     checks = [
       ("LKAS11", 100)
     ]
+    if CP.sccBus == 2 or CP.radarOffCan:
+      signals += [
+        ("MainMode_ACC", "SCC11", 0),
+        ("SCCInfoDisplay", "SCC11", 0),
+        ("AliveCounterACC", "SCC11", 0),
+        ("VSetDis", "SCC11", 0),
+        ("ObjValid", "SCC11", 0),
+        ("DriverAlertDisplay", "SCC11", 0),
+        ("TauGapSet", "SCC11", 4),
+        ("ACC_ObjStatus", "SCC11", 0),
+        ("ACC_ObjLatPos", "SCC11", 0),
+        ("ACC_ObjDist", "SCC11", 150.),
+        ("ACC_ObjRelSpd", "SCC11", 0),
+        ("Navi_SCC_Curve_Status", "SCC11", 0),
+        ("Navi_SCC_Curve_Act", "SCC11", 0),
+        ("Navi_SCC_Camera_Act", "SCC11", 0),
+        ("Navi_SCC_Camera_Status", "SCC11", 2),
+
+        ("ACCMode", "SCC12", 0),
+        ("CF_VSM_Prefill", "SCC12", 0),
+        ("CF_VSM_DecCmdAct", "SCC12", 0),
+        ("CF_VSM_HBACmd", "SCC12", 0),
+        ("CF_VSM_Warn", "SCC12", 0),
+        ("CF_VSM_Stat", "SCC12", 0),
+        ("CF_VSM_BeltCmd", "SCC12", 0),
+        ("ACCFailInfo", "SCC12", 0),
+        ("ACCMode", "SCC12", 0),
+        ("StopReq", "SCC12", 0),
+        ("CR_VSM_DecCmd", "SCC12", 0),
+        ("aReqRaw", "SCC12", 0),
+        ("TakeOverReq", "SCC12", 0),
+        ("PreFill", "SCC12", 0),
+        ("aReqValue", "SCC12", 0),
+        ("CF_VSM_ConfMode", "SCC12", 1),
+        ("AEB_Failinfo", "SCC12", 0),
+        ("AEB_Status", "SCC12", 2),
+        ("AEB_CmdAct", "SCC12", 0),
+        ("AEB_StopReq", "SCC12", 0),
+        ("CR_VSM_Alive", "SCC12", 0),
+        ("CR_VSM_ChkSum", "SCC12", 0),
+
+        ("SCCDrvModeRValue", "SCC13", 1),
+        ("SCC_Equip", "SCC13", 1),
+        ("AebDrvSetStatus", "SCC13", 0),
+        ("Lead_Veh_Dep_Alert_USM", "SCC13", 0),
+
+        ("JerkUpperLimit", "SCC14", 0),
+        ("JerkLowerLimit", "SCC14", 0),
+        ("ComfortBandUpper", "SCC14", 0),
+        ("ComfortBandLower", "SCC14", 0),
+        ("ACCMode", "SCC14", 0),
+        ("ObjGap", "SCC14", 0),
+
+        ("CF_VSM_Prefill", "FCA11", 0),
+        ("CF_VSM_HBACmd", "FCA11", 0),
+        ("CF_VSM_Warn", "FCA11", 0),
+        ("CF_VSM_BeltCmd", "FCA11", 0),
+        ("CR_VSM_DecCmd", "FCA11", 0),
+        ("FCA_Status", "FCA11", 2),
+        ("FCA_CmdAct", "FCA11", 0),
+        ("FCA_StopReq", "FCA11", 0),
+        ("FCA_DrvSetStatus", "FCA11", 1),
+        ("CF_VSM_DecCmdAct", "FCA11", 0),
+        ("FCA_Failinfo", "FCA11", 0),
+        ("FCA_RelativeVelocity", "FCA11", 0),
+        ("FCA_TimetoCollision", "FCA11", 2540.),
+        ("CR_FCA_Alive", "FCA11", 0),
+        ("CR_FCA_ChkSum", "FCA11", 0),
+        ("Supplemental_Counter", "FCA11", 0),
+        ("PAINT1_Status", "FCA11", 1),
+      ]
+      if CP.sccBus == 2:
+        checks += [
+          ("SCC11", 50),
+          ("SCC12", 50),
+        ]
+        if CP.fcaBus == 2:
+          checks += [("FCA11", 50)]
 
     return CANParser(DBC[CP.carFingerprint]['pt'], signals, checks, 2)
