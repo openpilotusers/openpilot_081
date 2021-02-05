@@ -24,7 +24,6 @@ from selfdrive.controls.lib.vehicle_model import VehicleModel
 from selfdrive.controls.lib.planner import LON_MPC_STEP
 from selfdrive.locationd.calibrationd import Calibration
 from common.hardware import HARDWARE
-from selfdrive.swaglog import cloudlog
 from selfdrive.controls.lib.dynamic_follow.df_manager import dfManager
 from common.op_params import opParams
 from selfdrive.debug.disable_ecu import disable_ecu
@@ -119,15 +118,6 @@ class Controls:
     cp_bytes = self.CP.to_bytes()
     params.put("CarParams", cp_bytes)
     put_nonblocking("CarParamsCache", cp_bytes)
-    if self.CP.openpilotLongitudinalControl:
-      rdr_addr = None
-      for fw in self.CP.carFw:
-        if fw.ecu == "fwdRadar":
-          rdr_addr = fw.address
-          break
-      cloudlog.info("disabling radar %s" % hex(rdr_addr))
-      # TODO: error handling for rdr_addr is None
-      disable_ecu(rdr_addr, self.can_sock, self.pm.sock['sendcan'], 0, timeout=1, retry=10)
 
     self.CC = car.CarControl.new_message()
     self.AM = AlertManager()
