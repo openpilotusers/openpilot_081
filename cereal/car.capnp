@@ -309,6 +309,8 @@ struct CarControl {
   cruiseControl @4 :CruiseControl;
   hudControl @5 :HUDControl;
 
+  vTargetFuture @8 :Float32;
+  lead @9 :Lead;
   struct Actuators {
     # range from 0.0 - 1.0
     gas @0: Float32;
@@ -378,6 +380,13 @@ struct CarControl {
       chimeModeDistance @19;
       chimeModeOneway @20;
     }
+  }
+
+  struct Lead {
+    dRel @0 :Float32;
+    yRel @1 :Float32;
+    vRel @2 :Float32;
+    status @3 :Bool;
   }
 }
 
@@ -454,15 +463,9 @@ struct CarParams {
   mdpsHarness @54: Bool;
   sasBus @55: Int8;
   fcaBus @56: Int8;
-  bsmAvailable @57: Bool;
-  lfaAvailable @58: Bool;
-  sccBus @59: Int8;
-  radarDisablePossible @60: Bool;
-  lvrAvailable @61: Bool;
-  evgearAvailable @62: Bool;
-  emsAvailable @63: Bool;
-  standStill @64: Bool;
-  limitSpeedmanual @65: Bool;
+  sccBus @57: Int8;
+  standStill @58: Bool;
+  limitSpeedmanual @59: Bool;
 
   struct LateralParams {
     torqueBP @0 :List(Int32);

@@ -6,29 +6,38 @@ from selfdrive.car.hyundai.values import CAR, Buttons
 from selfdrive.car import STD_CARGO_KG, scale_rot_inertia, scale_tire_stiffness, gen_empty_fingerprint
 from selfdrive.car.interfaces import CarInterfaceBase
 
-EventName = car.CarEvent.EventName
 ButtonType = car.CarState.ButtonEvent.Type
+EventName = car.CarEvent.EventName
+
+HYUNDAI_LONGITUDINAL_FLAG = 1
 
 class CarInterface(CarInterfaceBase):
   def __init__(self, CP, CarController, CarState):
     super().__init__(CP, CarController, CarState)
     self.buttonEvents = []
     self.cp2 = self.CS.get_can2_parser(CP)
-    self.visiononlyWarning = False
-    self.belowspeeddingtimer = 0.
 
   @staticmethod
   def compute_gb(accel, speed):
-    return float(accel) / 3.0
+    return float(accel) / 5.0
 
   @staticmethod
   def get_params(candidate, fingerprint=gen_empty_fingerprint(), car_fw=[]):  # pylint: disable=dangerous-default-value
+    params = Params()
+
     ret = CarInterfaceBase.get_std_params(candidate, fingerprint)
 
     ret.carName = "hyundai"
     ret.safetyModel = car.CarParams.SafetyModel.hyundai
 
-    params = Params()
+    ret.radarOffCan = True
+    ret.openpilotLongitudinalControl = True
+    ret.safetyParam = 0
+
+    ret.enableCruise = not ret.openpilotLongitudinalControl
+    if ret.openpilotLongitudinalControl:
+      ret.safetyParam |= HYUNDAI_LONGITUDINAL_FLAG
+
     PidKp = float(int(params.get('PidKp')) * 0.01)
     PidKi = float(int(params.get('PidKi')) * 0.001)
     PidKd = float(int(params.get('PidKd')) * 0.01)
@@ -150,63 +159,32 @@ class CarInterface(CarInterfaceBase):
       ret.steerMaxV = [LqrSteerMaxV]
       ret.steerMaxBP = [0.]
 
-    #ret.longitudinalTuning.kpBP = [0., 1., 10., 35.]
-    #ret.longitudinalTuning.kpV = [0.8, 0.7, 0.6, 0.55]
-    #ret.longitudinalTuning.kiBP = [0., 1., 15., 35.]
-    #ret.longitudinalTuning.kiV = [0.4, 0.3, 0.2, 0.1]
-    #ret.longitudinalTuning.kfBP = [0., 5.]
-    #ret.longitudinalTuning.kfV = [1., 1.]
-    #ret.longitudinalTuning.deadzoneBP = [0.0, 0.5]
-    #ret.longitudinalTuning.deadzoneV = [0.00, 0.00]
-    
-    #ret.longitudinalTuning.kpBP = [0., 10., 40.]
-    #ret.longitudinalTuning.kpV = [1.2, 0.6, 0.2]
-    #ret.longitudinalTuning.kiBP = [0., 10., 30., 40.]
-    #ret.longitudinalTuning.kiV = [0.05, 0.02, 0.01, 0.005]
-    #ret.longitudinalTuning.deadzoneBP = [0., 40]
-    #ret.longitudinalTuning.deadzoneV = [0., 0.02]
-  
-    #ret.gasMaxBP = [0., 1., 1.1, 15., 40.]
-    #ret.gasMaxV = [2., 2., 2., 2., 2.]
-    ret.brakeMaxBP = [0., 5.]
-    ret.brakeMaxV = [3.5, 3.5]
-    
-    #ret.gasMaxBP = [0., 10., 40.]
-    #ret.gasMaxV = [0.5, 0.5, 0.5]
-    #ret.brakeMaxBP = [0., 20.]
-    #ret.brakeMaxV = [1., 0.8]
+    # TODO: adjust?
+    ret.gasMaxBP = [0.]    # m/s
+    ret.gasMaxV = [.5]    # max gas allowed
+    ret.brakeMaxBP = [0.]  # m/s
+    ret.brakeMaxV = [1.]   # max brake allowed
 
-    ret.longitudinalTuning.deadzoneBP = [0., 9.]
-    ret.longitudinalTuning.deadzoneV = [0., .15]
-    ret.longitudinalTuning.kpBP = [0., 5., 35.]
+    ret.longitudinalTuning.kpBP = [0., 35.]
+    ret.longitudinalTuning.kpV = [1., 0.5]
     ret.longitudinalTuning.kiBP = [0., 35.]
+    ret.longitudinalTuning.kiV = [0.13, 0.07]
 
-    ret.gasMaxBP = [0., 9., 35]
-    ret.gasMaxV = [0.4, 0.5, 0.7]
-    ret.longitudinalTuning.kpV = [1.2, 1.1, 0.65]
-    ret.longitudinalTuning.kiV = [0.25, 0.2]
-
+    eps_modified = False
+    for fw in car_fw:
+      if fw.ecu == "eps" and b"," in fw.fwVersion:
+        eps_modified = True
 
     # these cars require a special panda safety mode due to missing counters and checksums in the messages
 
     ret.mdpsHarness = params.get('CommunityFeaturesToggle') == b'0'
     ret.sasBus = 0 if (688 in fingerprint[0] or not ret.mdpsHarness) else 1
     ret.fcaBus = 0 if 909 in fingerprint[0] else 2 if 909 in fingerprint[2] else -1
-    ret.bsmAvailable = True if 1419 in fingerprint[0] else False
-    ret.lfaAvailable = True if 1157 in fingerprint[2] else False
-    ret.lvrAvailable = True if 871 in fingerprint[0] else False
-    ret.evgearAvailable = True if 882 in fingerprint[0] else False
-    ret.emsAvailable = True if 608 and 809 in fingerprint[0] else False
 
     if True:
       ret.sccBus = 2 if 1057 in fingerprint[2] and False else 0 if 1057 in fingerprint[0] else -1
     else:
       ret.sccBus = -1
-
-    ret.radarOffCan = (ret.sccBus == -1)
-    #ret.radarTimeStep = 0.1
-
-    ret.openpilotLongitudinalControl = True and not (ret.sccBus == 0)
 
     ret.safetyModel = car.CarParams.SafetyModel.hyundaiLegacy
 
@@ -214,8 +192,6 @@ class CarInterface(CarInterfaceBase):
       ret.safetyModel = car.CarParams.SafetyModel.hyundaiCommunity
     if ret.radarOffCan or (ret.sccBus == 2) or True:
       ret.safetyModel = car.CarParams.SafetyModel.hyundaiCommunityNonscc
-    if ret.mdpsHarness:
-      ret.minSteerSpeed = 0.
 
     ret.centerToFront = ret.wheelbase * 0.4
 
@@ -229,20 +205,6 @@ class CarInterface(CarInterfaceBase):
                                                                          tire_stiffness_factor=tire_stiffness_factor)
 
     ret.enableCamera = True
-
-    ret.radarDisablePossible = True
-
-    ret.enableCruise = False and ret.sccBus == 0
-
-    if ret.radarDisablePossible:
-      ret.openpilotLongitudinalControl = True
-      ret.safetyModel = car.CarParams.SafetyModel.hyundaiCommunityNonscc # todo based on toggle
-      ret.sccBus = -1
-      ret.enableCruise = False
-      ret.radarOffCan = True
-      if ret.fcaBus == 0:
-        ret.fcaBus = -1
-
     ret.standStill = False
     return ret
 
@@ -254,17 +216,6 @@ class CarInterface(CarInterfaceBase):
     ret.canValid = self.cp.can_valid and self.cp2.can_valid and self.cp_cam.can_valid
     
     events = self.create_common_events(ret)
-
-    # speeds
-    ret.steeringRateLimited = self.CC.steer_rate_limited if self.CC is not None else False
-
-    # low speed steer alert hysteresis logic (only for cars with steer cut off above 10 m/s)
-    if ret.vEgo > (self.CP.minSteerSpeed + .84) or not self.CC.enabled:
-      self.low_speed_alert = False
-      self.belowspeeddingtimer = 0.
-
-    if self.CP.sccBus == 2:
-      self.CP.enableCruise = self.CC.usestockscc
 
     #if self.CS.brakeHold and not self.CC.usestockscc:
     #  events.add(EventName.brakeHold)
@@ -335,7 +286,6 @@ class CarInterface(CarInterfaceBase):
     can_sends = self.CC.update(c.enabled, self.CS, self.frame, c.actuators,
                                c.cruiseControl.cancel, c.hudControl.visualAlert, c.hudControl.leftLaneVisible,
                                c.hudControl.rightLaneVisible, c.hudControl.leftLaneDepart, c.hudControl.rightLaneDepart,
-                               c.hudControl.setSpeed, c.hudControl.leadVisible, c.hudControl.leadDistance,
-                               c.hudControl.leadvRel, c.hudControl.leadyRel, sm)
+                               c.hudControl.leadVisible, c.hudControl.setSpeed, c.lead, c.vTargetFuture, sm)
     self.frame += 1
     return can_sends

@@ -181,12 +181,10 @@ class Planner():
     fixed_offset = op_params.get('speed_offset')
     if self.last_time > 5:
       try:
-        self.offset = int(self.params.get("SpeedLimitOffset", encoding='utf8'))
+        self.offset = 0
       except (TypeError,ValueError):
-        self.params.delete("SpeedLimitOffset")
         self.offset = 0
       self.osm = self.params.get("LimitSetSpeed", encoding='utf8') == "1"
-      self.osm_curv = self.params.get("LimitSetSpeedCurv", encoding='utf8') == "1"
       self.osm_camera = self.params.get("LimitSetSpeedCamera", encoding='utf8') == "1"
       self.last_time = 0
     self.last_time = self.last_time + 1
@@ -207,7 +205,7 @@ class Planner():
     lead_2 = sm['radarState'].leadTwo
 
     enabled = (long_control_state == LongCtrlState.pid) or (long_control_state == LongCtrlState.stopping)
-    following = lead_1.status and lead_1.dRel < 50.0 and lead_1.vLeadK > v_ego and lead_1.aLeadK > 0.0
+    following = lead_1.status and lead_1.dRel < 45.0 and lead_1.vLeadK > v_ego and lead_1.aLeadK > 0.0
 
     if gas_button_status == 1:
       speed_ahead_distance = 150
@@ -249,13 +247,7 @@ class Planner():
           speed_limit_ahead = sm['liveMapData'].speedLimitAhead + (speed_limit - sm['liveMapData'].speedLimitAhead)*(sm['liveMapData'].speedLimitAheadDistance - distanceatlowlimit)/(speed_ahead_distance - distanceatlowlimit)
         else:
           speed_limit_ahead = sm['liveMapData'].speedLimitAhead
-        if speed_limit_ahead is not None:
-          v_speedlimit_ahead = speed_limit_ahead
-          if v_ego > offset_limit:
-            v_speedlimit_ahead = v_speedlimit_ahead * (1. + self.offset/100.0)
-          if v_speedlimit_ahead > fixed_offset:
-            v_speedlimit_ahead = v_speedlimit_ahead + fixed_offset
-      if sm['liveMapData'].curvatureValid and sm['liveMapData'].distToTurn < speed_ahead_distance and osm and (sm['liveMapData'].lastGps.timestamp -time.mktime(now.timetuple()) * 1000) < 10000:
+      if sm['liveMapData'].curvatureValid and sm['liveMapData'].distToTurn < speed_ahead_distance and osm and self.osm and (sm['liveMapData'].lastGps.timestamp -time.mktime(now.timetuple()) * 1000) < 10000:
         curvature = abs(sm['liveMapData'].curvature)
         radius = 1/max(1e-4, curvature) * curvature_factor
         if gas_button_status == 1:

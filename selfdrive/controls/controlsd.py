@@ -26,6 +26,7 @@ from selfdrive.locationd.calibrationd import Calibration
 from common.hardware import HARDWARE
 from selfdrive.controls.lib.dynamic_follow.df_manager import dfManager
 from common.op_params import opParams
+from selfdrive.debug.disable_ecu import disable_ecu
 
 import common.log as trace1
 
@@ -36,6 +37,7 @@ STEER_ANGLE_SATURATION_THRESHOLD = 45  # Degrees
 
 SIMULATION = "SIMULATION" in os.environ
 NOSENSOR = "NOSENSOR" in os.environ
+#IGNORE_PROCESSES = set(["rtshield", "uploader", "deleter", "loggerd", "logmessaged", "tombstoned", "logcatd", "proclogd", "clocksd", "gpsd", "updated"])
 
 ThermalStatus = log.ThermalData.ThermalStatus
 State = log.ControlsState.OpenpilotState
@@ -69,7 +71,7 @@ class Controls:
 
     self.sm = sm
     if self.sm is None:
-      self.sm = messaging.SubMaster(['thermal', 'health', 'model', 'liveCalibration', 'frontFrame',
+      self.sm = messaging.SubMaster(['thermal', 'health', 'modelV2', 'liveCalibration', 'frontFrame',
                                      'dMonitoringState', 'plan', 'pathPlan', 'liveLocationKalman', 'radarState', 'dynamicFollowData', 'liveTracks', 'dynamicFollowButton', 'modelLongButton'])
 
     self.op_params = opParams()
@@ -116,6 +118,15 @@ class Controls:
     cp_bytes = self.CP.to_bytes()
     params.put("CarParams", cp_bytes)
     put_nonblocking("CarParamsCache", cp_bytes)
+    if self.CP.openpilotLongitudinalControl:
+      rdr_addr = None
+      for fw in self.CP.carFw:
+        if fw.ecu == "fwdRadar":
+          rdr_addr = fw.address
+          break
+      cloudlog.info("disabling radar %s" % hex(rdr_addr))
+      # TODO: error handling for rdr_addr is None
+      disable_ecu(rdr_addr, self.can_sock, self.pm.sock['sendcan'], 0, timeout=1, retry=10)
 
     self.CC = car.CarControl.new_message()
     self.AM = AlertManager()
@@ -431,7 +442,9 @@ class Controls:
     extras_loc = {'lead_one': self.sm['radarState'].leadOne, 'mpc_TR': self.sm['dynamicFollowData'].mpcTR,
                   'live_tracks': self.sm['liveTracks'], 'has_lead': plan.hasLead}
     # Gas/Brake PID loop
-    actuators.gas, actuators.brake = self.LoC.update(self.active, CS, v_acc_sol, plan.vTargetFuture, a_acc_sol, self.CP, plan.hasLead, self.sm['radarState'], plan.decelForTurn, plan.longitudinalPlanSource, extras_loc)
+    self.LoC.update(self.active, CS, v_acc_sol, plan.vTargetFuture, a_acc_sol, self.CP, plan.hasLead, self.sm['radarState'], plan.decelForTurn, plan.longitudinalPlanSource, extras_loc)
+    actuators.gas = plan.aTarget if plan.aTarget > 0 else 0.
+    actuators.brake = -plan.aTarget if plan.aTarget < 0 else 0.
     # Steering PID loop and lateral MPC
     actuators.steer, actuators.steerAngle, lac_log = self.LaC.update(self.active, CS, self.CP, path_plan)
 
@@ -466,6 +479,14 @@ class Controls:
     CC.enabled = self.enabled
     CC.actuators = actuators
 
+    CC.vTargetFuture = float(self.sm['plan'].vTargetFuture)
+
+    lead = self.sm['radarState'].leadOne
+    CC.lead.status = bool(lead.status)
+    CC.lead.dRel = float(lead.dRel)
+    CC.lead.yRel = float(lead.yRel)
+    CC.lead.vRel = float(lead.vRel)
+
     CC.cruiseControl.override = True
     CC.cruiseControl.cancel = not self.CP.enableCruise or (not self.enabled and CS.cruiseState.enabled)
 
@@ -480,9 +501,6 @@ class Controls:
     CC.hudControl.speedVisible = self.enabled
     CC.hudControl.lanesVisible = self.enabled
     CC.hudControl.leadVisible = self.sm['plan'].hasLead
-    CC.hudControl.leadDistance = 0 #self.sm['radarState'].leadOne.dRel
-    CC.hudControl.leadvRel = 0 #self.sm['radarState'].leadOne.vRel
-    CC.hudControl.leadyRel = 0 #self.sm['radarState'].leadOne.yRel
 
     right_lane_visible = self.sm['pathPlan'].rProb > 0.5
     left_lane_visible = self.sm['pathPlan'].lProb > 0.5
@@ -493,7 +511,7 @@ class Controls:
     ldw_allowed = self.is_ldw_enabled and CS.vEgo > LDW_MIN_SPEED and not recent_blinker \
                     and not self.active and self.sm['liveCalibration'].calStatus == Calibration.CALIBRATED
 
-    meta = self.sm['model'].meta
+    meta = self.sm['modelV2'].meta
     if len(meta.desirePrediction) and ldw_allowed:
       l_lane_change_prob = meta.desirePrediction[Desire.laneChangeLeft - 1]
       r_lane_change_prob = meta.desirePrediction[Desire.laneChangeRight - 1]

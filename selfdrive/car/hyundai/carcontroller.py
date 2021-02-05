@@ -5,9 +5,7 @@ from cereal import car, log, messaging
 from common.numpy_fast import interp
 from selfdrive.car import apply_std_steer_torque_limits
 from selfdrive.car.hyundai.carstate import GearShifter
-from selfdrive.car.hyundai.hyundaican import create_lkas11, create_clu11, create_lfa_mfa, \
-                                             create_scc11, create_scc12, create_scc13, create_scc14, \
-                                             create_scc42a, create_scc7d0, create_fca11, create_fca12, create_mdps12
+from selfdrive.car.hyundai.hyundaican import create_lkas11, create_clu11, create_lfahda_mfc, create_acc_commands, create_acc_opt, create_frt_radar_opt, create_mdps12
 from selfdrive.car.hyundai.values import Buttons, SteerLimitParams, CAR, FEATURES
 from opendbc.can.packer import CANPacker
 from selfdrive.config import Conversions as CV
@@ -24,49 +22,22 @@ import common.CTime1000 as tm
 
 VisualAlert = car.CarControl.HUDControl.VisualAlert
 
-# Accel limits
-ACCEL_HYST_GAP = 0.02  # don't change accel command for small oscillations within this value
-ACCEL_MAX = 1.5  # 1.5 m/s2
-ACCEL_MIN = -3.0 # 3   m/s2
-ACCEL_SCALE = max(ACCEL_MAX, -ACCEL_MIN)
-
-def accel_hysteresis(accel, accel_steady):
-
-  # for small accel oscillations within ACCEL_HYST_GAP, don't change the accel command
-  if accel > accel_steady + ACCEL_HYST_GAP:
-    accel_steady = accel - ACCEL_HYST_GAP
-  elif accel < accel_steady - ACCEL_HYST_GAP:
-    accel_steady = accel + ACCEL_HYST_GAP
-  accel = accel_steady
-
-  return accel, accel_steady
-
-def accel_rate_limit(accel_lim, prev_accel_lim):
-
-  if accel_lim > 0:
-    if accel_lim > prev_accel_lim:
-      accel_lim = min(accel_lim, prev_accel_lim + 0.02)
-    else:
-      accel_lim = max(accel_lim, prev_accel_lim - 0.035)
-  else:
-    if accel_lim < prev_accel_lim:
-      accel_lim = max(accel_lim, prev_accel_lim - 0.035)
-    else:
-      accel_lim = min(accel_lim, prev_accel_lim + 0.01)
-
-  return accel_lim
+# TODO: adjust?
+#HYUNDAI_ACCEL_LOOKUP_BP = [-1., 0., 2./3.5]
+#HYUNDAI_ACCEL_LOOKUP_V = [-3.5, 0., 2.]
 
 def process_hud_alert(enabled, fingerprint, visual_alert, left_lane,
                       right_lane, left_lane_depart, right_lane_depart):
-
   sys_warning = (visual_alert == VisualAlert.steerRequired)
-  if sys_warning:
-      sys_warning = 1 if fingerprint in [CAR.GENESIS, CAR.GENESIS_G90, CAR.GENESIS_G80] else 3
 
-  if enabled or sys_warning:
-      sys_state = 3
-  else:
-      sys_state = 1
+  # initialize to no line visible
+  sys_state = 1
+  if left_lane and right_lane or sys_warning:  # HUD alert only display when LKAS status is active
+    sys_state = 3 if enabled or sys_warning else 4
+  elif left_lane:
+    sys_state = 5
+  elif right_lane:
+    sys_state = 6
 
   # initialize to no warnings
   left_lane_warning = 0
@@ -83,29 +54,9 @@ class CarController():
   def __init__(self, dbc_name, CP, VM):
     self.apply_steer_last = 0
     self.car_fingerprint = CP.carFingerprint
-    self.cp_oplongcontrol = CP.openpilotLongitudinalControl
     self.packer = CANPacker(dbc_name)
-    self.accel_steady = 0
-    self.accel_lim_prev = 0.
-    self.accel_lim = 0.
     self.steer_rate_limited = False
-    self.usestockscc = True
-    self.lead_visible = False
-    self.lead_debounce = 0
     self.prev_gapButton = 0
-    self.current_veh_speed = 0
-    self.lfainFingerprint = CP.lfaAvailable
-    self.vdiff = 0
-    self.resumebuttoncnt = 0
-    self.lastresumeframe = 0
-    self.fca11supcnt = self.fca11inc = self.fca11alivecnt = self.fca11cnt13 = self.scc11cnt = self.scc12cnt = 0
-    self.counter_init = False
-    self.fca11maxcnt = 0xD
-    self.radarDisableActivated = False
-    self.radarDisableResetTimer = 0
-    self.radarDisableOverlapTimer = 0
-    self.sendaccmode = not CP.radarDisablePossible
-    self.enabled = False
     self.sm = messaging.SubMaster(['controlsState'])
 
     self.lanechange_manual_timer = 0
@@ -130,8 +81,6 @@ class CarController():
     self.model_speed = 0
     self.model_sum = 0
 
-
-    self.accActive = False
     self.safety_camera_timer = 0
     self.model_speed_range = [30, 90, 255, 300]
     self.steerMax_range = [SteerLimitParams.STEER_MAX, int(self.params.get('SteerMaxBaseAdj')), int(self.params.get('SteerMaxBaseAdj')), 0]
@@ -156,27 +105,11 @@ class CarController():
 
   def update(self, enabled, CS, frame, actuators, pcm_cancel_cmd, visual_alert,
              left_lane, right_lane, left_lane_depart, right_lane_depart,
-             set_speed, lead_visible, lead_dist, lead_vrel, lead_yrel, sm):
-
-    self.enabled = enabled
-    # gas and brake
-    self.accel_lim_prev = self.accel_lim
-    apply_accel = actuators.gas - actuators.brake
-
-    apply_accel, self.accel_steady = accel_hysteresis(apply_accel, self.accel_steady)
-    apply_accel = clip(apply_accel * ACCEL_SCALE, ACCEL_MIN, ACCEL_MAX)
-
-    self.accel_lim = apply_accel
-    apply_accel = accel_rate_limit(self.accel_lim, self.accel_lim_prev)
+             lead_visible, set_speed, lead, vTargetFuture, sm):
 
     param = self.p
 
     self.model_speed, self.model_sum = self.SC.calc_va(sm, CS.out.vEgo)
-
-    self.accActive = CS.acc_active
-
-    path_plan = sm['pathPlan']
-    self.outScale = path_plan.outputScale
 
     if CS.out.vEgo > 8:
       if self.variable_steer_max:
@@ -243,11 +176,6 @@ class CarController():
     if not lkas_active:
       apply_steer = 0
 
-    if CS.CP.radarOffCan:
-      self.usestockscc = not self.cp_oplongcontrol
-    elif (CS.cancel_button_count == 3) and self.cp_oplongcontrol:
-      self.usestockscc = not self.usestockscc
-
     if self.prev_gapButton != CS.cruise_buttons:  # gap change.
       if CS.cruise_buttons == 3:
         self.gapsettingdance -= 1
@@ -257,39 +185,33 @@ class CarController():
 
     self.apply_steer_last = apply_steer
 
-    sys_warning, sys_state, left_lane_warning, right_lane_warning =\
+    sys_warning, sys_state, left_lane_warning, right_lane_warning = \
       process_hud_alert(enabled, self.car_fingerprint, visual_alert,
                         left_lane, right_lane, left_lane_depart, right_lane_depart)
 
     speed_conv = CV.MS_TO_MPH if CS.is_set_speed_in_mph else CV.MS_TO_KPH
-
     self.clu11_speed = CS.clu11["CF_Clu_Vanz"]
-
     enabled_speed = 38 if CS.is_set_speed_in_mph else 55
-
     if self.clu11_speed > enabled_speed or not lkas_active or CS.out.gearShifter != GearShifter.drive:
       enabled_speed = self.clu11_speed
 
-    self.current_veh_speed = int(CS.out.vEgo * speed_conv)
-
-    self.clu11_cnt = frame % 0x10
-
     can_sends = []
-
-    self.lfa_available = True if self.lfainFingerprint or self.car_fingerprint in FEATURES["send_lfa_mfa"] else False
+    if (frame % 10) == 0:
+      # tester present - w/ no response (keeps radar disabled)
+      can_sends.append([0x7D0, 0, b"\x02\x3E\x80\x00\x00\x00\x00\x00", 0])
 
     can_sends.append(create_lkas11(self.packer, frame, self.car_fingerprint, apply_steer, lkas_active,
                                    CS.lkas11, sys_warning, sys_state, enabled,
                                    left_lane, right_lane,
-                                   left_lane_warning, right_lane_warning, self.lfa_available, 0))
+                                   left_lane_warning, right_lane_warning, 0))
 
     if CS.CP.mdpsHarness:  # send lkas11 bus 1 if mdps
       can_sends.append(create_lkas11(self.packer, frame, self.car_fingerprint, apply_steer, lkas_active,
                                    CS.lkas11, sys_warning, sys_state, enabled,
                                    left_lane, right_lane,
-                                   left_lane_warning, right_lane_warning, self.lfa_available, 1))
+                                   left_lane_warning, right_lane_warning, 1))
+      can_sends.append(create_clu11(self.packer, frame, CS.clu11, Buttons.NONE, enabled_speed, 1))
 
-      can_sends.append(create_clu11(self.packer, 1, CS.clu11, Buttons.NONE, enabled_speed, self.clu11_cnt))
 
     str_log1 = 'CV={:03.0f}  TQ={:03.0f}  R={:03.0f}  ST={:03.0f}/{:01.0f}/{:01.0f}  G={:01.0f}'.format(abs(self.model_speed), abs(new_steer), self.timer1.sampleTime(), self.steerMax, self.steerDeltaUp, self.steerDeltaDown, CS.out.cruiseGapSet)
 
@@ -311,23 +233,6 @@ class CarController():
         os.system("echo -n 0 > /data/params/d/OpkrSafetyCamera &")
         os.system("echo -n 0 > /data/params/d/LimitSetSpeedCamera &")
         
-
-    if pcm_cancel_cmd and CS.scc12["ACCMode"] != 0 and not CS.out.standstill:
-      self.vdiff = 0.
-      self.resumebuttoncnt = 0
-      can_sends.append(create_clu11(self.packer, CS.CP.sccBus, CS.clu11, Buttons.CANCEL, self.current_veh_speed, self.clu11_cnt))
-    elif CS.out.cruiseState.standstill and CS.scc12["ACCMode"] != 0 and CS.vrelative > 0:
-      self.vdiff += (CS.vrelative - self.vdiff)
-      if (frame - self.lastresumeframe > 5) and (self.vdiff > .1 or CS.lead_distance > 4.5):
-        can_sends.append(create_clu11(self.packer, CS.CP.sccBus, CS.clu11, Buttons.RES_ACCEL, self.current_veh_speed, self.resumebuttoncnt))
-        self.resumebuttoncnt += 1
-        if self.resumebuttoncnt > 5:
-          self.lastresumeframe = frame
-          self.resumebuttoncnt = 0
-    else:
-      self.vdiff = 0.
-      self.resumebuttoncnt = 0
-
     if CS.out.vEgo <= 1:
       self.sm.update(0)
       long_control_state = self.sm['controlsState'].longControlState
@@ -347,119 +252,35 @@ class CarController():
       self.acc_standstill = False
       self.acc_standstill_timer = 0
 
-    if lead_visible:
-      self.lead_visible = True
-      self.lead_debounce = 50
-    elif self.lead_debounce > 0:
-      self.lead_debounce -= 1
-    else:
-      self.lead_visible = lead_visible
+    if not CS.CP.openpilotLongitudinalControl:
+      if pcm_cancel_cmd:
+        can_sends.append(create_clu11(self.packer, frame, CS.clu11, Buttons.CANCEL))
+      elif CS.out.cruiseState.standstill:
+        # send resume at a max freq of 10Hz
+        if (frame - self.last_resume_frame)*DT_CTRL > 0.1:
+          # send 25 messages at a time to increases the likelihood of resume being accepted
+          can_sends.extend([create_clu11(self.packer, frame, CS.clu11, Buttons.RES_ACCEL)] * 25)
+          self.last_resume_frame = frame
 
-    self.setspeed = set_speed * speed_conv
-
-    if enabled:
-      self.sendaccmode = enabled
-
-    if CS.CP.radarDisablePossible:
-      self.radarDisableOverlapTimer += 1
-      self.radarDisableResetTimer = 0
-      if self.radarDisableOverlapTimer >= 30:
-        self.radarDisableActivated = True
-        if 200 > self.radarDisableOverlapTimer > 36:
-          if frame % 41 == 0 or self.radarDisableOverlapTimer == 37:
-            can_sends.append(create_scc7d0(b'\x02\x10\x03\x00\x00\x00\x00\x00'))
-          elif frame % 43 == 0 or self.radarDisableOverlapTimer == 37:
-            can_sends.append(create_scc7d0(b'\x03\x28\x03\x01\x00\x00\x00\x00'))
-          elif frame % 19 == 0 or self.radarDisableOverlapTimer == 37:
-            can_sends.append(create_scc7d0(b'\x02\x10\x85\x00\x00\x00\x00\x00'))
-      else:
-        self.counter_init = False
-        can_sends.append(create_scc7d0(b'\x02\x10\x90\x00\x00\x00\x00\x00'))
-        can_sends.append(create_scc7d0(b'\x03\x29\x03\x01\x00\x00\x00\x00'))
-    elif self.radarDisableActivated:
-      can_sends.append(create_scc7d0(b'\x02\x10\x90\x00\x00\x00\x00\x00'))
-      can_sends.append(create_scc7d0(b'\x03\x29\x03\x01\x00\x00\x00\x00'))
-      self.radarDisableOverlapTimer = 0
-      if frame % 50 == 0:
-        self.radarDisableResetTimer += 1
-        if self.radarDisableResetTimer > 2:
-          self.radarDisableActivated = False
-          self.counter_init = True
-    else:
-      self.radarDisableOverlapTimer = 0
-      self.radarDisableResetTimer = 0
-
-    if (frame % 50 == 0 or self.radarDisableOverlapTimer == 37) and \
-            CS.CP.radarDisablePossible and self.radarDisableOverlapTimer >= 30:
-      can_sends.append(create_scc7d0(b'\x02\x3E\x00\x00\x00\x00\x00\x00'))
-
-    if self.lead_visible:
-      self.objdiststat = 1 if lead_dist < 25 else 2 if lead_dist < 40 else \
-                         3 if lead_dist < 60 else 4 if lead_dist < 80 else 5
-    else:
-      self.objdiststat = 0
-
-    # send scc to car if longcontrol enabled and SCC not on bus 0 or ont live
-    if (CS.CP.sccBus == 2 or not self.usestockscc or self.radarDisableActivated) and self.counter_init:
-      if frame % 2 == 0:
-        self.scc12cnt += 1
-        self.scc12cnt %= 0xF
-        self.scc11cnt += 1
-        self.scc11cnt %= 0x10
-        self.fca11supcnt += 1
-        self.fca11supcnt %= 0xF
-
-        if self.fca11alivecnt == 1:
-          self.fca11inc = 0
-          if self.fca11cnt13 == 3:
-            self.fca11maxcnt = 0x9
-            self.fca11cnt13 = 0
-          else:
-            self.fca11maxcnt = 0xD
-            self.fca11cnt13 += 1
-        else:
-          self.fca11inc += 4
-
-        self.fca11alivecnt = self.fca11maxcnt - self.fca11inc
-
-        can_sends.append(create_scc11(self.packer, enabled,
-                                      self.setspeed, self.lead_visible, lead_dist, lead_vrel, lead_yrel,
-                                      self.gapsettingdance,
-                                      CS.out.standstill, CS.scc11,
-                                      self.usestockscc, CS.CP.radarOffCan, self.scc11cnt, self.sendaccmode))
-
-        if CS.brake_check == 1 or CS.mainsw_check == 1:
-          can_sends.append(create_scc12(self.packer, apply_accel, enabled,
-                                      self.acc_standstill, CS.out.gasPressed, 1,
-                                      CS.out.stockAeb,
-                                      CS.scc12, self.usestockscc, CS.CP.radarOffCan, self.scc12cnt))
-        else:
-          can_sends.append(create_scc12(self.packer, apply_accel, enabled,
-                                      self.acc_standstill, CS.out.gasPressed, CS.out.brakePressed,
-                                      CS.out.stockAeb,
-                                      CS.scc12, self.usestockscc, CS.CP.radarOffCan, self.scc12cnt))
-
-        can_sends.append(create_scc14(self.packer, enabled, self.usestockscc, CS.out.stockAeb, apply_accel,
-                                      CS.scc14, self.objdiststat, CS.out.gasPressed, self.acc_standstill, CS.out.vEgo))
-        if CS.CP.fcaBus == -1:
-          can_sends.append(create_fca11(self.packer, CS.fca11, self.fca11alivecnt, self.fca11supcnt))
-
-      if frame % 20 == 0:
-        can_sends.append(create_scc13(self.packer, CS.scc13))
-        if CS.CP.fcaBus == -1:
-          can_sends.append(create_fca12(self.packer))
-      if frame % 50 == 0:
-        can_sends.append(create_scc42a(self.packer))
-    else:
-      self.counter_init = True
-      self.scc12cnt = CS.scc12init["CR_VSM_Alive"]
-      self.scc11cnt = CS.scc11init["AliveCounterACC"]
-      self.fca11alivecnt = CS.fca11init["CR_FCA_Alive"]
-      self.fca11supcnt = CS.fca11init["Supplemental_Counter"]
+    if frame % 2 == 0 and CS.CP.openpilotLongitudinalControl:
+      accel_target = round(clip(actuators.gas - actuators.brake, -3.5, 2.0), 2)
+      stopping = vTargetFuture < 0.05 and CS.out.vEgo < 0.1
+      # if stopping:
+      #   accel_target = -3.5
+      set_speed_in_units = set_speed * (CV.MS_TO_MPH if CS.clu11["CF_Clu_SPEED_UNIT"] == 1 else CV.MS_TO_KPH)
+      can_sends.extend(create_acc_commands(self.packer, enabled, accel_target, accel_target, int(frame / 2), lead, set_speed_in_units, stopping, self.gapsettingdance))
 
     # 20 Hz LFA MFA message
-    if frame % 5 == 0 and self.lfa_available:
-      can_sends.append(create_lfa_mfa(self.packer, frame, enabled))
+    if frame % 5 == 0 and self.car_fingerprint in [CAR.SONATA, CAR.PALISADE, CAR.IONIQ, CAR.KIA_NIRO_EV, CAR.IONIQ_EV_2020]:
+      can_sends.append(create_lfahda_mfc(self.packer, enabled))
+
+    # 5 Hz ACC options
+    if frame % 20 == 0 and CS.CP.openpilotLongitudinalControl:
+      can_sends.extend(create_acc_opt(self.packer))
+
+    # 2 Hz front radar options
+    if frame % 50 == 0 and CS.CP.openpilotLongitudinalControl:
+      can_sends.append(create_frt_radar_opt(self.packer))
 
     can_sends.append(create_mdps12(self.packer, frame, CS.mdps12))
 
