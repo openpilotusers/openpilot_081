@@ -217,11 +217,11 @@ class CarInterface(CarInterfaceBase):
     
     events = self.create_common_events(ret)
 
-    #if self.CS.brakeHold and not self.CC.usestockscc:
+    #if self.CS.brakeHold:
     #  events.add(EventName.brakeHold)
-    if self.CS.parkBrake and not self.CC.usestockscc:
+    if self.CS.brake_hold and self.CS.CP.openpilotLongitudinalControl:
       events.add(EventName.parkBrake)
-    if self.CS.brakeUnavailable and not self.CC.usestockscc:
+    if self.CS.brake_error:
       events.add(EventName.brakeUnavailable)
     if self.CC.lanechange_manual_timer and ret.vEgo > 0.3:
       events.add(EventName.laneChangeManual)
