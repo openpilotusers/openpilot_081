@@ -1,4 +1,5 @@
 import crcmod
+from common.numpy_fast import clip
 from common.params import Params
 from selfdrive.car.hyundai.values import CAR, CHECKSUM
 
@@ -114,9 +115,9 @@ def create_scc11(packer, enabled, set_speed, lead_visible, lead_dist, lead_vrel,
     values["TauGapSet"] = gapsetting
     values["ObjValid"] = lead_visible
     values["ACC_ObjStatus"] = lead_visible
-    values["ACC_ObjRelSpd"] = lead_vrel
-    values["ACC_ObjDist"] = lead_dist
-    values["ACC_ObjLatPos"] = -lead_yrel
+    values["ACC_ObjRelSpd"] = clip(lead_vrel if lead_visible else 0, -20., 20.)
+    values["ACC_ObjDist"] = clip(lead_dist if lead_visible else 204.6, 0., 204.6)
+    values["ACC_ObjLatPos"] = clip(-lead_yrel if lead_visible else 0, -170., 170.)
 
     if nosccradar:
       values["MainMode_ACC"] = sendaccmode
@@ -132,7 +133,7 @@ def create_scc12(packer, apply_accel, enabled, standstill, gaspressed, brakepres
 
   if not usestockscc and not aebcmdact:
     if enabled and not brakepressed:
-      values["ACCMode"] = 2 if gaspressed and (apply_accel > -0.2) else 1
+      values["ACCMode"] = 1 if enabled else 0
       if apply_accel < 0.0 and standstill:
         values["StopReq"] = 1
       values["aReqRaw"] = apply_accel
@@ -164,25 +165,14 @@ def create_scc14(packer, enabled, usestockscc, aebcmdact, accel, scc14, objgap, 
   values = scc14
   if not usestockscc and not aebcmdact:
     if enabled:
-      values["ACCMode"] = 2 if gaspressed and (accel > -0.2) else 1
-      values["ObjGap"] = objgap
-      if standstill:
-        values["JerkUpperLimit"] = 0.5
-        values["JerkLowerLimit"] = 10.
-        values["ComfortBandUpper"] = 0.
-        values["ComfortBandLower"] = 0.
-        if e_vgo > 0.27:
-          values["ComfortBandUpper"] = 2.
-          values["ComfortBandLower"] = 0.
-      else:
-        #values["JerkUpperLimit"] = 50.
-        #values["JerkLowerLimit"] = 50.
-        #values["ComfortBandUpper"] = 50.
-        #values["ComfortBandLower"] = 50.
-        values["JerkUpperLimit"] = 3.2
-        values["JerkLowerLimit"] = 0.1
-        values["ComfortBandUpper"] = 0.24
-        values["ComfortBandLower"] = 0.24
+      #values["ACCMode"] = 2 if gaspressed and (accel > -0.2) else 1
+      #values["ObjGap"] = objgap
+      values["ComfortBandUpper"] = 0.0, # stock usually is 0 but sometimes uses higher values
+      values["ComfortBandLower"] = 0.0, # stock usually is 0 but sometimes uses higher values
+      values["JerkUpperLimit"] = 12.7 if enabled else 0, # stock usually is 1.0 but sometimes uses higher values
+      values["JerkLowerLimit"] = 12.7 if enabled else 0, # stock usually is 0.5 but sometimes uses higher values
+      values["ACCMode"] = 1 if enabled else 4, # stock will always be 4 instead of 0 after first disengage
+      values["ObjGap"] = int(min(lead_dist+2, 10)/2) if lead_visible else 0, # 1-5 based on distance to lead vehicle
 
   return packer.make_can_msg("SCC14", 0, values)
 
