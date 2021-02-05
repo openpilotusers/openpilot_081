@@ -23,8 +23,8 @@ def plannerd_thread(sm=None, pm=None):
   VM = VehicleModel(CP)
 
   if sm is None:
-    sm = messaging.SubMaster(['carState', 'controlsState', 'radarState', 'modelV2', 'liveParameters', 'liveMapData', 'modelLongButton'],
-                             poll=['radarState', 'modelV2'])
+    sm = messaging.SubMaster(['carState', 'controlsState', 'radarState', 'model', 'liveParameters', 'liveMapData', 'modelLongButton', 'modelV2'],
+                             poll=['radarState', 'model'])
 
   if pm is None:
     pm = messaging.PubMaster(['plan', 'liveLongitudinalMpc', 'pathPlan', 'liveMpc'])
@@ -37,7 +37,7 @@ def plannerd_thread(sm=None, pm=None):
   while True:
     sm.update()
 
-    if sm.updated['modelV2']:
+    if sm.updated['model']:
       PP.update(sm, pm, CP, VM)
     if sm.updated['radarState']:
       PL.update(sm, pm, CP, VM, PP)
