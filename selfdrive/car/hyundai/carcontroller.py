@@ -270,7 +270,7 @@ class CarController():
       can_sends.extend(create_acc_commands(self.packer, enabled, accel_target, accel_target, int(frame / 2), lead, set_speed_in_units, stopping, self.gapsettingdance))
 
     # 20 Hz LFA MFA message
-    if frame % 5 == 0 and self.car_fingerprint in [CAR.SONATA, CAR.PALISADE, CAR.IONIQ, CAR.KIA_NIRO_EV, CAR.IONIQ_EV_2020]:
+    if frame % 5 == 0 and self.car_fingerprint in [CAR.PALISADE]:
       can_sends.append(create_lfahda_mfc(self.packer, enabled))
 
     # 5 Hz ACC options
