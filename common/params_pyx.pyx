@@ -138,6 +138,9 @@ keys = {
   b"OpkrLiveTune": [TxType.PERSISTENT],
   b"OpkrEnableMap": [TxType.PERSISTENT],
   b"OpkrDrivingRecord": [TxType.PERSISTENT],
+  b"OpkrTurnSteeringDisable": [TxType.PERSISTENT],
+  b"CarModel": [TxType.PERSISTENT],
+  b"OpkrSafetyCamera": [TxType.PERSISTENT],
 }
 
 def ensure_bytes(v):

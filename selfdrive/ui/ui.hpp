@@ -54,8 +54,7 @@ typedef struct Rect {
 } Rect;
 
 const int sbr_w = 300;
-const int bdr_s = 30;
-const int bdr_is = 30;
+const int bdr_s = 15;
 const int vwp_h = 1080;
 const int header_h = 420;
 const int footer_h = 280;
@@ -170,6 +169,8 @@ typedef struct UIScene {
   int long_plan_source;
   bool standStill;
   float v_ego;
+  float vSetDis;
+  bool cruiseAccEnabled;
 
   cereal::HealthData::HwType hwType;
   int satelliteCount;
@@ -260,8 +261,10 @@ typedef struct UIState {
   int img_battery_charging;
   int img_network[6];
   int img_map;
+  int img_safetycam;
   int img_speed;
   int img_speed_30;
+  int img_speed_40;
   int img_speed_50;
   int img_speed_60;
   int img_speed_70;
@@ -306,7 +309,7 @@ typedef struct UIState {
   bool longitudinal_control;
   bool limit_set_speed;
   bool limit_set_speed_camera;
-  bool limit_set_speed_curv;
+  int safety_camera;
   bool is_ego_over_limit;
   float speed_lim_off;
   int is_OpenpilotViewEnabled;
@@ -321,6 +324,7 @@ typedef struct UIState {
   int nOpkrBlindSpotDetect;
   int lat_control;
   int driving_record;
+  int enable_osm;
 
   uint64_t last_athena_ping;
   uint64_t started_frame;

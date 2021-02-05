@@ -24,7 +24,8 @@ class CarState(CarStateBase):
     self.cruise_buttons = 0
     self.allow_nonscc_available = False
     self.lkasstate = 0
-  
+    self.acc_active = False
+
     self.lead_distance = 150.
     self.radar_obj_valid = 0.
     self.vrelative = 0.
@@ -98,6 +99,9 @@ class CarState(CarStateBase):
 
     ret.brakeHold = cp.vl["ESP11"]['AVH_STAT'] == 1
     self.brakeHold = ret.brakeHold
+    
+    self.VSetDis = cp_scc.vl["SCC11"]['VSetDis']
+    ret.vSetDis = self.VSetDis
 
     self.cruise_main_button = cp.vl["CLU11"]["CF_Clu_CruiseSwMain"]
     self.cruise_buttons = cp.vl["CLU11"]["CF_Clu_CruiseSwState"]
@@ -134,6 +138,7 @@ class CarState(CarStateBase):
       ret.cruiseState.available = (cp_scc.vl["SCC11"]["MainMode_ACC"] != 0)
       ret.cruiseState.enabled = (cp_scc.vl["SCC12"]['ACCMode'] != 0)
 
+    self.acc_active = ret.cruiseState.enabled
     self.lead_distance = cp_scc.vl["SCC11"]['ACC_ObjDist']
     self.vrelative = cp_scc.vl["SCC11"]['ACC_ObjRelSpd']
     self.radar_obj_valid = cp_scc.vl["SCC11"]['ObjValid']
@@ -177,23 +182,22 @@ class CarState(CarStateBase):
 
     self.parkBrake = (cp.vl["CGW1"]['CF_Gway_ParkBrakeSw'] != 0)
 
-    #TPMS
-    if cp.vl["TPMS11"]['PRESSURE_FL'] > 43:
-      ret.tpmsPressureFl = cp.vl["TPMS11"]['PRESSURE_FL'] * 5 * 0.145
-    else:
+    # TPMS code added from OPKR
+    if cp.vl["TPMS11"]['UNIT'] == 0.0:
       ret.tpmsPressureFl = cp.vl["TPMS11"]['PRESSURE_FL']
-    if cp.vl["TPMS11"]['PRESSURE_FR'] > 43:
-      ret.tpmsPressureFr = cp.vl["TPMS11"]['PRESSURE_FR'] * 5 * 0.145
-    else:
       ret.tpmsPressureFr = cp.vl["TPMS11"]['PRESSURE_FR']
-    if cp.vl["TPMS11"]['PRESSURE_RL'] > 43:
-      ret.tpmsPressureRl = cp.vl["TPMS11"]['PRESSURE_RL'] * 5 * 0.145
-    else:
       ret.tpmsPressureRl = cp.vl["TPMS11"]['PRESSURE_RL']
-    if cp.vl["TPMS11"]['PRESSURE_RR'] > 43:
-      ret.tpmsPressureRr = cp.vl["TPMS11"]['PRESSURE_RR'] * 5 * 0.145
-    else:
       ret.tpmsPressureRr = cp.vl["TPMS11"]['PRESSURE_RR']
+    elif cp.vl["TPMS11"]['UNIT'] == 1.0:
+      ret.tpmsPressureFl = cp.vl["TPMS11"]['PRESSURE_FL'] * 5 * 0.145038
+      ret.tpmsPressureFr = cp.vl["TPMS11"]['PRESSURE_FR'] * 5 * 0.145038
+      ret.tpmsPressureRl = cp.vl["TPMS11"]['PRESSURE_RL'] * 5 * 0.145038
+      ret.tpmsPressureRr = cp.vl["TPMS11"]['PRESSURE_RR'] * 5 * 0.145038
+    elif cp.vl["TPMS11"]['UNIT'] == 2.0:
+      ret.tpmsPressureFl = cp.vl["TPMS11"]['PRESSURE_FL'] / 10 * 14.5038
+      ret.tpmsPressureFr = cp.vl["TPMS11"]['PRESSURE_FR'] / 10 * 14.5038
+      ret.tpmsPressureRl = cp.vl["TPMS11"]['PRESSURE_RL'] / 10 * 14.5038
+      ret.tpmsPressureRr = cp.vl["TPMS11"]['PRESSURE_RR'] / 10 * 14.5038
 
     ret.cruiseGapSet = self.cruise_gap
 
@@ -343,6 +347,7 @@ class CarState(CarStateBase):
       ("CR_FCA_Alive", "FCA11", 0),
       ("Supplemental_Counter", "FCA11", 0),
 
+      ("UNIT", "TPMS11", 0),
       ("PRESSURE_FL", "TPMS11", 0),
       ("PRESSURE_FR", "TPMS11", 0),
       ("PRESSURE_RL", "TPMS11", 0),

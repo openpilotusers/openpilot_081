@@ -35,27 +35,9 @@ bool control_button_clicked3(int touch_x, int touch_y) {
   return false;
 }
 
-bool control_button_clicked4(int touch_x, int touch_y) {
-  if (touch_x >= 1105 && touch_x <= 1245) {
-    if (touch_y >= 905 && touch_y <= 1045) {
-      return true;
-    }
-  }
-  return false;
-}
-
-bool control_button_clicked5(int touch_x, int touch_y) {
-  if (touch_x >= 945 && touch_x <= 1085) {
-    if (touch_y >= 905 && touch_y <= 1045) {
-      return true;
-    }
-  }
-  return false;
-}
-
 bool control_button_screenshot(int touch_x, int touch_y) {
-  if (touch_x >= 0 && touch_x <= 700) {
-    if (touch_y >= 700 && touch_y <= 1080) {
+  if (touch_x >= 0 && touch_x <= 150) {
+    if (touch_y >= 465 && touch_y <= 615) {
       return true;
     }
   }
@@ -139,74 +121,12 @@ static void draw_control_button3(UIState *s, int touch_x, int touch_y) {
     int btn_yc = btn_y + (btn_h/2);
     nvgBeginPath(s->vg);
     nvgRoundedRect(s->vg, btn_x3, btn_y, btn_w, btn_h, 100);
-    if (s->limit_set_speed_curv == 1) {
-      nvgStrokeColor(s->vg, nvgRGBA(55,104,200,255));
-      nvgStrokeWidth(s->vg, 6);
-      nvgStroke(s->vg);
-      nvgFillColor(s->vg, nvgRGBA(10,10,230,80));
-      nvgFill(s->vg);
-    } else {
-      nvgStrokeColor(s->vg, nvgRGBA(255,255,255,80));
-      nvgStrokeWidth(s->vg, 6);
-      nvgStroke(s->vg);
-    }
+    nvgStrokeColor(s->vg, nvgRGBA(255,255,255,80));
+    nvgStrokeWidth(s->vg, 6);
+    nvgStroke(s->vg);
     nvgFontSize(s->vg, 45);
     nvgFillColor(s->vg, nvgRGBA(255,255,255,200));
-    nvgText(s->vg,btn_xc3,btn_yc,"CURV",NULL);
-  }
-}
-
-static void draw_control_button4(UIState *s, int touch_x, int touch_y) {
-  if (s->vision_connected){
-    int btn_w = 140;
-    int btn_h = 140;
-    int btn_x4 = 1920 - btn_w - 675;
-    int btn_y = 1080 - btn_h - 35;
-    int btn_xc4 = btn_x4 + (btn_w/2);
-    int btn_yc = btn_y + (btn_h/2);
-    nvgBeginPath(s->vg);
-    nvgRoundedRect(s->vg, btn_x4, btn_y, btn_w, btn_h, 100);
-    if (s->limit_set_speed_camera == 1) {
-      nvgStrokeColor(s->vg, nvgRGBA(184,80,70,255));
-      nvgStrokeWidth(s->vg, 6);
-      nvgStroke(s->vg);
-      nvgFillColor(s->vg, nvgRGBA(200,20,20,80));
-      nvgFill(s->vg);
-    } else {
-      nvgStrokeColor(s->vg, nvgRGBA(255,255,255,80));
-      nvgStrokeWidth(s->vg, 6);
-      nvgStroke(s->vg);
-    }
-    nvgFontSize(s->vg, 45);
-    nvgFillColor(s->vg, nvgRGBA(255,255,255,200));
-    nvgText(s->vg,btn_xc4,btn_yc,"CAM",NULL);
-  }
-}
-
-static void draw_control_button5(UIState *s, int touch_x, int touch_y) {
-  if (s->vision_connected){
-    int btn_w = 140;
-    int btn_h = 140;
-    int btn_x5 = 1920 - btn_w - 835;
-    int btn_y = 1080 - btn_h - 35;
-    int btn_xc5 = btn_x5 + (btn_w/2);
-    int btn_yc = btn_y + (btn_h/2);
-    nvgBeginPath(s->vg);
-    nvgRoundedRect(s->vg, btn_x5, btn_y, btn_w, btn_h, 100);
-    if (s->limit_set_speed == 1) {
-      nvgStrokeColor(s->vg, nvgRGBA(55,184,104,255));
-      nvgStrokeWidth(s->vg, 6);
-      nvgStroke(s->vg);
-      nvgFillColor(s->vg, nvgRGBA(0,255,0,80));
-      nvgFill(s->vg);
-    } else {
-      nvgStrokeColor(s->vg, nvgRGBA(255,255,255,80));
-      nvgStrokeWidth(s->vg, 6);
-      nvgStroke(s->vg);
-    }
-    nvgFontSize(s->vg, 45);
-    nvgFillColor(s->vg, nvgRGBA(255,255,255,200));
-    nvgText(s->vg,btn_xc5,btn_yc,"LIM",NULL);
+    nvgText(s->vg,btn_xc3,btn_yc,"NAVI",NULL);
   }
 }
 
@@ -217,8 +137,6 @@ bool latcontrol( UIState *s, int touch_x, int touch_y ) {
   draw_control_button1(s, touch_x, touch_y);
   draw_control_button2(s, touch_x, touch_y);
   draw_control_button3(s, touch_x, touch_y);
-  draw_control_button4(s, touch_x, touch_y);
-  draw_control_button5(s, touch_x, touch_y);
 
   if ((control_button_clicked1(touch_x,touch_y)) && (s->scene.uilayout_sidebarcollapsed == true)) {
     s->lat_mode = s->lat_mode + 1;
@@ -236,6 +154,7 @@ bool latcontrol( UIState *s, int touch_x, int touch_y ) {
     }
     touched = true;
   }
+
   if ((control_button_clicked2(touch_x,touch_y)) && (s->scene.uilayout_sidebarcollapsed == true)) {
     s->acc_mode = s->acc_mode + 1;
     if (s->acc_mode > 2) {
@@ -251,45 +170,20 @@ bool latcontrol( UIState *s, int touch_x, int touch_y ) {
     touched = true;
   }
 
-  if ((control_button_clicked3(touch_x,touch_y)) && (s->scene.uilayout_sidebarcollapsed == true)) {
-    if (s->limit_set_speed_curv == false) {
-      s->limit_set_speed_curv = true;
-      Params().write_db_value("LimitSetSpeedCurv", "1", 1);
-    } else if (s->limit_set_speed_curv == true) {
-      s->limit_set_speed_curv = false;
-      Params().write_db_value("LimitSetSpeedCurv", "0", 1);
-    }
-    touched = true;
-  }
-
-  if ((control_button_clicked4(touch_x,touch_y)) && (s->scene.uilayout_sidebarcollapsed == true)) {
-    if (s->limit_set_speed_camera == false) {
-      s->limit_set_speed_camera = true;
-      Params().write_db_value("LimitSetSpeedCamera", "1", 1);
-    } else if (s->limit_set_speed_camera == true) {
-      s->limit_set_speed_camera = false;
-      Params().write_db_value("LimitSetSpeedCamera", "0", 1);
-    }
-    touched = true;
-  }
-
-  if ((control_button_clicked5(touch_x,touch_y)) && (s->scene.uilayout_sidebarcollapsed == true)) {
-    if (s->limit_set_speed == false) {
-      s->limit_set_speed = true;
-      Params().write_db_value("LimitSetSpeed", "1", 1);
-    } else if (s->limit_set_speed == true) {
-      s->limit_set_speed = false;
-      Params().write_db_value("LimitSetSpeed", "0", 1);
-    }
-    touched = true;
-  }
-
-  if ((control_button_screenshot(touch_x,touch_y)) && (s->scene.uilayout_sidebarcollapsed == true)) {
-    system("su -c 'touch /data/screenshots/camdetect'");
-    system("su -c 'mkdir -p /data/screenshots; screencap -p /data/screenshots/sc_$(date '+%Y-%m-%d_%H%M%S').png'");
+  if ((control_button_clicked3(touch_x,touch_y)) && (s->status != STATUS_OFFROAD) && (s->limit_set_speed == 0)) {
+    Params().write_db_value("LimitSetSpeed", "1", 1);
+    //system("su -c 'am start -n com.gmd.hidesoftkeys/com.gmd.hidesoftkeys.MainActivity'");
+    system("su -c 'am start --activity-task-on-home com.skt.tmap.ku/com.skt.tmap.activity.TmapNaviActivity'");
     s->sound->play(AudibleAlert::CHIME_WARNING1);
     touched = true;
   }
-  
+
+  if ((control_button_screenshot(touch_x,touch_y)) && (s->status != STATUS_OFFROAD)) {
+    Params().write_db_value("LimitSetSpeed", "0", 1);
+    system("su -c 'am start --activity-task-on-home ai.comma.plus.offroad/.MainActivity'");
+    s->sound->play(AudibleAlert::CHIME_WARNING1);
+    touched = true;
+  }
+
   return touched;
 }

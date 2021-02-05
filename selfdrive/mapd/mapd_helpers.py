@@ -247,7 +247,7 @@ class Way:
 
     speed_ahead = None
     speed_ahead_dist = None
-    lookahead_ways = 2
+    lookahead_ways = 5
     way = self
     for i in range(lookahead_ways):
       way_pts = way.points_in_car_frame(lat, lon, heading, True)

@@ -72,7 +72,7 @@ from common.spinner import Spinner
 from common.text_window import TextWindow
 
 if not (os.system("python3 -m pip list | grep 'scipy' ") == 0):
-  os.system("cd /data/openpilot/installer/scipy_installer/ && ./scipy_installer")
+  os.system("osmstat=`cat /data/params/d/OpkrEnableMap`;if [[ $osmstat -eq 1 ]]; then cd /data/openpilot/installer/scipy_installer/ && ./scipy_installer; fi")
 
 
 
@@ -567,7 +567,6 @@ def main():
     ("IsUploadRawEnabled", "1"),
     ("IsLdwEnabled", "1"),
     ("IsGeofenceEnabled", "-1"),
-    ("SpeedLimitOffset", "0"),
     ("LimitSetSpeed", "0"),
     ("LimitSetSpeedNeural", "0"),
     ("LastUpdateTime", datetime.datetime.utcnow().isoformat().encode('utf8')),
@@ -626,6 +625,7 @@ def main():
     ("OpkrBlindSpotDetect", "1"),
     ("OpkrMaxAngleLimit", "90"),
     ("OpkrAngleOffsetSelect", "0"),
+    ("OpkrSpeedLimitOffset", "0"),
     ("OpkrCruiseGapSet", "3"),
     ("OpkrLatMode", "0"),
     ("OpkrAccMode", "1"),
@@ -636,8 +636,11 @@ def main():
     ("OpkrVariableSteerDelta", "0"),
     ("FingerprintTwoSet", "1"),
     ("OpkrLiveTune", "0"),
-    ("OpkrEnableMap", "1"),
+    ("OpkrEnableMap", "0"),
     ("OpkrDrivingRecord", "0"),
+    ("OpkrTurnSteeringDisable", "1"),
+    ("CarModel", ""),
+    ("OpkrSafetyCamera", "0"),
   ]
 
   # set unset params

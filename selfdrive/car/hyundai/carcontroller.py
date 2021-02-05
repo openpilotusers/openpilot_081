@@ -1,3 +1,4 @@
+import os
 from numpy import clip
 from common.realtime import DT_CTRL
 from cereal import car, log, messaging
@@ -119,6 +120,8 @@ class CarController():
     self.gapsettingdance = int(self.params.get('OpkrCruiseGapSet'))
     self.opkr_autoresume = int(self.params.get('OpkrAutoResume'))
 
+    self.opkr_turnsteeringdisable = int(self.params.get('OpkrTurnSteeringDisable')) == 1
+
     self.opkr_maxanglelimit = int(self.params.get('OpkrMaxAngleLimit'))
 
     self.timer1 = tm.CTime1000("time")
@@ -126,6 +129,10 @@ class CarController():
     self.SC = SpdController()
     self.model_speed = 0
     self.model_sum = 0
+
+
+    self.accActive = False
+    self.safety_camera_timer = 0
     self.model_speed_range = [30, 90, 255, 300]
     self.steerMax_range = [SteerLimitParams.STEER_MAX, int(self.params.get('SteerMaxBaseAdj')), int(self.params.get('SteerMaxBaseAdj')), 0]
     self.steerDeltaUp_range = [5, int(self.params.get('SteerDeltaUpAdj')), int(self.params.get('SteerDeltaUpAdj')), 0]
@@ -165,6 +172,9 @@ class CarController():
     param = self.p
 
     self.model_speed, self.model_sum = self.SC.calc_va(sm, CS.out.vEgo)
+
+    self.accActive = CS.acc_active
+
     path_plan = sm['pathPlan']
     self.outScale = path_plan.outputScale
 
@@ -292,6 +302,15 @@ class CarController():
         self.str_log2 = 'T={:04.0f}/{:05.3f}/{:06.4f}'.format(float(int(self.params.get('Scale')) * 1.0), float(int(self.params.get('LqrKi')) * 0.001), float(int(self.params.get('DcGain')) * 0.0001))
 
     trace1.printf1('{}  {}'.format(str_log1, self.str_log2))
+
+    if ((self.params.get('LimitSetSpeedCamera') is not None and self.params.get('LimitSetSpeedCamera') != "0") or self.params.get('OpkrSafetyCamera') == "1") and not CS.acc_active:
+      self.safety_camera_timer += 1
+      if self.safety_camera_timer > 100:
+        self.safety_camera_timer = 0
+        os.system("logcat -c &")
+        os.system("echo -n 0 > /data/params/d/OpkrSafetyCamera &")
+        os.system("echo -n 0 > /data/params/d/LimitSetSpeedCamera &")
+        
 
     if pcm_cancel_cmd and CS.scc12["ACCMode"] != 0 and not CS.out.standstill:
       self.vdiff = 0.

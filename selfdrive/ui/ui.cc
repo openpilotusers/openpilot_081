@@ -48,8 +48,13 @@ void ui_init(UIState *s) {
   read_param(&s->nDebugUi2, "DebugUi2");
   read_param(&s->nOpkrBlindSpotDetect, "OpkrBlindSpotDetect");
   read_param(&s->lat_control, "LateralControlMethod");
+  read_param(&s->speed_lim_off, "OpkrSpeedLimitOffset");
   read_param(&s->driving_record, "OpkrDrivingRecord");
+  read_param(&s->enable_osm, "OpkrEnableMap");
   read_param(&s->acc_mode, "OpkrAccMode");
+  Params().write_db_value("LimitSetSpeed", "0", 1);
+  Params().write_db_value("LimitSetSpeedCamera", "0", 1);
+  Params().write_db_value("OpkrSafetyCamera", "0", 1);
 
   s->fb = framebuffer_init("ui", 0, true, &s->fb_w, &s->fb_h);
   assert(s->fb);
@@ -329,6 +334,8 @@ void update_sockets(UIState *s) {
     scene.tpmsPressureRr = data.getTpmsPressureRr();
     scene.radarDistance = data.getRadarDistance();
     scene.standStill = data.getStandStill();
+    scene.vSetDis = data.getVSetDis();
+    scene.cruiseAccEnabled = data.getCruiseState().getEnabled();
   }
 
   if (sm.updated("sensorEvents")) {
@@ -435,7 +442,7 @@ void ui_update(UIState *s) {
     read_param(&s->nOpkrUIVolumeBoost, "OpkrUIVolumeBoost");
     read_param(&s->limit_set_speed, "LimitSetSpeed");
     read_param(&s->limit_set_speed_camera, "LimitSetSpeedCamera");
-    read_param(&s->limit_set_speed_curv, "LimitSetSpeedCurv");
+    read_param(&s->safety_camera, "OpkrSafetyCamera");
     read_param(&s->lat_control, "LateralControlMethod");
   } else if ((s->sm)->frame % (6*UI_FREQ) == 0) {
     int param_read = read_param(&s->last_athena_ping, "LastAthenaPingTime");
