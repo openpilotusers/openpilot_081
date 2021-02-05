@@ -24,6 +24,7 @@ from selfdrive.controls.lib.vehicle_model import VehicleModel
 from selfdrive.controls.lib.planner import LON_MPC_STEP
 from selfdrive.locationd.calibrationd import Calibration
 from common.hardware import HARDWARE
+from selfdrive.swaglog import cloudlog
 from selfdrive.controls.lib.dynamic_follow.df_manager import dfManager
 from common.op_params import opParams
 from selfdrive.debug.disable_ecu import disable_ecu
