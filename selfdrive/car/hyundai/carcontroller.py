@@ -142,7 +142,6 @@ class CarController():
     self.steer_rate_limited = new_steer != apply_steer
 
     # disable if steer angle reach 90 deg, otherwise mdps fault in some models
-    self.high_steer_allowed = True if self.car_fingerprint in FEATURES["allow_high_steer"] else False
     if self.opkr_maxanglelimit >= 90:
       lkas_active = enabled and abs(CS.out.steeringAngle) < self.opkr_maxanglelimit
     else:
