@@ -165,9 +165,9 @@ def create_scc14(packer, enabled, usestockscc, aebcmdact, accel, scc14, objgap, 
   values = scc14
   if not usestockscc and not aebcmdact:
     if enabled:
-      values["ACCMode"] = 2 if gaspressed and (accel > -0.2) else 1
+      #values["ACCMode"] = 2 if gaspressed and (accel > -0.2) else 1
       #values["ObjGap"] = objgap
-      #values["ACCMode"] = 1 if enabled else 4 # stock will always be 4 instead of 0 after first disengage
+      values["ACCMode"] = 1 if enabled else 4 # stock will always be 4 instead of 0 after first disengage
       values["ObjGap"] = int(min(lead_dist+2, 10)/2) if lead_visible else 0 # 1-5 based on distance to lead vehicle
       if standstill:
         values["JerkUpperLimit"] = 0.5
