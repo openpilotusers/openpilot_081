@@ -616,8 +616,8 @@ static void ui_draw_vision_speedlimit(UIState *s) {
   if (s->enable_osm == 1) {
     is_speedlim_valid = s->scene.speedlimit_valid;
   } else {
-    speedlim_calc = s->scene.vSetDis; // to show cruise set speed on cluster
-    is_speedlim_valid = s->scene.vSetDis >= 30.0;
+    speedlim_calc = 30;
+    is_speedlim_valid = true;
   }
 
   float hysteresis_offset = 0.5;
@@ -627,7 +627,7 @@ static void ui_draw_vision_speedlimit(UIState *s) {
   if (s->enable_osm == 1) {
     s->is_ego_over_limit = is_speedlim_valid && s->scene.controls_state.getVEgo() > (speedlimit + (speedlimit*0.01*s->speed_lim_off) + hysteresis_offset);
   } else {
-    s->is_ego_over_limit = is_speedlim_valid && s->limit_set_speed_camera > 29 && ((s->limit_set_speed_camera+round(s->limit_set_speed_camera*0.01*s->speed_lim_off)) < s->scene.vSetDis) && s->safety_camera == 1;
+    s->is_ego_over_limit = false;
   }
 
   int viz_speedlim_w = 180;
@@ -672,7 +672,7 @@ static void ui_draw_vision_speedlimit(UIState *s) {
   // Draw Speed Text
   color = s->is_ego_over_limit ? COLOR_WHITE : COLOR_BLACK;
   if (is_speedlim_valid) {
-    if ((s->enable_osm == 1) || (s->scene.cruiseAccEnabled)) {
+    if (s->enable_osm == 1) {
       snprintf(speedlim_str, sizeof(speedlim_str), "%d", speedlim_calc);
       ui_draw_text(s->vg, text_x, text_y+100, speedlim_str, 48*2.3, color, s->font_sans_bold);
     } else {

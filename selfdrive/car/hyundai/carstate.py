@@ -99,9 +99,6 @@ class CarState(CarStateBase):
 
     ret.brakeHold = cp.vl["ESP11"]['AVH_STAT'] == 1
     self.brakeHold = ret.brakeHold
-    
-    self.VSetDis = cp_scc.vl["SCC11"]['VSetDis']
-    ret.vSetDis = self.VSetDis
 
     self.cruise_main_button = cp.vl["CLU11"]["CF_Clu_CruiseSwMain"]
     self.cruise_buttons = cp.vl["CLU11"]["CF_Clu_CruiseSwState"]
@@ -371,6 +368,20 @@ class CarState(CarStateBase):
     ]
 
     if not CP.openpilotLongitudinalControl:
+      signals += [
+        ("MainMode_ACC", "SCC11", 0),
+        ("VSetDis", "SCC11", 0),
+        ("SCCInfoDisplay", "SCC11", 0),
+        ("ACC_ObjStatus", "SCC11", 0),
+        ("ACC_ObjDist", "SCC11", 0),
+        ("ObjValid", "SCC11", 0),
+        ("ACC_ObjRelSpd", "SCC11", 0),
+        ("AliveCounterACC", "SCC11", 0),
+        ("ACCMode", "SCC12", 1),
+        ("AEB_CmdAct", "SCC12", 0),
+        ("CF_VSM_Warn", "SCC12", 0),
+        ("CR_VSM_Alive", "SCC12", 0),
+      ]
       checks += [
         ("SCC11", 50),
         ("SCC12", 50),
