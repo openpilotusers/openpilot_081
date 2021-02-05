@@ -568,15 +568,9 @@ FEATURES = {
   # which message has the gear
   "use_cluster_gears": set([CAR.ELANTRA, CAR.KONA, CAR.ELANTRA_GT_I30, CAR.CADENZA, CAR.GRANDEUR]),
   "use_tcu_gears": set([CAR.OPTIMA, CAR.SONATA19, CAR.VELOSTER]),
-  "use_elect_gears": set([CAR.IONIQ_EV, CAR.KONA_EV, CAR.NIRO_EV, CAR.NEXO, CAR.OPTIMA_HEV, CAR.IONIQ_HEV, CAR.SONATA_HEV, CAR.CADENZA_HEV, CAR.GRANDEUR_HEV, CAR.NIRO_HEV, CAR.KONA_HEV]),
 
   # send LFA MFA message for new HKG models
   "send_lfa_mfa": set([]),
-
-  # these cars use the FCA11 message for the AEB and FCW signals, all others use SCC12
-  "use_fca": set([]),
-
-  "use_bsm": set([CAR.OPTIMA_HEV, CAR.IONIQ_HEV, CAR.SONATA_HEV, CAR.CADENZA_HEV, CAR.GRANDEUR_HEV, CAR.NIRO_HEV, CAR.KONA_HEV]),
 }
 
 EV_HYBRID = set([CAR.IONIQ_EV, CAR.KONA_EV, CAR.NIRO_EV, CAR.NEXO, CAR.OPTIMA_HEV, CAR.IONIQ_HEV, CAR.SONATA_HEV, CAR.CADENZA_HEV, CAR.GRANDEUR_HEV, CAR.NIRO_HEV, CAR.KONA_HEV])

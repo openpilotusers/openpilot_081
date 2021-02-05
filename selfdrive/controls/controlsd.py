@@ -26,7 +26,6 @@ from selfdrive.locationd.calibrationd import Calibration
 from common.hardware import HARDWARE
 from selfdrive.controls.lib.dynamic_follow.df_manager import dfManager
 from common.op_params import opParams
-from selfdrive.debug.disable_ecu import disable_ecu
 
 import common.log as trace1
 
@@ -37,7 +36,6 @@ STEER_ANGLE_SATURATION_THRESHOLD = 45  # Degrees
 
 SIMULATION = "SIMULATION" in os.environ
 NOSENSOR = "NOSENSOR" in os.environ
-#IGNORE_PROCESSES = set(["rtshield", "uploader", "deleter", "loggerd", "logmessaged", "tombstoned", "logcatd", "proclogd", "clocksd", "gpsd", "updated"])
 
 ThermalStatus = log.ThermalData.ThermalStatus
 State = log.ControlsState.OpenpilotState
@@ -469,14 +467,6 @@ class Controls:
     CC = car.CarControl.new_message()
     CC.enabled = self.enabled
     CC.actuators = actuators
-
-    CC.vTargetFuture = float(self.sm['plan'].vTargetFuture)
-
-    lead = self.sm['radarState'].leadOne
-    CC.lead.status = bool(lead.status)
-    CC.lead.dRel = float(lead.dRel)
-    CC.lead.yRel = float(lead.yRel)
-    CC.lead.vRel = float(lead.vRel)
 
     CC.cruiseControl.override = True
     CC.cruiseControl.cancel = not self.CP.enableCruise or (not self.enabled and CS.cruiseState.enabled)

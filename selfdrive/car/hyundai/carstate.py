@@ -24,8 +24,7 @@ class CarState(CarStateBase):
     self.cruise_buttons = 0
     self.allow_nonscc_available = False
     self.lkasstate = 0
-    self.acc_active = False
-
+  
     self.lead_distance = 150.
     self.radar_obj_valid = 0.
     self.vrelative = 0.
@@ -135,7 +134,7 @@ class CarState(CarStateBase):
       ret.cruiseState.available = (cp_scc.vl["SCC11"]["MainMode_ACC"] != 0)
       ret.cruiseState.enabled = (cp_scc.vl["SCC12"]['ACCMode'] != 0)
 
-    self.acc_active = ret.cruiseState.enabled
+    self.lead_distance = cp_scc.vl["SCC11"]['ACC_ObjDist']
     self.vrelative = cp_scc.vl["SCC11"]['ACC_ObjRelSpd']
     self.radar_obj_valid = cp_scc.vl["SCC11"]['ObjValid']
     ret.cruiseState.standstill = cp_scc.vl["SCC11"]['SCCInfoDisplay'] == 4.
@@ -174,22 +173,23 @@ class CarState(CarStateBase):
 
     self.parkBrake = (cp.vl["CGW1"]['CF_Gway_ParkBrakeSw'] != 0)
 
-    # TPMS code added from OPKR
-    if cp.vl["TPMS11"]['UNIT'] == 0.0:
+    #TPMS
+    if cp.vl["TPMS11"]['PRESSURE_FL'] > 43:
+      ret.tpmsPressureFl = cp.vl["TPMS11"]['PRESSURE_FL'] * 5 * 0.145
+    else:
       ret.tpmsPressureFl = cp.vl["TPMS11"]['PRESSURE_FL']
+    if cp.vl["TPMS11"]['PRESSURE_FR'] > 43:
+      ret.tpmsPressureFr = cp.vl["TPMS11"]['PRESSURE_FR'] * 5 * 0.145
+    else:
       ret.tpmsPressureFr = cp.vl["TPMS11"]['PRESSURE_FR']
+    if cp.vl["TPMS11"]['PRESSURE_RL'] > 43:
+      ret.tpmsPressureRl = cp.vl["TPMS11"]['PRESSURE_RL'] * 5 * 0.145
+    else:
       ret.tpmsPressureRl = cp.vl["TPMS11"]['PRESSURE_RL']
+    if cp.vl["TPMS11"]['PRESSURE_RR'] > 43:
+      ret.tpmsPressureRr = cp.vl["TPMS11"]['PRESSURE_RR'] * 5 * 0.145
+    else:
       ret.tpmsPressureRr = cp.vl["TPMS11"]['PRESSURE_RR']
-    elif cp.vl["TPMS11"]['UNIT'] == 1.0:
-      ret.tpmsPressureFl = cp.vl["TPMS11"]['PRESSURE_FL'] * 5 * 0.145038
-      ret.tpmsPressureFr = cp.vl["TPMS11"]['PRESSURE_FR'] * 5 * 0.145038
-      ret.tpmsPressureRl = cp.vl["TPMS11"]['PRESSURE_RL'] * 5 * 0.145038
-      ret.tpmsPressureRr = cp.vl["TPMS11"]['PRESSURE_RR'] * 5 * 0.145038
-    elif cp.vl["TPMS11"]['UNIT'] == 2.0:
-      ret.tpmsPressureFl = cp.vl["TPMS11"]['PRESSURE_FL'] / 10 * 14.5038
-      ret.tpmsPressureFr = cp.vl["TPMS11"]['PRESSURE_FR'] / 10 * 14.5038
-      ret.tpmsPressureRl = cp.vl["TPMS11"]['PRESSURE_RL'] / 10 * 14.5038
-      ret.tpmsPressureRr = cp.vl["TPMS11"]['PRESSURE_RR'] / 10 * 14.5038
 
     ret.cruiseGapSet = self.cruise_gap
 
@@ -226,7 +226,7 @@ class CarState(CarStateBase):
       else:
         ret.gearShifter = GearShifter.unknown
     # Gear Selecton - This is only compatible with optima hybrid 2017
-    elif self.CP.carFingerprint in FEATURES["use_elect_gears"]:
+    elif self.CP.evgearAvailable:
       gear = cp.vl["ELECT_GEAR"]["Elect_Gear_Shifter"]
       if gear in (5, 8):  # 5: D, 8: sport mode
         ret.gearShifter = GearShifter.drive
@@ -239,7 +239,7 @@ class CarState(CarStateBase):
       else:
         ret.gearShifter = GearShifter.unknown
     # Gear Selecton - This is not compatible with all Kia/Hyundai's, But is the best way for those it is compatible with
-    else:
+    elif self.CP.lvrAvailable:
       gear = cp.vl["LVR12"]["CF_Lvr_Gear"]
       if gear in (5, 8):  # 5: D, 8: sport mode
         ret.gearShifter = GearShifter.drive
@@ -252,14 +252,14 @@ class CarState(CarStateBase):
       else:
         ret.gearShifter = GearShifter.unknown
 
-    if self.CP.carFingerprint in FEATURES["use_fca"]:
-      ret.stockAeb = cp.vl["FCA11"]['FCA_CmdAct'] != 0
-      ret.stockFcw = cp.vl["FCA11"]['CF_VSM_Warn'] == 2
-    else:
-      ret.stockAeb = cp.vl["SCC12"]['AEB_CmdAct'] != 0
-      ret.stockFcw = cp.vl["SCC12"]['CF_VSM_Warn'] == 2
+    if self.CP.fcaBus != -1:
+      ret.stockAeb = cp_fca.vl["FCA11"]['FCA_CmdAct'] != 0
+      ret.stockFcw = cp_fca.vl["FCA11"]['CF_VSM_Warn'] == 2
+    elif not self.CP.radarOffCan:
+      ret.stockAeb = cp_scc.vl["SCC12"]['AEB_CmdAct'] != 0
+      ret.stockFcw = cp_scc.vl["SCC12"]['CF_VSM_Warn'] == 2
 
-    if self.CP.carFingerprint in FEATURES["use_bsm"]:
+    if self.CP.bsmAvailable:
       ret.leftBlindspot = cp.vl["LCA11"]["CF_Lca_IndLeft"] != 0
       ret.rightBlindspot = cp.vl["LCA11"]["CF_Lca_IndRight"] != 0
 
@@ -269,19 +269,22 @@ class CarState(CarStateBase):
     # save the entire LKAS11, CLU11, SCC12 and MDPS12
     self.lkas11 = copy.copy(cp_cam.vl["LKAS11"])
     self.clu11 = copy.copy(cp.vl["CLU11"])
-    self.park_brake = cp.vl["TCS13"]['PBRAKE_ACT'] == 1
-    self.steer_state = cp_mdps.vl["MDPS12"]['CF_Mdps_ToiActive']  # 0 NOT ACTIVE, 1 ACTIVE
-    self.lead_distance = cp_scc.vl["SCC11"]['ACC_ObjDist']
-    self.brake_hold = cp.vl["TCS15"]['AVH_LAMP'] == 2 # 0 OFF, 1 ERROR, 2 ACTIVE, 3 READY
-    self.brake_error = cp.vl["TCS13"]['ACCEnable'] != 0 # 0 ACC CONTROL ENABLED, 1-3 ACC CONTROL DISABLED
-    self.prev_cruise_buttons = self.cruise_buttons
-    self.cruise_buttons = cp.vl["CLU11"]["CF_Clu_CruiseSwState"]
+    self.scc11 = copy.copy(cp_scc.vl["SCC11"])
+    self.scc12 = copy.copy(cp_scc.vl["SCC12"])
+    self.scc13 = copy.copy(cp_scc.vl["SCC13"])
+    self.scc14 = copy.copy(cp_scc.vl["SCC14"])
+    self.fca11 = copy.copy(cp_fca.vl["FCA11"])
     self.mdps12 = copy.copy(cp_mdps.vl["MDPS12"])
+
+    self.scc11init = copy.copy(cp.vl["SCC11"])
+    self.scc12init = copy.copy(cp.vl["SCC12"])
+    self.fca11init = copy.copy(cp.vl["FCA11"])
 
     return ret
 
   @staticmethod
   def get_can_parser(CP):
+    checks = []
     signals = [
       # sig_name, sig_address, default
       ("WHL_SPD_FL", "WHL_SPD11", 0),
@@ -322,33 +325,20 @@ class CarState(CarStateBase):
       ("CF_Clu_AliveCnt1", "CLU11", 0),
 
       ("ACCEnable", "TCS13", 0),
-      ("ACC_REQ", "TCS13", 0),
       ("BrakeLight", "TCS13", 0),
       ("DriverBraking", "TCS13", 0),
-      ("StandStill", "TCS13", 0),
-      ("PBRAKE_ACT", "TCS13", 0),
+      ("DriverOverride", "TCS13",0),
 
       ("ESC_Off_Step", "TCS15", 0),
-      ("AVH_LAMP", "TCS15", 0),
 
-      ("CF_Lvr_GearInf", "LVR11", 0),        # Transmission Gear (0 = N or P, 1-8 = Fwd, 14 = Rev)
+      ("CF_Lvr_CruiseSet", "LVR12", 0),
+      ("CRUISE_LAMP_M", "EMS16", 0),
 
-      ("CR_Mdps_StrColTq", "MDPS12", 0),
-      ("CF_Mdps_ToiActive", "MDPS12", 0),
-      ("CF_Mdps_ToiUnavail", "MDPS12", 0),
-      ("CF_Mdps_FailStat", "MDPS12", 0),
-      ("CR_Mdps_OutTq", "MDPS12", 0),
+      ("CR_VSM_Alive", "SCC12", 0),
+      ("AliveCounterACC", "SCC11", 0),
+      ("CR_FCA_Alive", "FCA11", 0),
+      ("Supplemental_Counter", "FCA11", 0),
 
-      ("SAS_Angle", "SAS11", 0),
-      ("SAS_Speed", "SAS11", 0),
-
-      ("MainMode_ACC", "SCC11", 0),
-      ("VSetDis", "SCC11", 0),
-      ("SCCInfoDisplay", "SCC11", 0),
-      ("ACC_ObjDist", "SCC11", 0),
-      ("ACCMode", "SCC12", 1),
-
-      ("UNIT", "TPMS11", 0),
       ("PRESSURE_FL", "TPMS11", 0),
       ("PRESSURE_FR", "TPMS11", 0),
       ("PRESSURE_RL", "TPMS11", 0),
@@ -366,7 +356,7 @@ class CarState(CarStateBase):
       ("WHL_SPD11", 50),
     ]
 
-    if not CP.openpilotLongitudinalControl:
+    if CP.sccBus == 0:
       signals += [
         ("MainMode_ACC", "SCC11", 0),
         ("VSetDis", "SCC11", 0),
@@ -385,6 +375,14 @@ class CarState(CarStateBase):
         ("SCC11", 50),
         ("SCC12", 50),
       ]
+    if CP.fcaBus == 0:
+      signals += [
+        ("FCA_CmdAct", "FCA11", 0),
+        ("CF_VSM_Warn", "FCA11", 0),
+        ("CR_FCA_Alive", "FCA11", 0),
+        ("Supplemental_Counter", "FCA11", 0),
+      ]
+      checks += [("FCA11", 50)]
 
     if not CP.mdpsHarness:
       signals += [
@@ -412,7 +410,7 @@ class CarState(CarStateBase):
         ("SAS11", 100)
       ]
 
-    if CP.carFingerprint in FEATURES["use_bsm"]:
+    if CP.bsmAvailable:
       signals += [
         ("CF_Lca_IndLeft", "LCA11", 0),
         ("CF_Lca_IndRight", "LCA11", 0),
@@ -443,39 +441,18 @@ class CarState(CarStateBase):
         ("CF_Clu_InhibitN", "CLU15", 0),
         ("CF_Clu_InhibitR", "CLU15", 0),
       ]
-      checks += [
-        ("CLU15", 5)
-      ]
+      checks += [("CLU15", 5)]
     elif CP.carFingerprint in FEATURES["use_tcu_gears"]:
       signals += [
         ("CUR_GR", "TCU12", 0)
       ]
-      checks += [
-        ("TCU12", 100)
-      ]
-    elif CP.carFingerprint in FEATURES["use_elect_gears"]:
+      checks += [("TCU12", 100)]
+    elif CP.evgearAvailable:
       signals += [("Elect_Gear_Shifter", "ELECT_GEAR", 0)]
       checks += [("ELECT_GEAR", 20)]
-    else:
-      signals += [
-        ("CF_Lvr_Gear", "LVR12", 0)
-      ]
-      checks += [
-        ("LVR12", 100)
-      ]
-
-    if CP.carFingerprint in FEATURES["use_fca"]:
-      signals += [
-        ("FCA_CmdAct", "FCA11", 0),
-        ("CF_VSM_Warn", "FCA11", 0),
-      ]
-      if not CP.openpilotLongitudinalControl:
-        checks += [("FCA11", 50)]
-    else:
-      signals += [
-        ("AEB_CmdAct", "SCC12", 0),
-        ("CF_VSM_Warn", "SCC12", 0),
-      ]
+    elif CP.lvrAvailable:
+      signals += [("CF_Lvr_Gear", "LVR12", 0)]
+      checks += [("LVR12", 100)]
 
     return CANParser(DBC[CP.carFingerprint]['pt'], signals, checks, 0)
 
@@ -522,14 +499,16 @@ class CarState(CarStateBase):
       ("CF_Lkas_LdwsRHWarning", "LKAS11", 0),
       ("CF_Lkas_HbaLamp", "LKAS11", 0),
       ("CF_Lkas_FcwBasReq", "LKAS11", 0),
+      ("CF_Lkas_ToiFlt", "LKAS11", 0),
       ("CF_Lkas_HbaSysState", "LKAS11", 0),
       ("CF_Lkas_FcwOpt", "LKAS11", 0),
       ("CF_Lkas_HbaOpt", "LKAS11", 0),
       ("CF_Lkas_FcwSysState", "LKAS11", 0),
       ("CF_Lkas_FcwCollisionWarning", "LKAS11", 0),
+      ("CF_Lkas_MsgCount", "LKAS11", 0),
       ("CF_Lkas_FusionState", "LKAS11", 0),
       ("CF_Lkas_FcwOpt_USM", "LKAS11", 0),
-      ("CF_Lkas_LdwsOpt_USM", "LKAS11", 0),
+      ("CF_Lkas_LdwsOpt_USM", "LKAS11", 0)
     ]
 
     checks = [
