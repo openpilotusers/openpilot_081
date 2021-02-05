@@ -103,7 +103,7 @@ class RadarD():
     if sm.updated['controlsState']:
       self.v_ego = sm['controlsState'].vEgo
       self.v_ego_hist.append(self.v_ego)
-    if sm.updated['model']:
+    if sm.updated['modelV2']:
       self.ready = True
 
     ar_pts = {}
@@ -159,7 +159,7 @@ class RadarD():
     dat = messaging.new_message('radarState')
     dat.valid = sm.all_alive_and_valid()
     radarState = dat.radarState
-    radarState.mdMonoTime = sm.logMonoTime['model']
+    radarState.mdMonoTime = sm.logMonoTime['modelV2']
     radarState.canMonoTimes = list(rr.canMonoTimes)
     radarState.radarErrors = list(rr.errors)
     radarState.controlsStateMonoTime = sm.logMonoTime['controlsState']
@@ -187,7 +187,7 @@ def radard_thread(sm=None, pm=None, can_sock=None):
   if can_sock is None:
     can_sock = messaging.sub_sock('can')
   if sm is None:
-    sm = messaging.SubMaster(['model', 'controlsState'])
+    sm = messaging.SubMaster(['modelV2', 'controlsState'])
   if pm is None:
     pm = messaging.PubMaster(['radarState', 'liveTracks'])
 
