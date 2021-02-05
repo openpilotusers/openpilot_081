@@ -71,7 +71,7 @@ class Controls:
 
     self.sm = sm
     if self.sm is None:
-      self.sm = messaging.SubMaster(['thermal', 'health', 'modelV2', 'liveCalibration', 'frontFrame',
+      self.sm = messaging.SubMaster(['thermal', 'health', 'model', 'liveCalibration', 'frontFrame',
                                      'dMonitoringState', 'plan', 'pathPlan', 'liveLocationKalman', 'radarState', 'dynamicFollowData', 'liveTracks', 'dynamicFollowButton', 'modelLongButton'])
 
     self.op_params = opParams()
@@ -511,7 +511,7 @@ class Controls:
     ldw_allowed = self.is_ldw_enabled and CS.vEgo > LDW_MIN_SPEED and not recent_blinker \
                     and not self.active and self.sm['liveCalibration'].calStatus == Calibration.CALIBRATED
 
-    meta = self.sm['modelV2'].meta
+    meta = self.sm['model'].meta
     if len(meta.desirePrediction) and ldw_allowed:
       l_lane_change_prob = meta.desirePrediction[Desire.laneChangeLeft - 1]
       r_lane_change_prob = meta.desirePrediction[Desire.laneChangeRight - 1]
