@@ -155,6 +155,8 @@ class LongControl():
       afactor = interp(CS.vEgo,[1,8,16], [4.2,2.3,2])
       if abs(output_gb) < abs(a_target_raw)/afactor and a_target_raw < 0 and dRel > 4.0:
         output_gb = -abs(a_target_raw)/afactor
+      elif output_gb > 0 and a_target_raw < 0 and dRel > 4.0:
+        output_gb = output_gb/afactor
 
       if prevent_overshoot:
         output_gb = min(output_gb, 0.0)
@@ -167,6 +169,8 @@ class LongControl():
         factor = interp(dRel,[2.0,3.0,4.0,5.0,6.0,7.0,8.0], [6,3.5,1.5,0.7,0.5,0.3,0.0])
       if not CS.standstill or output_gb > -BRAKE_STOPPING_TARGET:
         output_gb -= CP.stoppingBrakeRate / RATE * factor
+      elif CS.cruiseState.standstill and output_gb < -BRAKE_STOPPING_TARGET:
+        output_gb += CP.stoppingBrakeRate / RATE
       output_gb = clip(output_gb, -brake_max, gas_max)
 
       self.reset(CS.vEgo)

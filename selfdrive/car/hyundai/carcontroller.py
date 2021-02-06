@@ -305,13 +305,8 @@ class CarController():
       self.resumebuttoncnt = 0
       can_sends.append(create_clu11(self.packer, CS.CP.sccBus, CS.clu11, Buttons.CANCEL, self.current_veh_speed, self.clu11_cnt))
     elif CS.out.cruiseState.standstill and CS.scc12["ACCMode"] != 0 and CS.vrelative > 0:
-      self.vdiff += (CS.vrelative - self.vdiff)
-      if (frame - self.lastresumeframe > 5) and (self.vdiff > .1 or CS.lead_distance > 4.5):
-        can_sends.append(create_clu11(self.packer, CS.CP.sccBus, CS.clu11, Buttons.RES_ACCEL, self.current_veh_speed, self.resumebuttoncnt))
-        self.resumebuttoncnt += 1
-        if self.resumebuttoncnt > 5:
-          self.lastresumeframe = frame
-          self.resumebuttoncnt = 0
+      self.acc_standstill_timer = 0
+      self.acc_standstill = False
     else:
       self.vdiff = 0.
       self.resumebuttoncnt = 0
@@ -319,15 +314,14 @@ class CarController():
     if CS.out.vEgo <= 1:
       self.sm.update(0)
       long_control_state = self.sm['controlsState'].longControlState
-      self.acc_standstill = True if long_control_state == LongCtrlState.stopping else False
-      if self.acc_standstill == True and not CS.out.gasPressed:
+      if long_control_state == LongCtrlState.stopping and CS.out.vEgo == 0 and not CS.out.gasPressed:
         self.acc_standstill_timer += 1
         if self.acc_standstill_timer >= 200:
           self.acc_standstill_timer = 200
-      elif CS.out.gasPressed:
-        self.acc_standstill_timer = 0
+          self.acc_standstill = True
       else:
         self.acc_standstill_timer = 0
+        self.acc_standstill = False
     elif CS.out.gasPressed or CS.out.vEgo > 1:
       self.acc_standstill = False
       self.acc_standstill_timer = 0      
@@ -413,7 +407,7 @@ class CarController():
         can_sends.append(create_scc11(self.packer, enabled,
                                       self.setspeed, self.lead_visible, lead_dist, lead_vrel, lead_yrel,
                                       self.gapsettingdance,
-                                      CS.out.standstill, CS.scc11,
+                                      self.acc_standstill, CS.scc11,
                                       self.usestockscc, CS.CP.radarOffCan, self.scc11cnt, self.sendaccmode))
 
         if CS.brake_check == 1 or CS.mainsw_check == 1:
