@@ -138,7 +138,7 @@ bool latcontrol( UIState *s, int touch_x, int touch_y ) {
   draw_control_button2(s, touch_x, touch_y);
   draw_control_button3(s, touch_x, touch_y);
 
-  if ((control_button_clicked1(touch_x,touch_y)) && (s->scene.uilayout_sidebarcollapsed == true)) {
+  if ((control_button_clicked1(touch_x,touch_y)) && (s->status != STATUS_OFFROAD) && (s->limit_set_speed == 0)) {
     s->lat_mode = s->lat_mode + 1;
     if (s->lat_mode > 3) {
       s->lat_mode = 0;
@@ -155,7 +155,7 @@ bool latcontrol( UIState *s, int touch_x, int touch_y ) {
     touched = true;
   }
 
-  if ((control_button_clicked2(touch_x,touch_y)) && (s->scene.uilayout_sidebarcollapsed == true)) {
+  if ((control_button_clicked2(touch_x,touch_y)) && (s->status != STATUS_OFFROAD) && (s->limit_set_speed == 0)) {
     s->acc_mode = s->acc_mode + 1;
     if (s->acc_mode > 2) {
       s->acc_mode = 0;

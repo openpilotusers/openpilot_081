@@ -53,7 +53,7 @@ static bool handle_ml_touch(UIState *s, int touch_x, int touch_y) {
   //mlButton manager
   int xs[2] = {1105, 1245};
   int ys[2] = {905, 1045};
-  if ((xs[0] <= touch_x && touch_x <= xs[1]) && (ys[0] <= touch_y && touch_y <= ys[1])) {
+  if ((xs[0] <= touch_x && touch_x <= xs[1]) && (ys[0] <= touch_y && touch_y <= ys[1]) && (s->status != STATUS_OFFROAD) && (s->limit_set_speed == 0)) {
     s->scene.mlButtonEnabled = !s->scene.mlButtonEnabled;
     send_ml(s, s->scene.mlButtonEnabled);
     printf("ml button: %d\n", s->scene.mlButtonEnabled);
