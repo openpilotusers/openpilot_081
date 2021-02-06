@@ -355,7 +355,7 @@ class Planner():
       elif self.osm_camera and self.osm_curv and self.osm:
         v_cruise_setpoint = min([v_cruise_setpoint, v_speedlimit_ahead, v_curvature_map, v_speedlimit])
       elif self.map_enable:
-        v_cruise_setpoint = min([self.target_speed_map])
+        v_cruise_setpoint = min([v_cruise_setpoint, self.target_speed_map])
       else:
         v_cruise_setpoint = min([v_cruise_setpoint])
 
