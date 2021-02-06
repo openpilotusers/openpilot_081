@@ -617,7 +617,7 @@ static void ui_draw_vision_speedlimit(UIState *s) {
   if (s->enable_osm == 1) {
     is_speedlim_valid = s->scene.speedlimit_valid;
   } else {
-    speedlim_calc = 30;
+    speedlim_calc = s->scene.cruiseSpeed;
     is_speedlim_valid = true;
   }
 
