@@ -299,14 +299,6 @@ class CarController():
         self.str_log2 = 'T={:04.0f}/{:05.3f}/{:06.4f}'.format(float(int(self.params.get('Scale')) * 1.0), float(int(self.params.get('LqrKi')) * 0.001), float(int(self.params.get('DcGain')) * 0.0001))
 
     trace1.printf1('{}  {}'.format(str_log1, self.str_log2))
-
-    if ((self.params.get('LimitSetSpeedCamera') is not None and self.params.get('LimitSetSpeedCamera') != "0") or self.params.get('OpkrSafetyCamera') == "1") and not CS.acc_active:
-      self.safety_camera_timer += 1
-      if self.safety_camera_timer > 100:
-        self.safety_camera_timer = 0
-        os.system("logcat -c &")
-        os.system("echo -n 0 > /data/params/d/OpkrSafetyCamera &")
-        os.system("echo -n 0 > /data/params/d/LimitSetSpeedCamera &")
         
     if pcm_cancel_cmd and CS.scc12["ACCMode"] != 0 and not CS.out.standstill:
       self.vdiff = 0.
@@ -429,6 +421,13 @@ class CarController():
                                       self.acc_standstill, CS.out.gasPressed, 1,
                                       CS.out.stockAeb,
                                       CS.scc12, self.usestockscc, CS.CP.radarOffCan, self.scc12cnt))
+          if ((self.params.get('LimitSetSpeedCamera') is not None and self.params.get('LimitSetSpeedCamera') != "0") or self.params.get('OpkrSafetyCamera') == "1"):
+            self.safety_camera_timer += 1
+            if self.safety_camera_timer > 100:
+              self.safety_camera_timer = 0
+              os.system("logcat -c &")
+              os.system("echo -n 0 > /data/params/d/OpkrSafetyCamera &")
+              os.system("echo -n 0 > /data/params/d/LimitSetSpeedCamera &")
         else:
           can_sends.append(create_scc12(self.packer, apply_accel, enabled,
                                       self.acc_standstill, CS.out.gasPressed, CS.out.brakePressed,

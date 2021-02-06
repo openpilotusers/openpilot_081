@@ -314,8 +314,6 @@ class Planner():
         self.target_speed_map = 0
         if self.params.get("OpkrSafetyCamera", encoding="utf8") == "1":
           os.system("echo -n 0 > /data/params/d/OpkrSafetyCamera &")
-          os.system("echo -n 0 > /data/params/d/LimitSetSpeedCamera &")
-          os.system("logcat -c &")
 
     decel_for_turn = bool(v_curvature_map < min([v_cruise_setpoint, v_speedlimit, v_ego + 1.]))
 
@@ -456,7 +454,7 @@ class Planner():
     plan_send.plan.yRel2 = lead_2.yRel
     plan_send.plan.vRel2 = lead_2.vRel
     plan_send.plan.status2 = lead_2.status
-    plan_send.plan.targetSpeedCamera = self.target_speed_map
+    plan_send.plan.targetSpeedCamera = self.target_speed_map*3.6
 
     pm.send('plan', plan_send)
 
