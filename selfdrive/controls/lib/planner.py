@@ -278,32 +278,34 @@ class Planner():
     except KeyError:
       pass
     
-    print('timer={}'.format(self.target_speed_map_counter))
     self.target_speed_map_counter += 1
-    if self.target_speed_map_counter == (50+self.target_speed_map_counter1):
+    if self.target_speed_map_counter == (100+self.target_speed_map_counter1):
       os.system("logcat -d -s opkrspdlimit,opkrspd2limit,opkrspd5limit | grep opkrspd | tail -n 1 | awk \'{print $7}\' > /data/params/d/LimitSetSpeedCamera &")
-    elif self.target_speed_map_counter >= (75+self.target_speed_map_counter1):
+      print("1")
+    elif self.target_speed_map_counter >= (150+self.target_speed_map_counter1):
       self.target_speed_map_counter1 = 0
-      self.target_speed_map_counter = 1
+      self.target_speed_map_counter = 0
       mapspeed = self.params.get("LimitSetSpeedCamera", encoding="utf8")
       if mapspeed is not None:
         mapspeed = int(float(mapspeed.rstrip('\n')))
         if mapspeed > 29:
           self.map_enable = True
           self.target_speed_map = (mapspeed + round(mapspeed*0.01*int(self.tartget_speed_offset)))/3.6
-          self.target_speed_map_counter1 = 75
+          self.target_speed_map_counter1 = 150
           os.system("echo -n 1 > /data/params/d/OpkrSafetyCamera &")
           os.system("logcat -c &")
         else:
           self.map_enable = False
           self.target_speed_map = 0
       elif mapspeed is None and self.target_speed_map_counter2 <= 2:
+        print("2")
         self.target_speed_map_counter2 += 1
-        self.target_speed_map_counter = 50
+        self.target_speed_map_counter = 100
         self.map_enable = False
         self.target_speed_map = 0
       else:
-        self.target_speed_map_counter = 49
+        print("3")
+        self.target_speed_map_counter = 99
         self.target_speed_map_counter2 = 0
         self.map_enable = False
         self.target_speed_map = 0
