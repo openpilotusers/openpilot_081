@@ -120,6 +120,7 @@ class LongControl():
       self.v_pid = v_target
       self.pid.pos_limit = gas_max
       self.pid.neg_limit = - brake_max
+      afactor = 1
 
       # Toyota starts braking more when it thinks you want to stop
       # Freeze the integrator so we don't accelerate to compensate, and don't allow positive acceleration
@@ -151,9 +152,9 @@ class LongControl():
         self.pid.k_f=1.0
 
       output_gb = self.pid.update(self.v_pid, v_ego_pid, speed=v_ego_pid, deadzone=deadzone, feedforward=a_target, freeze_integrator=prevent_overshoot)
-
-      if abs(output_gb) < abs(a_target_raw)/2 and a_target_raw < 0 and dRel > 4.0:
-        output_gb = -abs(a_target_raw)/2
+      afactor = interp(CS.vEgo,[1,8,16], [3,2,1])
+      if abs(output_gb) < abs(a_target_raw)/afactor and a_target_raw < 0 and dRel > 4.0:
+        output_gb = -abs(a_target_raw)/afactor
 
       if prevent_overshoot:
         output_gb = min(output_gb, 0.0)
