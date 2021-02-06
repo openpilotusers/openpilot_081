@@ -311,7 +311,6 @@ class CarController():
       self.vdiff = 0.
       self.resumebuttoncnt = 0
 
-    print('stat={} timer={}  vEgo={}'.format(self.acc_standstill, self.acc_standstill_timer, CS.out.vEgo))
     if CS.out.vEgo <= 1:
       self.sm.update(0)
       long_control_state = self.sm['controlsState'].longControlState

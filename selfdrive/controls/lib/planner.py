@@ -278,6 +278,7 @@ class Planner():
     except KeyError:
       pass
     
+    print('timer={}'.format(self.target_speed_map_counter))
     self.target_speed_map_counter += 1
     if self.target_speed_map_counter == (50+self.target_speed_map_counter1):
       os.system("logcat -d -s opkrspdlimit,opkrspd2limit,opkrspd5limit | grep opkrspd | tail -n 1 | awk \'{print $7}\' > /data/params/d/LimitSetSpeedCamera &")
