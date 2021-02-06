@@ -61,7 +61,7 @@ class LongControl():
   def __init__(self, CP, compute_gb, candidate):
     self.long_control_state = LongCtrlState.off  # initialized to off
     kdBP = [0., 16., 35.]
-    kdV = [0.3, 1.5, 1.3]
+    kdV = [0.5, 1.7, 1.5]
 
     self.pid = LongPIDController((CP.longitudinalTuning.kpBP, CP.longitudinalTuning.kpV),
                                  (CP.longitudinalTuning.kiBP, CP.longitudinalTuning.kiV),
@@ -152,7 +152,7 @@ class LongControl():
         self.pid.k_f=1.0
 
       output_gb = self.pid.update(self.v_pid, v_ego_pid, speed=v_ego_pid, deadzone=deadzone, feedforward=a_target, freeze_integrator=prevent_overshoot)
-      afactor = interp(CS.vEgo,[1,8,16], [4,2.3,2])
+      afactor = interp(CS.vEgo,[1,8,16], [4.2,2.3,2])
       if abs(output_gb) < abs(a_target_raw)/afactor and a_target_raw < 0 and dRel > 4.0:
         output_gb = -abs(a_target_raw)/afactor
 
