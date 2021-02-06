@@ -61,8 +61,7 @@ class LongControl():
   def __init__(self, CP, compute_gb, candidate):
     self.long_control_state = LongCtrlState.off  # initialized to off
     kdBP = [0., 16., 35.]
-    #kdV = [0.3, 1.7, 1.5]
-    kdV = [0., 0., 0.]
+    kdV = [0.3, 1.5, 1.3]
 
     self.pid = LongPIDController((CP.longitudinalTuning.kpBP, CP.longitudinalTuning.kpV),
                                  (CP.longitudinalTuning.kiBP, CP.longitudinalTuning.kiV),
@@ -84,7 +83,7 @@ class LongControl():
     self.pid.reset()
     self.v_pid = v_pid
 
-  def update(self, active, CS, v_target, v_target_future, a_target, CP, hasLead, radarState, decelForTurn, longitudinalPlanSource, extras):
+  def update(self, active, CS, v_target, v_target_future, a_target_raw, a_target, CP, hasLead, radarState, decelForTurn, longitudinalPlanSource, extras):
     """Update longitudinal control. This updates the state machine and runs a PID loop"""
     # Actuation limits
     gas_max = interp(CS.vEgo, CP.gasMaxBP, CP.gasMaxV)
@@ -153,6 +152,9 @@ class LongControl():
 
       output_gb = self.pid.update(self.v_pid, v_ego_pid, speed=v_ego_pid, deadzone=deadzone, feedforward=a_target, freeze_integrator=prevent_overshoot)
 
+      if output_gb < 0 and dRel > 4.0:
+        output_gb = -abs(a_target_raw)
+
       if prevent_overshoot:
         output_gb = min(output_gb, 0.0)
 
@@ -193,7 +195,7 @@ class LongControl():
     else:
       self.long_stat = "---"
 
-    str_log3 = 'LS={:s}  GS={:01.2f}/{:01.2f}  BK={:01.2f}/{:01.2f}  GB={:+04.2f}  TG=P:{:05.2f}/F:{:05.2f}'.format(self.long_stat, final_gas, gas_max, abs(final_brake), abs(brake_max), output_gb, abs(self.v_pid), abs(v_target_future))
+    str_log3 = 'LS={:s}  GS={:01.2f}/{:01.2f}  BK={:01.2f}/{:01.2f}  GB={:+04.2f}  TG=P:{:05.2f}/F:{:05.2f}/A:{:04.2f}/AR:{:04.2f}'.format(self.long_stat, final_gas, gas_max, abs(final_brake), abs(brake_max), output_gb, abs(self.v_pid), abs(v_target_future), a_target, a_target_raw)
     trace1.printf2('{}'.format(str_log3))
 
     return final_gas, final_brake
