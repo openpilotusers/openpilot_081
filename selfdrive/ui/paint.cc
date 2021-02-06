@@ -673,7 +673,7 @@ static void ui_draw_vision_speedlimit(UIState *s) {
   // Draw Speed Text
   color = s->is_ego_over_limit ? COLOR_WHITE : COLOR_BLACK;
   if (is_speedlim_valid) {
-    if ((s->enable_osm == 1) || (s->scene.v_cruise_last > 0)) {
+    if ((s->enable_osm == 1) || (s->scene.v_cruise_last > 1 && s->scene.v_cruise_last < 255)) {
       snprintf(speedlim_str, sizeof(speedlim_str), "%d", speedlim_calc);
       ui_draw_text(s->vg, text_x, text_y+100, speedlim_str, 48*2.3, color, s->font_sans_bold);
     } else {

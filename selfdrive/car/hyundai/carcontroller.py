@@ -304,17 +304,18 @@ class CarController():
       self.vdiff = 0.
       self.resumebuttoncnt = 0
       can_sends.append(create_clu11(self.packer, CS.CP.sccBus, CS.clu11, Buttons.CANCEL, self.current_veh_speed, self.clu11_cnt))
-    elif CS.out.cruiseState.standstill and CS.scc12["ACCMode"] != 0 and CS.vrelative > 0:
+    elif CS.out.cruiseState.standstill and CS.scc12["ACCMode"] != 0 and CS.vrelative > 0.1:
       self.acc_standstill_timer = 0
       self.acc_standstill = False
     else:
       self.vdiff = 0.
       self.resumebuttoncnt = 0
 
+    print('stat={} timer={}  vEgo={}'.format(self.acc_standstill, self.acc_standstill_timer, CS.out.vEgo))
     if CS.out.vEgo <= 1:
       self.sm.update(0)
       long_control_state = self.sm['controlsState'].longControlState
-      if long_control_state == LongCtrlState.stopping and CS.out.vEgo == 0 and not CS.out.gasPressed:
+      if long_control_state == LongCtrlState.stopping and CS.out.vEgo < 0.1 and not CS.out.gasPressed:
         self.acc_standstill_timer += 1
         if self.acc_standstill_timer >= 200:
           self.acc_standstill_timer = 200
