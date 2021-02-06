@@ -894,34 +894,34 @@ static void ui_draw_driver_view(UIState *s) {
   ui_draw_circle_image(s->vg, x, y, face_size-5, s->img_face, scene->dmonitoring_state.getFaceDetected());
 }
 
-static void ui_draw_ml_button(UIState *s) {
-  int btn_w = 140;
-  int btn_h = 140;
-  int btn_x = 1920 - btn_w - 675;
-  int btn_y = 1080 - btn_h - 35;
-  int btn_xc = btn_x + (btn_w/2);
-  int btn_yc = btn_y + (btn_h/2);
-  nvgBeginPath(s->vg);
-  nvgRoundedRect(s->vg, btn_x, btn_y, btn_w, btn_h, 100);
-  if (s->scene.mlButtonEnabled) {
-    nvgStrokeColor(s->vg, nvgRGBA(55, 184, 104, 255));
-  } else {
-    nvgStrokeColor(s->vg, nvgRGBA(255,10,10,80));
-  }
-  nvgStrokeWidth(s->vg, 6);
-  nvgStroke(s->vg);
+// static void ui_draw_ml_button(UIState *s) {
+//   int btn_w = 140;
+//   int btn_h = 140;
+//   int btn_x = 1920 - btn_w - 675;
+//   int btn_y = 1080 - btn_h - 35;
+//   int btn_xc = btn_x + (btn_w/2);
+//   int btn_yc = btn_y + (btn_h/2);
+//   nvgBeginPath(s->vg);
+//   nvgRoundedRect(s->vg, btn_x, btn_y, btn_w, btn_h, 100);
+//   if (s->scene.mlButtonEnabled) {
+//     nvgStrokeColor(s->vg, nvgRGBA(55, 184, 104, 255));
+//   } else {
+//     nvgStrokeColor(s->vg, nvgRGBA(255,10,10,80));
+//   }
+//   nvgStrokeWidth(s->vg, 6);
+//   nvgStroke(s->vg);
 
-  nvgTextAlign(s->vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
-  nvgFontSize(s->vg, 45);
-  if (s->scene.mlButtonEnabled) {
-    nvgFillColor(s->vg, nvgRGBA(55, 184, 104, 255));
-    nvgFontSize(s->vg, 60);
-    nvgText(s->vg,btn_xc,btn_yc,"ML",NULL);
-  } else {
-    nvgFillColor(s->vg, nvgRGBA(255,255,255,200));
-    nvgText(s->vg,btn_xc,btn_yc,"ML",NULL);
-  }
-}
+//   nvgTextAlign(s->vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
+//   nvgFontSize(s->vg, 45);
+//   if (s->scene.mlButtonEnabled) {
+//     nvgFillColor(s->vg, nvgRGBA(55, 184, 104, 255));
+//     nvgFontSize(s->vg, 60);
+//     nvgText(s->vg,btn_xc,btn_yc,"ML",NULL);
+//   } else {
+//     nvgFillColor(s->vg, nvgRGBA(255,255,255,200));
+//     nvgText(s->vg,btn_xc,btn_yc,"ML",NULL);
+//   }
+// }
 
 //BB START: functions added for the display of various items
 static int bb_ui_draw_measure(UIState *s,  const char* bb_value, const char* bb_uom, const char* bb_label,
@@ -1347,7 +1347,7 @@ static void ui_draw_vision_footer(UIState *s) {
   nvgRect(s->vg, scene->viz_rect.x, s->scene.viz_rect.bottom(), scene->viz_rect.w, footer_h);
   ui_draw_vision_face(s);
   ui_draw_vision_map(s);
-  ui_draw_ml_button(s);
+  //ui_draw_ml_button(s);
   ui_draw_vision_car(s);
 }
 
