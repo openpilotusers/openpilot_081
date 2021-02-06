@@ -152,8 +152,8 @@ class LongControl():
 
       output_gb = self.pid.update(self.v_pid, v_ego_pid, speed=v_ego_pid, deadzone=deadzone, feedforward=a_target, freeze_integrator=prevent_overshoot)
 
-      if abs(a_target) < abs(a_target_raw) and a_target_raw < 0 and dRel > 4.0:
-        output_gb = -abs(a_target_raw)
+      if abs(output_gb) < abs(a_target_raw)/2.5 and abs(a_target) < abs(a_target_raw) and a_target_raw < 0 and dRel > 4.0:
+        output_gb = -abs(a_target_raw)/2.5
 
       if prevent_overshoot:
         output_gb = min(output_gb, 0.0)
