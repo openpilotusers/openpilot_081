@@ -421,13 +421,6 @@ class CarController():
                                       self.acc_standstill, CS.out.gasPressed, 1,
                                       CS.out.stockAeb,
                                       CS.scc12, self.usestockscc, CS.CP.radarOffCan, self.scc12cnt))
-          if ((self.params.get('LimitSetSpeedCamera') is not None and self.params.get('LimitSetSpeedCamera') != "0") or self.params.get('OpkrSafetyCamera') == "1"):
-            self.safety_camera_timer += 1
-            if self.safety_camera_timer > 100:
-              self.safety_camera_timer = 0
-              os.system("logcat -c &")
-              os.system("echo -n 0 > /data/params/d/OpkrSafetyCamera &")
-              os.system("echo -n 0 > /data/params/d/LimitSetSpeedCamera &")
         else:
           can_sends.append(create_scc12(self.packer, apply_accel, enabled,
                                       self.acc_standstill, CS.out.gasPressed, CS.out.brakePressed,
