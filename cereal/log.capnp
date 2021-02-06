@@ -559,6 +559,7 @@ struct ControlsState @0x97ff69c53601abf1 {
   lateralControlMethod  @60 :UInt8;
   longPlanSource  @61 :UInt8;
   targetSpeedCamera @62 :Float32;
+  vCruiseLast @63 :Float32;
 
   lateralControlState :union {
     indiState @52 :LateralINDIState;

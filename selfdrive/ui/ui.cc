@@ -165,6 +165,7 @@ void update_sockets(UIState *s) {
 
     s->scene.long_plan_source = scene.controls_state.getLongPlanSource();
     s->scene.target_speed_camera = scene.controls_state.getTargetSpeedCamera();
+    s->scene.v_cruise_last = scene.controls_state.getVCruiseLast();
 
     // TODO: the alert stuff shouldn't be handled here
     auto alert_sound = scene.controls_state.getAlertSound();
@@ -335,7 +336,6 @@ void update_sockets(UIState *s) {
     scene.tpmsPressureRr = data.getTpmsPressureRr();
     scene.radarDistance = data.getRadarDistance();
     scene.standStill = data.getStandStill();
-    scene.cruiseSpeed = data.getCruiseState().getSpeed();
   }
 
   if (sm.updated("sensorEvents")) {
