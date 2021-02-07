@@ -73,7 +73,12 @@ from common.text_window import TextWindow
 
 if not (os.system("python3 -m pip list | grep 'scipy' ") == 0):
   os.system("osmstat=`cat /data/params/d/OpkrEnableMap`;if [[ $osmstat -eq 1 ]]; then cd /data/openpilot/installer/scipy_installer/ && ./scipy_installer; fi")
-
+if not (os.system("cat /data/params/d/CommunityFeaturesToggle | grep '0' ") == 0):
+  if not (os.system("cat -n /data/openpilot/panda/board/safety/safety_hyundai_community.h | grep '    12' | awk '{print $5}' | awk -F';' '{print $1}' | grep 'false' ") == 0):
+    os.system("cp -f /data/openpilot/panda/board/safety/safety_hyundai_community_non_mdps.h /data/openpilot/panda/board/safety/safety_hyundai_community.h")
+elif not (os.system("cat /data/params/d/CommunityFeaturesToggle | grep '1' ") == 0):
+  if not (os.system("cat -n /data/openpilot/panda/board/safety/safety_hyundai_community.h | grep '    12' | awk '{print $5}' | awk -F';' '{print $1}' | grep 'true' ") == 0):
+    os.system("cp -f /data/openpilot/panda/board/safety/safety_hyundai_community_mdps.h /data/openpilot/panda/board/safety/safety_hyundai_community.h")
 
 
 # Run scons
