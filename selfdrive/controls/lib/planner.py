@@ -287,6 +287,7 @@ class Planner():
     elif self.target_speed_map_counter >= (150+self.target_speed_map_counter1):
       self.target_speed_map_counter1 = 0
       self.target_speed_map_counter = 0
+      self.target_speed_map_counter_check = False
       mapspeed = self.params.get("LimitSetSpeedCamera", encoding="utf8")
       print('mapspeed={}'.format(mapspeed))
       if mapspeed is not None:
@@ -306,12 +307,14 @@ class Planner():
         self.target_speed_map_counter = 100
         self.map_enable = False
         self.target_speed_map = 0
+        self.target_speed_map_counter_check = True
       else:
         print("333")
         self.target_speed_map_counter = 99
         self.target_speed_map_counter2 = 0
         self.map_enable = False
         self.target_speed_map = 0
+        self.target_speed_map_counter_check = False
         if self.params.get("OpkrSafetyCamera", encoding="utf8") == "1":
           os.system("echo -n 0 > /data/params/d/OpkrSafetyCamera &")
 
