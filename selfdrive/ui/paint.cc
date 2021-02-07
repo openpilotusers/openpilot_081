@@ -617,7 +617,11 @@ static void ui_draw_vision_speedlimit(UIState *s) {
   if (s->enable_osm == 1) {
     is_speedlim_valid = s->scene.speedlimit_valid;
   } else {
-    speedlim_calc = s->scene.v_cruise_last;
+    if (s->scene.target_speed_camera > 29) {
+      speedlim_calc = s->scene.target_speed_camera;
+    } else {
+      speedlim_calc = s->scene.v_cruise_last;
+    }
     is_speedlim_valid = true;
   }
 
@@ -628,7 +632,11 @@ static void ui_draw_vision_speedlimit(UIState *s) {
   if (s->enable_osm == 1) {
     s->is_ego_over_limit = is_speedlim_valid && s->scene.controls_state.getVEgo() > (speedlimit + (speedlimit*0.01*s->speed_lim_off) + hysteresis_offset);
   } else {
-    s->is_ego_over_limit = false;
+    if (s->scene.target_speed_camera > 29 && s->scene.target_speed_camera < s->scene.controls_state.getVEgo()*3.6) {
+      s->is_ego_over_limit = true;
+    } else {
+      s->is_ego_over_limit = false;
+    }
   }
 
   int viz_speedlim_w = 180;
