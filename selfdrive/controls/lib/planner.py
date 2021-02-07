@@ -301,6 +301,7 @@ class Planner():
         else:
           self.map_enable = False
           self.target_speed_map = 0
+          os.system("logcat -c &")
       elif mapspeed is None and self.target_speed_map_counter2 <= 2:
         print("222")
         self.target_speed_map_counter2 += 1
