@@ -280,6 +280,7 @@ class Planner():
       pass
     
     self.target_speed_map_counter += 1
+    print(self.target_speed_map_counter)
     if self.target_speed_map_counter >= (100+self.target_speed_map_counter1) and self.target_speed_map_counter_check == False:
       print("111")
       self.target_speed_map_counter_check = True
