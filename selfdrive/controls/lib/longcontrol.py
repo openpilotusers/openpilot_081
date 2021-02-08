@@ -161,10 +161,8 @@ class LongControl():
       dfactor = interp(dRel,[4,10], [1.5,1])
       if abs(output_gb) < abs(a_target_raw)/afactor and a_target_raw < 0 and dRel > 4:
         output_gb = (-abs(a_target_raw)/afactor)*dfactor
-      elif output_gb > 0 and a_target_raw < 0 and dRel > 20:
+      elif output_gb > 0 and a_target_raw < 0 and dRel > 4:
         output_gb = output_gb/vfactor
-      elif output_gb > 0 and a_target_raw < 0 and 20 >= dRel > 4:
-        output_gb = 0
 
       if prevent_overshoot:
         output_gb = min(output_gb, 0.0)
