@@ -121,6 +121,7 @@ class LongControl():
       self.pid.pos_limit = gas_max
       self.pid.neg_limit = - brake_max
       afactor = 1
+      vfactor = 1
       dfactor = 1
 
       # Toyota starts braking more when it thinks you want to stop
@@ -155,12 +156,13 @@ class LongControl():
       output_gb = self.pid.update(self.v_pid, v_ego_pid, speed=v_ego_pid, deadzone=deadzone, feedforward=a_target, freeze_integrator=prevent_overshoot)
 
       # added by opkr
-      afactor = interp(CS.vEgo,[1,8,16], [4.1,2.2,1.9])
-      dfactor = interp(dRel,[4,10], [2,1])
+      afactor = interp(CS.vEgo,[1,8,16], [4.2,2.3,2])
+      vfactor = interp(dRel,[1,25,50], [10,7,4])
+      dfactor = interp(dRel,[4,10], [1.5,1])
       if abs(output_gb) < abs(a_target_raw)/afactor and a_target_raw < 0 and dRel > 4:
         output_gb = (-abs(a_target_raw)/afactor)*dfactor
       elif output_gb > 0 and a_target_raw < 0 and dRel > 20:
-        output_gb = output_gb/afactor
+        output_gb = output_gb/vfactor
       elif output_gb > 0 and a_target_raw < 0 and 20 >= dRel > 4:
         output_gb = 0
 
