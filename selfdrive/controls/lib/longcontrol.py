@@ -121,6 +121,7 @@ class LongControl():
       self.pid.pos_limit = gas_max
       self.pid.neg_limit = - brake_max
       afactor = 1
+      dfactor = 1
 
       # Toyota starts braking more when it thinks you want to stop
       # Freeze the integrator so we don't accelerate to compensate, and don't allow positive acceleration
@@ -152,12 +153,15 @@ class LongControl():
         self.pid.k_f=1.0
 
       output_gb = self.pid.update(self.v_pid, v_ego_pid, speed=v_ego_pid, deadzone=deadzone, feedforward=a_target, freeze_integrator=prevent_overshoot)
-      afactor = interp(CS.vEgo,[1,8,16], [4.2,2.3,2])
-      if abs(output_gb) < abs(a_target_raw)/afactor and a_target_raw < 0 and dRel > 4.0:
-        output_gb = -abs(a_target_raw)/afactor
+
+      # added by opkr
+      afactor = interp(CS.vEgo,[1,8,16], [4.1,2.2,1.9])
+      dfactor = interp(dRel,[4,10], [2,1])
+      if abs(output_gb) < abs(a_target_raw)/afactor and a_target_raw < 0 and dRel > 4:
+        output_gb = (-abs(a_target_raw)/afactor)*dfactor
       elif output_gb > 0 and a_target_raw < 0 and dRel > 20:
         output_gb = output_gb/afactor
-      elif output_gb > 0 and a_target_raw < 0 and 20 >= dRel > 4.0:
+      elif output_gb > 0 and a_target_raw < 0 and 20 >= dRel > 4:
         output_gb = 0
 
       if prevent_overshoot:
@@ -168,7 +172,7 @@ class LongControl():
       # Keep applying brakes until the car is stopped
       factor = 1
       if hasLead:
-        factor = interp(dRel,[2.0,3.0,4.0,5.0,6.0,7.0,8.0], [6,3.5,1.5,0.7,0.5,0.3,0.0])
+        factor = interp(dRel,[2.0,3.0,4.0,5.0,6.0,7.0,8.0], [5,3,1.5,0.7,0.5,0.3,0.0])
       if not CS.standstill or output_gb > -BRAKE_STOPPING_TARGET:
         output_gb -= CP.stoppingBrakeRate / RATE * factor
       elif CS.cruiseState.standstill and output_gb < -BRAKE_STOPPING_TARGET:
@@ -181,7 +185,7 @@ class LongControl():
     elif self.long_control_state == LongCtrlState.starting:
       factor = 1
       if hasLead:
-        factor = interp(dRel,[0.0,2.0,3.0,4.0,5.0], [0.0,0.5,0.75,1.0,1000.0])
+        factor = interp(dRel,[0.0,2.0,3.0,4.0,5.0], [0.0,0.5,0.75,1.0,1500.0])
       if output_gb < -0.2:
         output_gb += CP.startingBrakeRate / RATE * factor
       self.reset(CS.vEgo)
