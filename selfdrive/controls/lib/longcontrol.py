@@ -160,13 +160,13 @@ class LongControl():
       afactor = interp(CS.vEgo,[1,8,16], [4.2,2.3,2])
       vfactor = interp(dRel,[1,25,50], [10,7,4])
       dfactor = interp(dRel,[4,10], [1.5,1])
-      gasadd = interp((vRel*3.6),[1,10], [1,2.5])
+      gasadd = interp((vRel*3.6),[1,10], [1,2])
 
       if abs(output_gb) < abs(a_target_raw)/afactor and a_target_raw < 0 and dRel > 4:
         output_gb = (-abs(a_target_raw)/afactor)*dfactor
       elif output_gb > 0 and a_target_raw < 0 and dRel > 4:
         output_gb = output_gb/vfactor
-      elif output_gb > 0.1 and a_target_raw > 0 and 20 > dRel > 4:
+      elif output_gb > 0 and a_target_raw > 0 and 20 > dRel > 4 and (CS.vEgo*3.6) < 35:
         output_gb = output_gb*gasadd
 
       if prevent_overshoot:
