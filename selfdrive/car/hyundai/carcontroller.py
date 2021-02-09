@@ -299,7 +299,16 @@ class CarController():
         self.str_log2 = 'T={:04.0f}/{:05.3f}/{:06.4f}'.format(float(int(self.params.get('Scale')) * 1.0), float(int(self.params.get('LqrKi')) * 0.001), float(int(self.params.get('DcGain')) * 0.0001))
 
     trace1.printf1('{}  {}'.format(str_log1, self.str_log2))
-        
+
+#    if CS.acc_active and CS.lead_distance > 149 and self.dRel < ((CS.out.vEgo * CV.MS_TO_KPH)+5) and self.vRel < -5 and CS.out.vEgo > 7:
+#      self.need_brake_timer += 1
+#      if self.need_brake_timer > 50:
+#        self.need_brake = True
+#    else:
+#      self.need_brake = False
+#      self.need_brake_timer = 0
+
+
     if pcm_cancel_cmd and CS.scc12["ACCMode"] != 0 and not CS.out.standstill:
       self.vdiff = 0.
       self.resumebuttoncnt = 0
