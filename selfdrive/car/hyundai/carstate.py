@@ -103,6 +103,7 @@ class CarState(CarStateBase):
     self.cruise_main_button = cp.vl["CLU11"]["CF_Clu_CruiseSwMain"]
     ret.cruiseMainButton = self.cruise_main_button
     self.cruise_buttons = cp.vl["CLU11"]["CF_Clu_CruiseSwState"]
+    ret.cruiseButtons = self.cruise_buttons
 
     if not self.cruise_main_button:
       if self.cruise_buttons == 4 and self.prev_cruise_buttons != 4 and self.cancel_button_count < 3:
