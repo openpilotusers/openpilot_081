@@ -338,7 +338,7 @@ class Controls:
       if CS.cruiseButtons == Buttons.RES_ACCEL or CS.cruiseButtons == Buttons.SET_DECEL:
         self.v_cruise_kph = update_v_cruise(self.v_cruise_kph, self.v_cruise_kph_last, CS.vEgo, CS.gasPressed, CS.buttonEvents, self.enabled, self.is_metric)
       elif CS.brakePressed or CS.cruiseMainButton != 0:
-        self.v_cruise_kph = 255
+        self.v_cruise_kph = 0
     elif self.CP.enableCruise and CS.cruiseState.enabled:
       self.v_cruise_kph = CS.cruiseState.speed * CV.MS_TO_KPH
 
