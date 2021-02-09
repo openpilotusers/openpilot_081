@@ -598,7 +598,7 @@ static void ui_draw_vision_maxspeed(UIState *s) {
   const int text_y = viz_maxspeed_y + 65;
   ui_draw_text(s->vg, text_x, text_y, "설정속도", 26 * 2.2, COLOR_WHITE_ALPHA(is_cruise_set ? 200 : 100), s->font_sans_regular);
 
-  if (is_cruise_set && s->scene.controls_state.getEnabled()) {
+  if (is_cruise_set) {
     snprintf(maxspeed_str, sizeof(maxspeed_str), "%d", maxspeed_calc);
     ui_draw_text(s->vg, text_x, text_y+100, maxspeed_str, 48 * 2.3, COLOR_WHITE, s->font_sans_bold);
   } else {
@@ -684,7 +684,7 @@ static void ui_draw_vision_speedlimit(UIState *s) {
   // Draw Speed Text
   color = s->is_ego_over_limit ? COLOR_WHITE : COLOR_BLACK;
   if (is_speedlim_valid) {
-    if ((s->enable_osm == 1) || (s->scene.target_speed_camera > 29) || (s->scene.v_cruise_set_point > 0)) {
+    if (((s->enable_osm == 1) || (s->scene.target_speed_camera > 29) || (s->scene.v_cruise_set_point > 0)) && s->scene.controls_state.getEnabled()) {
       snprintf(speedlim_str, sizeof(speedlim_str), "%d", speedlim_calc);
       ui_draw_text(s->vg, text_x, text_y+100, speedlim_str, 48*2.3, color, s->font_sans_bold);
     } else {
