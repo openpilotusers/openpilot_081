@@ -162,13 +162,13 @@ class LongControl():
       vfactor = interp(dRel,[1,25,50], [10,7,4])
       dfactor = interp(dRel,[4,10], [1.5,1])
       dvfactor = interp(((CS.vEgo*3.6)/(max(3,dRel))),[1,2,3], [1,2,3])
-      gasadd = interp((vRel*3.6),[1,10], [1,2.5])
+      gasadd = interp((vRel*3.6),[1,10], [1,2.2])
 
       if abs(output_gb) < abs(a_target_raw)/afactor and a_target_raw < 0 and dRel > 4:
         output_gb = (-abs(a_target_raw)/afactor)*dfactor
       elif output_gb > 0 and a_target_raw < 0 and dRel > 4:
         output_gb = output_gb/vfactor
-      elif output_gb > 0 and a_target_raw > 0 and 23 > dRel > 4 and (CS.vEgo*3.6) < 30:
+      elif output_gb > 0 and a_target_raw > 0 and 22 > dRel > 4 and (CS.vEgo*3.6) < 30:
         output_gb = output_gb*gasadd
       elif output_gb > 0 and a_target_raw > 0 and dRel > 4 and (CS.vEgo*3.6) < 65:
         output_gb = output_gb/dvfactor
@@ -181,7 +181,7 @@ class LongControl():
       # Keep applying brakes until the car is stopped
       factor = 1
       if hasLead:
-        factor = interp(dRel,[2.0,3.0,4.0,5.0,6.0,7.0,8.0], [5,3,1.5,0.7,0.5,0.3,0.0])
+        factor = interp(dRel,[2.0,3.0,4.0,5.0,6.0,7.0,8.0], [6,3.5,1.5,0.7,0.5,0.3,0.0])
       if not CS.standstill or output_gb > -BRAKE_STOPPING_TARGET:
         output_gb -= CP.stoppingBrakeRate / RATE * factor
       elif CS.cruiseState.standstill and output_gb < -BRAKE_STOPPING_TARGET:
