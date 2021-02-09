@@ -620,8 +620,10 @@ static void ui_draw_vision_speedlimit(UIState *s) {
   } else {
     if (s->scene.target_speed_camera > 29) {
       speedlim_calc = s->scene.target_speed_camera;
+    } else if (s->scene.v_cruise_set_point > 0){
+      speedlim_calc = s->scene.v_cruise_set_point;
     } else {
-      speedlim_calc = s->scene.controls_state.getVCruise();
+      speedlim_calc = s->scene.v_cruise_last;
     }
     is_speedlim_valid = true;
   }
@@ -682,7 +684,7 @@ static void ui_draw_vision_speedlimit(UIState *s) {
   // Draw Speed Text
   color = s->is_ego_over_limit ? COLOR_WHITE : COLOR_BLACK;
   if (is_speedlim_valid) {
-    if ((s->enable_osm == 1) || (s->scene.cruiseStat)) {
+    if ((s->enable_osm == 1) || (s->scene.target_speed_camera > 29) || (s->scene.v_cruise_set_point > 0)) {
       snprintf(speedlim_str, sizeof(speedlim_str), "%d", speedlim_calc);
       ui_draw_text(s->vg, text_x, text_y+100, speedlim_str, 48*2.3, color, s->font_sans_bold);
     } else {

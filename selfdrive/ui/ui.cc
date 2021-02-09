@@ -166,6 +166,7 @@ void update_sockets(UIState *s) {
     s->scene.long_plan_source = scene.controls_state.getLongPlanSource();
     s->scene.target_speed_camera = scene.controls_state.getTargetSpeedCamera();
     s->scene.v_cruise_last = scene.controls_state.getVCruiseLast();
+    s->scene.v_cruise_set_point = scene.controls_state.getVCruiseSetPoint();
 
     // TODO: the alert stuff shouldn't be handled here
     auto alert_sound = scene.controls_state.getAlertSound();

@@ -172,6 +172,7 @@ typedef struct UIScene {
   float target_speed_camera;
   float v_cruise_last;
   bool cruiseStat;
+  float v_cruise_set_point;
 
   cereal::HealthData::HwType hwType;
   int satelliteCount;

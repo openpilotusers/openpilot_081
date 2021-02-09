@@ -475,6 +475,7 @@ class Planner():
     plan_send.plan.vRel2 = lead_2.vRel
     plan_send.plan.status2 = lead_2.status
     plan_send.plan.targetSpeedCamera = self.target_speed_map*3.6
+    plan_send.plan.vCruiseSetPoint = v_cruise_setpoint*3.6
 
     pm.send('plan', plan_send)
 

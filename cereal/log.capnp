@@ -560,6 +560,7 @@ struct ControlsState @0x97ff69c53601abf1 {
   longPlanSource  @61 :UInt8;
   targetSpeedCamera @62 :Float32;
   vCruiseLast @63 :Float32;
+  vCruiseSetPoint @64 :Float32;
 
   lateralControlState :union {
     indiState @52 :LateralINDIState;
@@ -858,6 +859,7 @@ struct Plan {
   status2 @38 :Bool;
   targetSpeed @39 :Float32;
   targetSpeedCamera @40 :Float32;
+  vCruiseSetPoint @41 :Float32;
 
   struct GpsTrajectory {
     x @0 :List(Float32);

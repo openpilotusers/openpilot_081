@@ -579,6 +579,7 @@ class Controls:
     controlsState.alertTextMsg2 = self.log_alertTextMsg2
     controlsState.lateralControlMethod = self.lateral_control_method
     controlsState.targetSpeedCamera = self.sm['plan'].targetSpeedCamera
+    controlsState.vCruiseSetPoint = self.sm['plan'].vCruiseSetPoint
 
     if self.sm['plan'].longitudinalPlanSource == LongitudinalPlanSource.cruise:
       self.long_plan_source = 1
