@@ -101,6 +101,7 @@ class CarState(CarStateBase):
     self.brakeHold = ret.brakeHold
 
     self.cruise_main_button = cp.vl["CLU11"]["CF_Clu_CruiseSwMain"]
+    ret.cruiseMainButton = self.cruise_main_button
     self.cruise_buttons = cp.vl["CLU11"]["CF_Clu_CruiseSwState"]
 
     if not self.cruise_main_button:

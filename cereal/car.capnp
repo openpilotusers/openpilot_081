@@ -205,6 +205,7 @@ struct CarState {
   cruiseGapSet @43 :UInt8;
   standStill @44 :Bool;
   limitSpeedmanual @45 :Bool;
+  cruiseMainButton @46 :UInt8;
 
   struct WheelSpeeds {
     # optional wheel speeds

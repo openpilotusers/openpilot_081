@@ -556,7 +556,8 @@ static void ui_draw_gear( UIState *s )
 
 static void ui_draw_vision_maxspeed(UIState *s) {
   char maxspeed_str[32];
-  float maxspeed = s->scene.controls_state.getVCruise();
+  //float maxspeed = s->scene.controls_state.getVCruise();
+  float maxspeed = s->scene.v_cruise_last;
   int maxspeed_calc = maxspeed * 0.6225 + 0.5;
   float speedlimit = s->scene.speedlimit;
   int speedlim_calc = speedlimit * 2.2369363 + 0.5;
@@ -620,7 +621,7 @@ static void ui_draw_vision_speedlimit(UIState *s) {
     if (s->scene.target_speed_camera > 29) {
       speedlim_calc = s->scene.target_speed_camera;
     } else {
-      speedlim_calc = s->scene.v_cruise_last;
+      speedlim_calc = s->scene.controls_state.getVCruise();
     }
     is_speedlim_valid = true;
   }
@@ -681,7 +682,7 @@ static void ui_draw_vision_speedlimit(UIState *s) {
   // Draw Speed Text
   color = s->is_ego_over_limit ? COLOR_WHITE : COLOR_BLACK;
   if (is_speedlim_valid) {
-    if ((s->enable_osm == 1) || (s->scene.v_cruise_last > 1 && s->scene.v_cruise_last < 255)) {
+    if ((s->enable_osm == 1) || (s->scene.controls_state.getVCruise() > 0 && s->scene.controls_state.getVCruise() < 255)) {
       snprintf(speedlim_str, sizeof(speedlim_str), "%d", speedlim_calc);
       ui_draw_text(s->vg, text_x, text_y+100, speedlim_str, 48*2.3, color, s->font_sans_bold);
     } else {

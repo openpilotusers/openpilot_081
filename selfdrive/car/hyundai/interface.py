@@ -250,6 +250,8 @@ class CarInterface(CarInterfaceBase):
       events.add(EventName.laneChangeManual)
     if self.CC.emergency_manual_timer:
       events.add(EventName.emgButtonManual)
+    if self.CC.need_brake:
+      events.add(EventName.needBrake)
     if self.CC.acc_standstill_timer >= 200:
       #events.add(EventName.standStill)
       self.CP.standStill = True
