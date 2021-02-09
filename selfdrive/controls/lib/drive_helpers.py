@@ -74,10 +74,10 @@ def update_v_cruise(v_cruise_kph, v_cruise_kph_last, v_ego, gas_pressed, buttonE
       ButtonCnt = FIRST_PRESS_TIME
     elif ButtonCnt == FIRST_PRESS_TIME and not LongPressed and not PrevDisable:
       if ButtonPrev == ButtonType.accelCruise:
-        v_cruise = CurrentVspeed if (gas_pressed and not PrevGaspressed and (v_cruise < CurrentVspeed)) else (v_cruise + 1) if v_cruise_kph != 0 else v_cruise_kph_last if v_cruise_kph_last > CurrentVspeed else CurrentVspeed
+        v_cruise = CurrentVspeed if (gas_pressed and not PrevGaspressed and (v_cruise < CurrentVspeed)) else (v_cruise + 1) if v_cruise_kph != 0 and v_cruise_kph != 255 else v_cruise_kph_last if v_cruise_kph_last > CurrentVspeed else CurrentVspeed
         PrevGaspressed = gas_pressed
       elif ButtonPrev == ButtonType.decelCruise:
-        v_cruise = CurrentVspeed if (gas_pressed and not PrevGaspressed) else (v_cruise - 1) if v_cruise_kph != 0 else CurrentVspeed
+        v_cruise = CurrentVspeed if (gas_pressed and not PrevGaspressed) else (v_cruise - 1) if v_cruise_kph != 0 and v_cruise_kph != 255 else CurrentVspeed
         PrevGaspressed = gas_pressed
     elif not gas_pressed:
       PrevGaspressed = False
