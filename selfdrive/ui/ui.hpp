@@ -171,6 +171,7 @@ typedef struct UIScene {
   float v_ego;
   float target_speed_camera;
   float v_cruise_last;
+  bool cruiseStat;
 
   cereal::HealthData::HwType hwType;
   int satelliteCount;
