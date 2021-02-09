@@ -123,6 +123,7 @@ class LongControl():
       afactor = 1
       vfactor = 1
       dfactor = 1
+      dvfactor = 1
       gasadd = 1
 
       # Toyota starts braking more when it thinks you want to stop
@@ -160,14 +161,17 @@ class LongControl():
       afactor = interp(CS.vEgo,[1,8,16], [4.2,2.3,2])
       vfactor = interp(dRel,[1,25,50], [10,7,4])
       dfactor = interp(dRel,[4,10], [1.5,1])
-      gasadd = interp((vRel*3.6),[1,10], [1,2])
+      dvfactor = interp(((CS.vEgo*3.6)/dRel),[1,2,3], [1,2,3])
+      gasadd = interp((vRel*3.6),[1,10], [1,2.5])
 
       if abs(output_gb) < abs(a_target_raw)/afactor and a_target_raw < 0 and dRel > 4:
         output_gb = (-abs(a_target_raw)/afactor)*dfactor
       elif output_gb > 0 and a_target_raw < 0 and dRel > 4:
         output_gb = output_gb/vfactor
-      elif output_gb > 0 and a_target_raw > 0 and 20 > dRel > 4 and (CS.vEgo*3.6) < 35:
+      elif output_gb > 0 and a_target_raw > 0 and 23 > dRel > 4 and (CS.vEgo*3.6) < 30:
         output_gb = output_gb*gasadd
+      elif output_gb > 0 and a_target_raw > 0 and dRel > 4 and (CS.vEgo*3.6) < 60:
+        output_gb = output_gb/dvfactor
 
       if prevent_overshoot:
         output_gb = min(output_gb, 0.0)
