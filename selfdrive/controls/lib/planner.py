@@ -19,6 +19,9 @@ from selfdrive.controls.lib.long_mpc import LongitudinalMpc
 from selfdrive.controls.lib.drive_helpers import V_CRUISE_MAX
 from selfdrive.controls.lib.long_mpc_model import LongitudinalMpcModel
 from common.op_params import opParams
+
+from selfdrive.car.hyundai.spdcontroller  import SpdController
+
 op_params = opParams()
 osm = op_params.get('osm')
 smart_speed = op_params.get('smart_speed')
@@ -132,6 +135,12 @@ class Planner():
     self.target_speed_map_counter2 = 0
     self.target_speed_map_counter3 = 0
     self.tartget_speed_offset = int(self.params.get("OpkrSpeedLimitOffset", encoding="utf8"))
+
+    self.SC = SpdController()
+    self.model_speed = 0
+    self.model_sum = 0
+    self.lat_mode = 0
+    self.curv_speed = 0
 
   def choose_solution(self, v_cruise_setpoint, enabled, model_enabled):
     possible_futures = [self.mpc1.v_mpc_future, self.mpc2.v_mpc_future, v_cruise_setpoint]
@@ -297,7 +306,7 @@ class Planner():
         mapspeed = int(float(mapspeed.rstrip('\n')))
         if mapspeed > 29:
           self.map_enable = True
-          self.target_speed_map = (mapspeed + round(mapspeed*0.01*int(self.tartget_speed_offset)))/3.6
+          self.target_speed_map = (mapspeed + round(mapspeed*0.01*int(self.tartget_speed_offset)))*CV.KPH_TO_MS
           self.target_speed_map_counter1 = 40
           os.system("echo -n 1 > /data/params/d/OpkrSafetyCamera &")
           os.system("logcat -c &")
@@ -320,6 +329,11 @@ class Planner():
           os.system("echo -n 0 > /data/params/d/OpkrSafetyCamera &")
 
     decel_for_turn = bool(v_curvature_map < min([v_cruise_setpoint, v_speedlimit, v_ego + 1.]))
+
+    self.model_speed, self.model_sum = self.SC.calc_va(sm, v_ego)
+    self.curv_speed = interp(abs(self.model_speed), [30, 60, 90, 91, 255], [30, 50, 70, 255, 255])
+    self.curv_speed = self.curv_speed*CV.KPH_TO_MS
+    self.lat_mode = int(self.params.get("OpkrLatMode", encoding='utf8'))
 
     # Calculate speed for normal cruise control
     if enabled and not self.first_loop and not sm['carState'].brakePressed and not sm['carState'].gasPressed:
@@ -360,6 +374,8 @@ class Planner():
         v_cruise_setpoint = min([v_cruise_setpoint, v_speedlimit_ahead, v_curvature_map, v_speedlimit])
       elif self.map_enable:
         v_cruise_setpoint = min([v_cruise_setpoint, self.target_speed_map])
+      elif self.lat_mode == 1:
+        v_cruise_setpoint = min([v_cruise_setpoint, self.curv_speed])
       else:
         v_cruise_setpoint = min([v_cruise_setpoint])
 

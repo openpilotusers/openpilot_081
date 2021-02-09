@@ -53,14 +53,11 @@ static void draw_control_button1(UIState *s, int touch_x, int touch_y) {
     
     if (s->lat_mode == 0) {
       nvgFillColor(s->vg, nvgRGBA(255,255,255,200));
-      nvgText(s->vg,btn_xc1,btn_yc,"OPA",NULL);
+      nvgText(s->vg,btn_xc1,btn_yc,"NONE",NULL);
     } else if (s->lat_mode == 1) {
       nvgFillColor(s->vg, nvgRGBA(255,255,255,200));
-      nvgText(s->vg,btn_xc1,btn_yc,"CITY",NULL);
+      nvgText(s->vg,btn_xc1,btn_yc,"CURV",NULL);
     } else if (s->lat_mode == 2) {
-      nvgFillColor(s->vg, nvgRGBA(255,255,255,200));
-      nvgText(s->vg,btn_xc1,btn_yc,"HIGW",NULL);
-    } else if (s->lat_mode == 3) {
       nvgFillColor(s->vg, nvgRGBA(255,255,255,200));
       nvgText(s->vg,btn_xc1,btn_yc,"ONEW",NULL);
     }
@@ -96,7 +93,7 @@ bool latcontrol( UIState *s, int touch_x, int touch_y ) {
 
   if ((control_button_clicked1(touch_x,touch_y)) && (s->status != STATUS_OFFROAD) && (s->limit_set_speed == 0)) {
     s->lat_mode = s->lat_mode + 1;
-    if (s->lat_mode > 3) {
+    if (s->lat_mode > 2) {
       s->lat_mode = 0;
     }
     if (s->lat_mode == 0) {
@@ -105,8 +102,6 @@ bool latcontrol( UIState *s, int touch_x, int touch_y ) {
       Params().write_db_value("OpkrLatMode", "1", 1);
     } else if (s->lat_mode == 2) {
       Params().write_db_value("OpkrLatMode", "2", 1);
-    } else if (s->lat_mode == 3) {
-      Params().write_db_value("OpkrLatMode", "3", 1);
     }
     touched = true;
   }
