@@ -118,7 +118,10 @@ class CarController():
 
     self.acc_standstill_timer = 0
     self.acc_standstill = False
-    
+
+    self.need_brake = False
+    self.need_brake_timer = 0
+
     self.params = Params()
     self.gapsettingdance = int(self.params.get('OpkrCruiseGapSet'))
     self.opkr_autoresume = int(self.params.get('OpkrAutoResume'))
