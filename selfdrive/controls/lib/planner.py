@@ -332,7 +332,7 @@ class Planner():
 
     self.model_speed, self.model_sum = self.SC.calc_va(sm, v_ego)
     self.curv_speed = interp(abs(self.model_speed), [30, 60, 90, 91, 255], [30, 50, 70, 255, 255])
-    self.curv_speed = self.curv_speed*CV.KPH_TO_MS
+    self.curv_speed = self.curv_speed*CV.KPH_TO_MS if v_ego > 8 else 255
     self.lat_mode = int(self.params.get("OpkrLatMode", encoding='utf8'))
 
     # Calculate speed for normal cruise control
