@@ -97,7 +97,8 @@ class CarState(CarStateBase):
 
     ret.steerWarning = cp_mdps.vl["MDPS12"]['CF_Mdps_ToiUnavail'] != 0
 
-    ret.brakeHold = cp.vl["ESP11"]['AVH_STAT'] == 1
+    #ret.brakeHold = cp.vl["ESP11"]['AVH_STAT'] == 1
+    ret.brakeHold = cp.vl["TCS15"]['AVH_LAMP'] == 2 # 0 OFF, 1 ERROR, 2 ACTIVE, 3 READY
     self.brakeHold = ret.brakeHold
 
     self.cruise_main_button = cp.vl["CLU11"]["CF_Clu_CruiseSwMain"]
@@ -161,7 +162,8 @@ class CarState(CarStateBase):
     # TODO: Find brake pressure
     ret.brake = 0
     ret.brakePressed = cp.vl["TCS13"]['DriverBraking'] != 0
-    self.brakeUnavailable = cp.vl["TCS13"]['ACCEnable'] == 3
+    #self.brakeUnavailable = cp.vl["TCS13"]['ACCEnable'] == 3
+    self.brakeUnavailable = cp.vl["TCS13"]['ACCEnable'] != 0 # 0 ACC CONTROL ENABLED, 1-3 ACC CONTROL DISABLED
     if ret.brakePressed:
       self.brake_check = 1
       ret.cruiseStatus = False
@@ -182,7 +184,8 @@ class CarState(CarStateBase):
 
     ret.espDisabled = (cp.vl["TCS15"]['ESC_Off_Step'] != 0)
 
-    self.parkBrake = (cp.vl["CGW1"]['CF_Gway_ParkBrakeSw'] != 0)
+    #self.parkBrake = (cp.vl["CGW1"]['CF_Gway_ParkBrakeSw'] != 0)
+    self.parkBrake = cp.vl["TCS13"]['PBRAKE_ACT'] == 1
 
     #TPMS
     if cp.vl["TPMS11"]['PRESSURE_FL'] > 43:
@@ -339,8 +342,12 @@ class CarState(CarStateBase):
       ("BrakeLight", "TCS13", 0),
       ("DriverBraking", "TCS13", 0),
       ("DriverOverride", "TCS13",0),
+      ("ACC_REQ", "TCS13", 0),
+      ("StandStill", "TCS13", 0),
+      ("PBRAKE_ACT", "TCS13", 0),
 
       ("ESC_Off_Step", "TCS15", 0),
+      ("AVH_LAMP", "TCS15", 0),
 
       ("CF_Lvr_CruiseSet", "LVR12", 0),
       ("CRUISE_LAMP_M", "EMS16", 0),

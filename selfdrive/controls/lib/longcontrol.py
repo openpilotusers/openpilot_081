@@ -173,7 +173,7 @@ class LongControl():
       elif output_gb > 0 and a_target_raw > 0 and dRel > 4 and (CS.vEgo*3.6) < 65:
         output_gb = output_gb/dvfactor
 
-      if prevent_overshoot:
+      if prevent_overshoot or CS.brakeHold:
         output_gb = min(output_gb, 0.0)
 
     # Intention is to stop, switch to a different brake control until we stop

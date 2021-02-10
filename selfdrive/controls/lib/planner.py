@@ -358,6 +358,23 @@ class Planner():
         self.a_acc_start = required_decel
         v_speedlimit_ahead = v_ego
 
+      # 심리적 불안을 해소하기 위한 가변크루즈 적용 부분, 크루즈 상한속도를 조절하여 선제적 감속대응 및 급가속을 줄이기 위함입니다.
+      current_speed = v_ego*CV.MS_TO_KPH
+      current_vRel = lead_1.vRel*CV.MS_TO_KPH
+      current_dRel = lead_1.dRel
+      variable_set_speed = 0
+      decrease_value = interp(abs(current_vRel), [0,20], [0,10])
+      increase_value = interp(abs(current_vRel), [0,10], [0,10])
+      divide_value = interp(current_speed, [30,60,90,110], [1.8,1.85,2,2.2])
+      if current_vRel < -1 and current_dRel < current_speed/divide_value and current_speed > 30:
+        variable_set_speed = current_speed-decrease_value
+      elif current_vRel > 1 and current_dRel > current_speed/(divide_value+0.1) and current_speed > 30:
+        variable_set_speed = current_speed+increase_value
+      elif 0 <= current_vRel <= 1 and current_speed > 30:
+        variable_set_speed = current_speed+1
+      variable_set_speed = variable_set_speed*CV.KPH_TO_MS if variable_set_speed > 0 else v_cruise_setpoint
+
+
       if (v_speedlimit_ahead*CV.MS_TO_KPH) >= 30 and self.osm_camera and not self.osm_curv and not self.osm:
         v_cruise_setpoint = min([v_cruise_setpoint, v_speedlimit_ahead])
       elif self.osm_curv and not self.osm_camera and not self.osm:
@@ -377,7 +394,7 @@ class Planner():
       elif self.lat_mode == 1:
         v_cruise_setpoint = min([v_cruise_setpoint, self.curv_speed])
       else:
-        v_cruise_setpoint = min([v_cruise_setpoint])
+        v_cruise_setpoint = min([v_cruise_setpoint, variable_set_speed])
 
       self.v_cruise, self.a_cruise = speed_smoother(self.v_acc_start, self.a_acc_start,
                                                     v_cruise_setpoint,
@@ -478,7 +495,7 @@ class Planner():
     if v_cruise_setpoint is not None:
       plan_send.plan.vCruiseSetPoint = v_cruise_setpoint*CV.MS_TO_KPH
     else:
-      plan_send.plan.vCruiseSetPoint = v_cruise_setpoint
+      plan_send.plan.vCruiseSetPoint = 0
 
     pm.send('plan', plan_send)
 
