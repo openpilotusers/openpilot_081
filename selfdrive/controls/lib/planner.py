@@ -366,10 +366,10 @@ class Planner():
       decrease_value = interp(abs(current_vRel), [0,20], [0,10])
       increase_value = interp(abs(current_vRel), [0,10], [0,10])
       divide_value = interp(current_speed, [30,60,90,110], [1.8,1.85,2,2.2])
-      if current_vRel < -1 and current_dRel < current_speed/divide_value and current_speed > 30:
-        variable_set_speed = current_speed-decrease_value
-      elif current_vRel > 1 and current_dRel > current_speed/(divide_value+0.1) and current_speed > 30:
-        variable_set_speed = current_speed+increase_value
+      if current_vRel < -1 and current_dRel < current_speed/divide_value and current_speed > 2:
+        variable_set_speed = max(current_speed-decrease_value, 3)
+      elif current_vRel > 1 and current_dRel > current_speed/(divide_value+0.1) and current_speed > 2:
+        variable_set_speed = max(current_speed+increase_value, 5)
       elif 0 <= current_vRel <= 1 and current_speed > 30:
         variable_set_speed = current_speed+1
       variable_set_speed = variable_set_speed*CV.KPH_TO_MS if variable_set_speed > 0 else v_cruise_setpoint
