@@ -372,7 +372,7 @@ class Planner():
         variable_set_speed = current_speed+increase_value
       elif 0 <= current_vRel <= 1 and current_speed > 30:
         variable_set_speed = current_speed+1
-      variable_set_speed = variable_set_speed*CV.KPH_TO_MS if variable_set_speed > 0 else v_cruise_setpoint
+      variable_set_speed = variable_set_speed*CV.KPH_TO_MS if variable_set_speed > 0 else float(v_cruise_setpoint)
 
 
       if (v_speedlimit_ahead*CV.MS_TO_KPH) >= 30 and self.osm_camera and not self.osm_curv and not self.osm:
