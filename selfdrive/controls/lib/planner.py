@@ -493,7 +493,7 @@ class Planner():
     plan_send.plan.status2 = lead_2.status
     plan_send.plan.targetSpeedCamera = self.target_speed_map*3.6
     if v_cruise_setpoint is not None:
-      plan_send.plan.vCruiseSetPoint = v_cruise_setpoint*CV.MS_TO_KPH
+      plan_send.plan.vCruiseSetPoint = float(v_cruise_setpoint*CV.MS_TO_KPH)
     else:
       plan_send.plan.vCruiseSetPoint = 0
 
