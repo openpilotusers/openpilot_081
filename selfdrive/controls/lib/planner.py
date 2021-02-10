@@ -379,7 +379,7 @@ class Planner():
       elif current_vRel > 0 and current_dRel > 10 and current_speed > 2:
         variable_set_speed = max(current_speed+5, 2)
       else:
-        variable_set_speed = max(current_speed+2, 5)
+        variable_set_speed = max(current_speed+3, 5)
       variable_set_speed = variable_set_speed*CV.KPH_TO_MS if variable_set_speed > 0 else v_cruise_setpoint
 
 

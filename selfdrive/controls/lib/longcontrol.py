@@ -158,11 +158,11 @@ class LongControl():
       output_gb = self.pid.update(self.v_pid, v_ego_pid, speed=v_ego_pid, deadzone=deadzone, feedforward=a_target, freeze_integrator=prevent_overshoot)
 
       # added by opkr
-      afactor = interp(CS.vEgo,[0,8,16], [4.2,2.3,2])
-      vfactor = interp(dRel,[1,25,50], [10,7,4])
+      afactor = interp(CS.vEgo,[0,4,8,12,16,20], [4.1,2.9,2.2,1.9,1.9,1.9])
+      vfactor = interp(dRel,[1,25,50], [15,7,4])
       dfactor = interp(dRel,[4,10], [1.6,1])
-      dvfactor = interp(((CS.vEgo*3.6)/(max(3,dRel))),[1,2,3], [1,2,3])
-      gasadd = interp((vRel*3.6),[1,10], [1,2.2])
+      dvfactor = interp(((CS.vEgo*3.6)/(max(3,dRel))),[1,2,3], [1,3,5])
+      gasadd = interp((vRel*3.6),[1,10], [1,2.3])
 
       if abs(output_gb) < abs(a_target_raw)/afactor and a_target_raw < 0 and dRel > 4:
         output_gb = (-abs(a_target_raw)/afactor)*dfactor
