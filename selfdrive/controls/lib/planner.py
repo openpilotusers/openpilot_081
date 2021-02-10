@@ -365,10 +365,10 @@ class Planner():
       variable_set_speed = 0
       decrease_value = interp(abs(current_vRel), [0,20], [0,10])
       increase_value = interp(abs(current_vRel), [0,10], [0,10])
-      divide_value = interp(current_speed, [10,30,60,90,110], [1.1,1.7,1.9,2,2.2])
-      if current_vRel < -1 and current_dRel < current_speed/divide_value and current_speed >= 10:
+      divide_value = interp(current_speed, [5,10,30,60,90,110], [0.8,1.1,1.7,1.9,2,2.2])
+      if current_vRel < -1 and current_dRel < current_speed/divide_value and current_speed >= 5:
         variable_set_speed = max(current_speed-decrease_value, 3)
-      elif current_vRel > 1 and current_dRel > current_speed/(divide_value+0.1) and current_speed >= 10:
+      elif current_vRel > 1 and current_dRel > current_speed/(divide_value+0.1) and current_speed >= 5:
         variable_set_speed = max(current_speed+increase_value, 5)
       else:
         variable_set_speed = max(current_speed+10, 5)
