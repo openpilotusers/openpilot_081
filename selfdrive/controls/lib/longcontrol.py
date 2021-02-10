@@ -159,7 +159,7 @@ class LongControl():
 
       # added by opkr
       afactor = interp(CS.vEgo,[0,4,8,12,16,20], [4.1,2.9,2.2,1.9,1.9,1.9])
-      vfactor = interp(dRel,[1,25,50], [15,7,4])
+      vfactor = interp(dRel,[1,30,50], [15,7,4])
       dfactor = interp(dRel,[4,10], [1.6,1])
       dvfactor = interp(((CS.vEgo*3.6)/(max(3,dRel))),[1,2,3], [1,3,5])
       gasadd = interp((vRel*3.6),[1,10], [1,2.3])
