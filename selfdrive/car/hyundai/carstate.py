@@ -162,8 +162,8 @@ class CarState(CarStateBase):
     # TODO: Find brake pressure
     ret.brake = 0
     ret.brakePressed = cp.vl["TCS13"]['DriverBraking'] != 0
-    #self.brakeUnavailable = cp.vl["TCS13"]['ACCEnable'] == 3
-    self.brakeUnavailable = cp.vl["TCS13"]['ACCEnable'] != 0 # 0 ACC CONTROL ENABLED, 1-3 ACC CONTROL DISABLED
+    self.brakeUnavailable = cp.vl["TCS13"]['ACCEnable'] == 3
+    #self.brakeUnavailable = cp.vl["TCS13"]['ACCEnable'] != 0 # 0 ACC CONTROL ENABLED, 1-3 ACC CONTROL DISABLED
     if ret.brakePressed:
       self.brake_check = 1
       ret.cruiseStatus = False
