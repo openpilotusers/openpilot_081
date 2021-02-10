@@ -478,7 +478,7 @@ class Planner():
     if v_cruise_setpoint is not None:
       plan_send.plan.vCruiseSetPoint = v_cruise_setpoint*CV.MS_TO_KPH
     else:
-      plan_send.plan.vCruiseSetPoint = 0
+      plan_send.plan.vCruiseSetPoint = v_cruise_setpoint
 
     pm.send('plan', plan_send)
 
