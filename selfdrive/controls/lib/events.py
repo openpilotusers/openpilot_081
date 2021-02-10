@@ -816,14 +816,13 @@ EVENTS: Dict[int, Dict[str, Union[Alert, Callable[[Any, messaging.SubMaster, boo
   },
 
   EventName.brakeUnavailable: {
-    #ET.IMMEDIATE_DISABLE: ImmediateDisableAlert("크루즈 오류: 차량을 재시작하세요"),
-    ET.IMMEDIATE_DISABLE: ImmediateDisableAlert("브레이크 확인 필요: 브레이크 페달을 한번 밟아주세요"),
-    #ET.PERMANENT: Alert(
-    #  "크루즈 오류: 시작을 위해 차량을 재시작하세요",
-    #  "",
-    #  AlertStatus.normal, AlertSize.small,
-    #  Priority.LOWER, VisualAlert.none, AudibleAlert.none, 0., 0., .2),
-    ET.NO_ENTRY: NoEntryAlert("브레이크 확인 필요: 브레이크 페달을 한번 밟아주세요"),
+    ET.IMMEDIATE_DISABLE: ImmediateDisableAlert("크루즈 오류: 차량을 재시작하세요"),
+    ET.PERMANENT: Alert(
+      "크루즈 오류: 시작을 위해 차량을 재시작하세요",
+      "",
+      AlertStatus.normal, AlertSize.small,
+      Priority.LOWER, VisualAlert.none, AudibleAlert.none, 0., 0., .2),
+    ET.NO_ENTRY: NoEntryAlert("크루즈 오류: 차량을 재시작하세요"),
   },
 
   EventName.reverseGear: {
