@@ -239,7 +239,7 @@ class Planner():
           self.map_enable = True
           self.target_speed_map = mapspeed + round(mapspeed*0.01*int(self.tartget_speed_offset))
           self.target_speed_map_dist = mapspeeddist
-          self.target_speed_map_counter1 = 200
+          self.target_speed_map_counter1 = 150
           os.system("echo -n 1 > /data/params/d/OpkrSafetyCamera &")
           os.system("logcat -c &")
         else:
