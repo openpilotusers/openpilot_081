@@ -218,7 +218,7 @@ class Planner():
     decel_for_turn = bool(v_curvature_map < min([v_cruise_setpoint, v_speedlimit, v_ego + 1.]))
 
     self.target_speed_map_counter += 1
-    if self.target_speed_map_counter >= (30+self.target_speed_map_counter1) and self.target_speed_map_counter_check == False:
+    if self.target_speed_map_counter >= (100+self.target_speed_map_counter1) and self.target_speed_map_counter_check == False:
       self.target_speed_map_counter_check = True
       os.system("logcat -d -s opkrspdlimit,opkrspd2limit | grep opkrspd | tail -n 1 | awk \'{print $7}\' > /data/params/d/LimitSetSpeedCamera &")
       os.system("logcat -d -s opkrspddist | grep opkrspd | tail -n 1 | awk \'{print $7}\' > /data/params/d/LimitSetSpeedCameraDist &")
@@ -226,7 +226,7 @@ class Planner():
       if self.target_speed_map_counter3 > 3:
         self.target_speed_map_counter3 = 0
         os.system("logcat -c &")
-    elif self.target_speed_map_counter >= (40+self.target_speed_map_counter1):
+    elif self.target_speed_map_counter >= (150+self.target_speed_map_counter1):
       self.target_speed_map_counter1 = 0
       self.target_speed_map_counter = 0
       self.target_speed_map_counter_check = False
@@ -239,7 +239,7 @@ class Planner():
           self.map_enable = True
           self.target_speed_map = mapspeed + round(mapspeed*0.01*int(self.tartget_speed_offset))
           self.target_speed_map_dist = mapspeeddist
-          self.target_speed_map_counter1 = 40
+          self.target_speed_map_counter1 = 200
           os.system("echo -n 1 > /data/params/d/OpkrSafetyCamera &")
           os.system("logcat -c &")
         else:
@@ -248,13 +248,13 @@ class Planner():
           self.target_speed_map_dist = 0
       elif mapspeed is None and self.target_speed_map_counter2 <= 2:
         self.target_speed_map_counter2 += 1
-        self.target_speed_map_counter = 30
+        self.target_speed_map_counter = 101
         self.map_enable = False
         self.target_speed_map = 0
         self.target_speed_map_dist = 0
         self.target_speed_map_counter_check = True
       else:
-        self.target_speed_map_counter = 29
+        self.target_speed_map_counter = 99
         self.target_speed_map_counter2 = 0
         self.map_enable = False
         self.target_speed_map = 0
