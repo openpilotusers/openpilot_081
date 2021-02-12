@@ -222,7 +222,7 @@ class Planner():
       os.system("logcat -d -s opkrspdlimit,opkrspd2limit | grep opkrspd | tail -n 1 | awk \'{print $7}\' > /data/params/d/LimitSetSpeedCamera &")
       os.system("logcat -d -s opkrspddist | grep opkrspd | tail -n 1 | awk \'{print $7}\' > /data/params/d/LimitSetSpeedCameraDist &")
       self.target_speed_map_counter3 += 1
-      if self.target_speed_map_counter3 > 3:
+      if self.target_speed_map_counter3 > 2:
         self.target_speed_map_counter3 = 0
         os.system("logcat -c &")
     elif self.target_speed_map_counter >= (150+self.target_speed_map_counter1):
@@ -243,7 +243,7 @@ class Planner():
         else:
           self.target_speed_map = 0
           self.target_speed_map_dist = 0
-      elif mapspeed is None and mapspeeddist is None and self.target_speed_map_counter2 <= 2:
+      elif mapspeed is None and mapspeeddist is None and self.target_speed_map_counter2 < 2:
         self.target_speed_map_counter2 += 1
         self.target_speed_map_counter = 101
         self.target_speed_map = 0
