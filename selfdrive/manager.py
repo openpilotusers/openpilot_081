@@ -630,6 +630,7 @@ def main():
     ("OpkrAngleOffsetSelect", "0"),
     ("OpkrSpeedLimitOffset", "0"),
     ("LimitSetSpeedCamera", "0"),
+    ("LimitSetSpeedCameraDist", "0"),
     ("OpkrLiveSteerRatio", "0"),
     ("OpkrVariableSteerMax", "1"),
     ("OpkrVariableSteerDelta", "0"),

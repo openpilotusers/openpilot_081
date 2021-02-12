@@ -129,6 +129,7 @@ keys = {
   b"OpkrAngleOffsetSelect": [TxType.PERSISTENT],
   b"OpkrSpeedLimitOffset": [TxType.PERSISTENT],
   b"LimitSetSpeedCamera": [TxType.PERSISTENT],
+  b"LimitSetSpeedCameraDist": [TxType.PERSISTENT],
   b"OpkrLiveSteerRatio": [TxType.PERSISTENT],
   b"OpkrVariableSteerMax": [TxType.PERSISTENT],
   b"OpkrVariableSteerDelta": [TxType.PERSISTENT],
