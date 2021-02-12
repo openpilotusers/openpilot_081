@@ -231,7 +231,7 @@ class Planner():
       self.target_speed_map_counter_check = False
       mapspeed = self.params.get("LimitSetSpeedCamera", encoding="utf8")
       mapspeeddist = self.params.get("LimitSetSpeedCameraDist", encoding="utf8")
-      if mapspeed is not None:
+      if mapspeed is not None and mapspeeddist is not None:
         mapspeed = int(float(mapspeed.rstrip('\n')))
         mapspeeddist = int(float(mapspeeddist.rstrip('\n')))
         if mapspeed > 29:
@@ -243,7 +243,7 @@ class Planner():
         else:
           self.target_speed_map = 0
           self.target_speed_map_dist = 0
-      elif mapspeed is None and self.target_speed_map_counter2 <= 2:
+      elif mapspeed is None and mapspeeddist is None and self.target_speed_map_counter2 <= 2:
         self.target_speed_map_counter2 += 1
         self.target_speed_map_counter = 101
         self.target_speed_map = 0
