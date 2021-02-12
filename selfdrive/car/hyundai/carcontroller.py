@@ -391,7 +391,7 @@ class CarController():
       self.safety_camera_timer += 1
       if self.safety_camera_timer > 100:
         self.safety_camera_timer = 0
-        os.system("logcat -c &")
+        #os.system("logcat -c &")
         os.system("echo -n 0 > /data/params/d/OpkrSafetyCamera &")
         os.system("echo -n 0 > /data/params/d/LimitSetSpeedCamera &")
 
