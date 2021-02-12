@@ -321,7 +321,6 @@ class Planner():
       self.a_acc_start = reset_accel
       self.v_cruise = reset_speed
       self.a_cruise = reset_accel
-      os.system("logcat -c &")
 
     self.mpc1.set_cur_state(self.v_acc_start, self.a_acc_start)
     self.mpc2.set_cur_state(self.v_acc_start, self.a_acc_start)
