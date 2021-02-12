@@ -102,7 +102,6 @@ class Planner():
     self.v_speedlimit_ahead = 0.0
     self.v_speedlimit_ahead_timer = 0
 
-    self.map_enable = False
     self.target_speed_map = 0.0
     self.target_speed_map_counter = 0
     self.target_speed_map_counter_check = False
@@ -236,27 +235,23 @@ class Planner():
         mapspeed = int(float(mapspeed.rstrip('\n')))
         mapspeeddist = int(float(mapspeedist.rstrip('\n')))
         if mapspeed > 29:
-          self.map_enable = True
           self.target_speed_map = mapspeed + round(mapspeed*0.01*int(self.tartget_speed_offset))
           self.target_speed_map_dist = mapspeeddist
           self.target_speed_map_counter1 = 150
           os.system("echo -n 1 > /data/params/d/OpkrSafetyCamera &")
           os.system("logcat -c &")
         else:
-          self.map_enable = False
           self.target_speed_map = 0
           self.target_speed_map_dist = 0
       elif mapspeed is None and self.target_speed_map_counter2 <= 2:
         self.target_speed_map_counter2 += 1
         self.target_speed_map_counter = 101
-        self.map_enable = False
         self.target_speed_map = 0
         self.target_speed_map_dist = 0
         self.target_speed_map_counter_check = True
       else:
         self.target_speed_map_counter = 99
         self.target_speed_map_counter2 = 0
-        self.map_enable = False
         self.target_speed_map = 0
         self.target_speed_map_dist = 0
         self.target_speed_map_counter_check = False
