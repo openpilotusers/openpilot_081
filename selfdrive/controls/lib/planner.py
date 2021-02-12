@@ -101,6 +101,17 @@ class Planner():
     self.v_speedlimit_ahead = 0.0
     self.v_speedlimit_ahead_timer = 0
 
+    self.map_enable = False
+    self.target_speed_map = 0.0
+    self.target_speed_map_counter = 0
+    self.target_speed_map_counter_check = False
+    self.target_speed_map_counter1 = 0
+    self.target_speed_map_counter2 = 0
+    self.target_speed_map_counter3 = 0
+    self.tartget_speed_offset = int(self.params.get("OpkrSpeedLimitOffset", encoding="utf8"))
+
+    self.osm_enable_map = int(self.params.get("OpkrEnableMap", encoding='utf8')) == 1
+
   def choose_solution(self, v_cruise_setpoint, enabled):
     if enabled:
       solutions = {'cruise': self.v_cruise}
@@ -204,6 +215,45 @@ class Planner():
 
     decel_for_turn = bool(v_curvature_map < min([v_cruise_setpoint, v_speedlimit, v_ego + 1.]))
 
+    self.target_speed_map_counter += 1
+    if self.target_speed_map_counter >= (30+self.target_speed_map_counter1) and self.target_speed_map_counter_check == False:
+      self.target_speed_map_counter_check = True
+      os.system("logcat -d -s opkrspdlimit,opkrspd2limit,opkrspd5limit | grep opkrspd | tail -n 1 | awk \'{print $7}\' > /data/params/d/LimitSetSpeedCamera &")
+      self.target_speed_map_counter3 += 1
+      if self.target_speed_map_counter3 > 3:
+        self.target_speed_map_counter3 = 0
+        os.system("logcat -c &")
+    elif self.target_speed_map_counter >= (40+self.target_speed_map_counter1):
+      self.target_speed_map_counter1 = 0
+      self.target_speed_map_counter = 0
+      self.target_speed_map_counter_check = False
+      mapspeed = self.params.get("LimitSetSpeedCamera", encoding="utf8")
+      if mapspeed is not None:
+        mapspeed = int(float(mapspeed.rstrip('\n')))
+        if mapspeed > 29:
+          self.map_enable = True
+          self.target_speed_map = mapspeed + round(mapspeed*0.01*int(self.tartget_speed_offset))
+          self.target_speed_map_counter1 = 40
+          os.system("echo -n 1 > /data/params/d/OpkrSafetyCamera &")
+          os.system("logcat -c &")
+        else:
+          self.map_enable = False
+          self.target_speed_map = 0
+      elif mapspeed is None and self.target_speed_map_counter2 <= 2:
+        self.target_speed_map_counter2 += 1
+        self.target_speed_map_counter = 30
+        self.map_enable = False
+        self.target_speed_map = 0
+        self.target_speed_map_counter_check = True
+      else:
+        self.target_speed_map_counter = 29
+        self.target_speed_map_counter2 = 0
+        self.map_enable = False
+        self.target_speed_map = 0
+        self.target_speed_map_counter_check = False
+        if self.params.get("OpkrSafetyCamera", encoding="utf8") == "1":
+          os.system("echo -n 0 > /data/params/d/OpkrSafetyCamera &")
+
     # Calculate speed for normal cruise control
     if enabled and not self.first_loop and not sm['carState'].brakePressed and not sm['carState'].gasPressed:
       accel_limits = [float(x) for x in calc_cruise_accel_limits(v_ego, following)]
@@ -267,6 +317,7 @@ class Planner():
       self.a_acc_start = reset_accel
       self.v_cruise = reset_speed
       self.a_cruise = reset_accel
+      os.system("logcat -c &")
 
     self.mpc1.set_cur_state(self.v_acc_start, self.a_acc_start)
     self.mpc2.set_cur_state(self.v_acc_start, self.a_acc_start)
@@ -337,7 +388,10 @@ class Planner():
     plan_send.plan.vRel2 = lead_2.vRel
     plan_send.plan.status2 = lead_2.status
     plan_send.plan.targetSpeed = v_cruise_setpoint * CV.MS_TO_KPH
-    plan_send.plan.targetSpeedCamera = self.v_speedlimit_ahead * CV.MS_TO_KPH
+    if self.osm_enable_map:
+      plan_send.plan.targetSpeedCamera = self.v_speedlimit_ahead * CV.MS_TO_KPH
+    else:
+      plan_send.plan.targetSpeedCamera = self.target_speed_map
 
     pm.send('plan', plan_send)
 

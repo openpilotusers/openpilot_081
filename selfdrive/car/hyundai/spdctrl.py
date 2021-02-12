@@ -36,45 +36,6 @@ class Spdctrl(SpdController):
         self.osm_enable_map = int(Params().get("OpkrEnableMap", encoding='utf8')) == 1
 
     def update_lead(self, sm, CS, dRel, yRel, vRel):
-        if not self.osm_enable_map:
-            if self.target_speed_map_counter == 0:
-                os.system("echo -n 0 > /data/params/d/LimitSetSpeedCamera &")
-                os.system("echo -n 0 > /data/params/d/OpkrSafetyCamera &")
-                os.system("logcat -c &")
-                self.map_enable = False
-                self.target_speed_map = 0
-            self.target_speed_map_counter += 1
-            if self.target_speed_map_counter == (100+self.target_speed_map_counter1):
-                os.system("logcat -d -s opkrspdlimit,opkrspd2limit,opkrspd5limit | grep opkrspd | tail -n 1 | awk \'{print $7}\' > /data/params/d/LimitSetSpeedCamera &")
-            elif self.target_speed_map_counter >= (150+self.target_speed_map_counter1):
-                self.target_speed_map_counter1 = 0
-                self.target_speed_map_counter = 1
-                mapspeed = Params().get("LimitSetSpeedCamera", encoding="utf8")
-                if mapspeed is not None:
-                    mapspeed = int(float(mapspeed.rstrip('\n')))
-                    if mapspeed > 29:
-                        self.map_enable = True
-                        self.target_speed_map = mapspeed
-                        self.target_speed_map_counter1 = 150
-                        os.system("echo -n 1 > /data/params/d/OpkrSafetyCamera &")
-                        os.system("logcat -c &")
-                    else:
-                        self.map_enable = False
-                        self.target_speed_map = 0
-                elif mapspeed is None and self.target_speed_map_counter2 <= 2:
-                    self.target_speed_map_counter2 += 1
-                    self.target_speed_map_counter = 101
-                    self.map_enable = False
-                    self.target_speed_map = 0
-                else:
-                    self.target_speed_map_counter = 99
-                    self.target_speed_map_counter2 = 0
-                    self.map_enable = False
-                    self.target_speed_map = 0
-                    if Params().get("OpkrSafetyCamera", encoding="utf8") == "1":
-                        os.system("echo -n 0 > /data/params/d/OpkrSafetyCamera &")
-
-
         if self.osm_enable_map:
             self.osm_enable = int(Params().get("LimitSetSpeed", encoding='utf8')) == 1
             self.osm_enable_camera = int(Params().get("LimitSetSpeedCamera", encoding='utf8')) == 1
@@ -95,15 +56,17 @@ class Spdctrl(SpdController):
         self.target_speed_road = plan.targetSpeed + round(plan.targetSpeed*0.01*self.osm_spdlimit_offset)
         self.target_speed_camera = plan.targetSpeedCamera + round(plan.targetSpeedCamera*0.01*self.osm_spdlimit_offset)
         
-        if self.map_enable:
-            self.target_speed = int(self.target_speed_map) + round(int(self.target_speed_map)*0.01*self.osm_spdlimit_offset)
-        elif self.osm_enable:
+        if self.osm_enable:
             self.target_speed = self.target_speed_road
         elif self.target_speed_camera <= 29:
             self.osm_enable_camera = False
+            self.map_enable = False
             self.target_speed = 0
         elif self.osm_enable_camera and self.target_speed_camera > 29:
             self.target_speed = self.target_speed_camera
+        elif self.target_speed_camera > 29:
+            self.target_speed = self.target_speed_camera
+            self.map_enable = True
         else:
             self.target_speed = 0
 
