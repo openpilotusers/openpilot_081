@@ -233,7 +233,7 @@ class Planner():
       mapspeeddist = self.params.get("LimitSetSpeedCameraDist", encoding="utf8")
       if mapspeed is not None:
         mapspeed = int(float(mapspeed.rstrip('\n')))
-        mapspeeddist = int(float(mapspeedist.rstrip('\n')))
+        mapspeeddist = int(float(mapspeeddist.rstrip('\n')))
         if mapspeed > 29:
           self.target_speed_map = mapspeed + round(mapspeed*0.01*int(self.tartget_speed_offset))
           self.target_speed_map_dist = mapspeeddist
