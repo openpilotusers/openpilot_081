@@ -635,7 +635,7 @@ static void ui_draw_vision_speedlimit(UIState *s) {
   if (s->enable_osm == 1) {
     s->is_ego_over_limit = is_speedlim_valid && s->scene.controls_state.getVEgo() > (speedlimit + (speedlimit*0.01*s->speed_lim_off) + hysteresis_offset);
   } else {
-    if (s->scene.target_speed_camera > 29 && s->scene.target_speed_camera < s->scene.controls_state.getVEgo()*3.6) {
+    if (s->scene.target_speed_camera > 29 && s->scene.target_speed_camera+1 < s->scene.controls_state.getVEgo()*3.6) {
       s->is_ego_over_limit = true;
     } else {
       s->is_ego_over_limit = false;
@@ -791,7 +791,7 @@ static void ui_draw_vision_event(UIState *s) {
       color = nvgRGBA(23, 51, 73, 255);
     }
 
-    if (s->safety_camera == 1) {
+    if (s->scene.target_speed_camera > 29) {
       const int img_x_size = 172*1.5;
       const int img_y_size = 271*1.5;
       const int img_x = s->scene.viz_rect.x + bdr_s + 390;
@@ -805,21 +805,21 @@ static void ui_draw_vision_event(UIState *s) {
     }
 
     //if (s->scene.controls_state.getEngageable()){
-    if (s->safety_camera == 1) {
+    if (s->scene.target_speed_camera > 29) {
       const int img_turn_size = 180;
       const int img_turn_x = viz_event_x-(img_turn_size/4)+85;
       const int img_turn_y = viz_event_y;
       float img_turn_alpha = 0.7f;
       int speed_img;
-      if ((29 < s->limit_set_speed_camera) && (s->limit_set_speed_camera < 40)) {speed_img = s->img_speed_30;}
-      else if ((39 < s->limit_set_speed_camera) && (s->limit_set_speed_camera < 50)) {speed_img = s->img_speed_40;}
-      else if ((49 < s->limit_set_speed_camera) && (s->limit_set_speed_camera < 60)) {speed_img = s->img_speed_50;}
-      else if ((59 < s->limit_set_speed_camera) && (s->limit_set_speed_camera < 70)) {speed_img = s->img_speed_60;}
-      else if ((69 < s->limit_set_speed_camera) && (s->limit_set_speed_camera < 80)) {speed_img = s->img_speed_70;}
-      else if ((79 < s->limit_set_speed_camera) && (s->limit_set_speed_camera < 90)) {speed_img = s->img_speed_80;}
-      else if ((89 < s->limit_set_speed_camera) && (s->limit_set_speed_camera < 100)) {speed_img = s->img_speed_90;}
-      else if ((99 < s->limit_set_speed_camera) && (s->limit_set_speed_camera < 110)) {speed_img = s->img_speed_100;}
-      else if ((109 < s->limit_set_speed_camera) && (s->limit_set_speed_camera < 120)) {speed_img = s->img_speed_110;}
+      if ((29 < s->scene.target_speed_camera) && (s->scene.target_speed_camera < 40)) {speed_img = s->img_speed_30;}
+      else if ((39 < s->scene.target_speed_camera) && (s->scene.target_speed_camera < 50)) {speed_img = s->img_speed_40;}
+      else if ((49 < s->scene.target_speed_camera) && (s->scene.target_speed_camera < 60)) {speed_img = s->img_speed_50;}
+      else if ((59 < s->scene.target_speed_camera) && (s->scene.target_speed_camera < 70)) {speed_img = s->img_speed_60;}
+      else if ((69 < s->scene.target_speed_camera) && (s->scene.target_speed_camera < 80)) {speed_img = s->img_speed_70;}
+      else if ((79 < s->scene.target_speed_camera) && (s->scene.target_speed_camera < 90)) {speed_img = s->img_speed_80;}
+      else if ((89 < s->scene.target_speed_camera) && (s->scene.target_speed_camera < 100)) {speed_img = s->img_speed_90;}
+      else if ((99 < s->scene.target_speed_camera) && (s->scene.target_speed_camera < 110)) {speed_img = s->img_speed_100;}
+      else if ((109 < s->scene.target_speed_camera) && (s->scene.target_speed_camera < 120)) {speed_img = s->img_speed_110;}
       nvgBeginPath(s->vg);
       NVGpaint imgPaint = nvgImagePattern(s->vg, img_turn_x, img_turn_y,
         img_turn_size, img_turn_size, 0, speed_img, img_turn_alpha);

@@ -134,6 +134,7 @@ class Planner():
     self.target_speed_map_counter1 = 0
     self.target_speed_map_counter2 = 0
     self.target_speed_map_counter3 = 0
+    self.target_speed_map_dist = 0
     self.tartget_speed_offset = int(self.params.get("OpkrSpeedLimitOffset", encoding="utf8"))
 
     self.SC = SpdController()
@@ -288,47 +289,54 @@ class Planner():
         v_curvature_map = min(NO_CURVATURE_SPEED, v_curvature_map)
     except KeyError:
       pass
-    
+
+    decel_for_turn = bool(v_curvature_map < min([v_cruise_setpoint, v_speedlimit, v_ego + 1.]))
+
     self.target_speed_map_counter += 1
-    if self.target_speed_map_counter >= (30+self.target_speed_map_counter1) and self.target_speed_map_counter_check == False:
+    if self.target_speed_map_counter >= (50+self.target_speed_map_counter1) and self.target_speed_map_counter_check == False:
       self.target_speed_map_counter_check = True
-      os.system("logcat -d -s opkrspdlimit,opkrspd2limit,opkrspd5limit | grep opkrspd | tail -n 1 | awk \'{print $7}\' > /data/params/d/LimitSetSpeedCamera &")
+      os.system("logcat -d -s opkrspdlimit,opkrspd2limit | grep opkrspd | tail -n 1 | awk \'{print $7}\' > /data/params/d/LimitSetSpeedCamera &")
+      os.system("logcat -d -s opkrspddist | grep opkrspd | tail -n 1 | awk \'{print $7}\' > /data/params/d/LimitSetSpeedCameraDist &")
       self.target_speed_map_counter3 += 1
-      if self.target_speed_map_counter3 > 3:
+      if self.target_speed_map_counter3 > 2:
         self.target_speed_map_counter3 = 0
         os.system("logcat -c &")
-    elif self.target_speed_map_counter >= (40+self.target_speed_map_counter1):
+    elif self.target_speed_map_counter >= (75+self.target_speed_map_counter1):
       self.target_speed_map_counter1 = 0
       self.target_speed_map_counter = 0
       self.target_speed_map_counter_check = False
       mapspeed = self.params.get("LimitSetSpeedCamera", encoding="utf8")
-      if mapspeed is not None:
+      mapspeeddist = self.params.get("LimitSetSpeedCameraDist", encoding="utf8")
+      if mapspeed is not None and mapspeeddist is not None:
         mapspeed = int(float(mapspeed.rstrip('\n')))
+        mapspeeddist = int(float(mapspeeddist.rstrip('\n')))
         if mapspeed > 29:
+          self.target_speed_map = mapspeed
+          self.target_speed_map_dist = mapspeeddist
+          self.target_speed_map_counter1 = 80
           self.map_enable = True
-          self.target_speed_map = (mapspeed + round(mapspeed*0.01*int(self.tartget_speed_offset)))*CV.KPH_TO_MS
-          self.target_speed_map_counter1 = 40
           os.system("echo -n 1 > /data/params/d/OpkrSafetyCamera &")
           os.system("logcat -c &")
         else:
-          self.map_enable = False
           self.target_speed_map = 0
-      elif mapspeed is None and self.target_speed_map_counter2 <= 2:
+          self.target_speed_map_dist = 0
+          self.map_enable = False
+      elif mapspeed is None and mapspeeddist is None and self.target_speed_map_counter2 < 2:
         self.target_speed_map_counter2 += 1
-        self.target_speed_map_counter = 30
-        self.map_enable = False
+        self.target_speed_map_counter = 51
         self.target_speed_map = 0
+        self.target_speed_map_dist = 0
         self.target_speed_map_counter_check = True
+        self.map_enable = False
       else:
-        self.target_speed_map_counter = 29
+        self.target_speed_map_counter = 49
         self.target_speed_map_counter2 = 0
         self.map_enable = False
         self.target_speed_map = 0
+        self.target_speed_map_dist = 0
         self.target_speed_map_counter_check = False
         if self.params.get("OpkrSafetyCamera", encoding="utf8") == "1":
           os.system("echo -n 0 > /data/params/d/OpkrSafetyCamera &")
-
-    decel_for_turn = bool(v_curvature_map < min([v_cruise_setpoint, v_speedlimit, v_ego + 1.]))
 
     self.model_speed, self.model_sum = self.SC.calc_va(sm, v_ego)
     self.curv_speed = interp(abs(self.model_speed), [30, 60, 90, 91, 255], [30, 50, 70, 255, 255])
@@ -397,7 +405,7 @@ class Planner():
         v_cruise_setpoint = min([v_cruise_setpoint, v_curvature_map, v_speedlimit])
       elif self.osm_camera and self.osm_curv and self.osm:
         v_cruise_setpoint = min([v_cruise_setpoint, v_speedlimit_ahead, v_curvature_map, v_speedlimit])
-      elif self.map_enable:
+      elif self.map_enable and self.target_speed_map_dist < 5.5*v_ego*CV.MS_TO_KPH:
         v_cruise_setpoint = min([v_cruise_setpoint, self.target_speed_map])
       elif self.lat_mode == 1:
         v_cruise_setpoint = min([v_cruise_setpoint, self.curv_speed])
