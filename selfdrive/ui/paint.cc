@@ -490,7 +490,6 @@ static void ui_draw_debug(UIState *s)
     ui_print(s, ui_viz_rx, ui_viz_ry+400, "AD:%.2f", scene.pathPlan.steerActuatorDelay);
     ui_print(s, ui_viz_rx, ui_viz_ry+450, "SC:%.2f", scene.pathPlan.steerRateCost);
     ui_print(s, ui_viz_rx, ui_viz_ry+500, "OS:%.2f", abs(scene.output_scale));
-    ui_print(s, ui_viz_rx, ui_viz_ry+550, "TIMER:%.0f", abs(scene.limitSpeedCamera));
     nvgFontSize(s->vg, 40);
     nvgTextAlign(s->vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
     if (s->lat_control == 0) {

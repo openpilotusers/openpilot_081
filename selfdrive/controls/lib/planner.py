@@ -103,7 +103,6 @@ class Planner():
     self.v_speedlimit_ahead_timer = 0
 
     self.target_speed_map = 0.0
-    self.target_speed_map2 = 0.0
     self.target_speed_map_counter = 0
     self.target_speed_map_counter_check = False
     self.target_speed_map_counter1 = 0
@@ -392,13 +391,12 @@ class Planner():
     plan_send.plan.vRel2 = lead_2.vRel
     plan_send.plan.status2 = lead_2.status
     plan_send.plan.targetSpeed = v_cruise_setpoint * CV.MS_TO_KPH
-    self.target_speed_map2 += 1
     if self.osm_enable_map:
       plan_send.plan.targetSpeedCamera = self.v_speedlimit_ahead * CV.MS_TO_KPH
     elif self.target_speed_map > 29 and self.target_speed_map_dist < 6.5*v_ego*CV.MS_TO_KPH:
       plan_send.plan.targetSpeedCamera = self.target_speed_map
     else:
-      plan_send.plan.targetSpeedCamera = self.target_speed_map2
+      plan_send.plan.targetSpeedCamera = 0
 
     pm.send('plan', plan_send)
 
