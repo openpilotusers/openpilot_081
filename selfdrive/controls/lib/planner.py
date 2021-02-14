@@ -109,6 +109,7 @@ class Planner():
     self.target_speed_map_counter2 = 0
     self.target_speed_map_counter3 = 0
     self.target_speed_map_dist = 0
+    self.target_speed_map_block = False
     self.tartget_speed_offset = int(self.params.get("OpkrSpeedLimitOffset", encoding="utf8"))
 
     self.osm_enable_map = int(self.params.get("OpkrEnableMap", encoding='utf8')) == 1
@@ -237,24 +238,29 @@ class Planner():
         if mapspeed > 29:
           self.target_speed_map = mapspeed
           self.target_speed_map_dist = mapspeeddist
+          if self.target_speed_map_dist > 1001:
+            self.target_speed_map_block = True
           self.target_speed_map_counter1 = 80
           os.system("echo -n 1 > /data/params/d/OpkrSafetyCamera &")
           os.system("logcat -c &")
         else:
           self.target_speed_map = 0
           self.target_speed_map_dist = 0
+          self.target_speed_map_block = False
       elif mapspeed is None and mapspeeddist is None and self.target_speed_map_counter2 < 2:
         self.target_speed_map_counter2 += 1
         self.target_speed_map_counter = 51
         self.target_speed_map = 0
         self.target_speed_map_dist = 0
         self.target_speed_map_counter_check = True
+        self.target_speed_map_block = False
       else:
         self.target_speed_map_counter = 49
         self.target_speed_map_counter2 = 0
         self.target_speed_map = 0
         self.target_speed_map_dist = 0
         self.target_speed_map_counter_check = False
+        self.target_speed_map_block = False
         if self.params.get("OpkrSafetyCamera", encoding="utf8") == "1":
           os.system("echo -n 0 > /data/params/d/OpkrSafetyCamera &")
 
@@ -394,6 +400,8 @@ class Planner():
     if self.osm_enable_map:
       plan_send.plan.targetSpeedCamera = self.v_speedlimit_ahead * CV.MS_TO_KPH
     elif self.target_speed_map > 29 and self.target_speed_map_dist < 6.5*v_ego*CV.MS_TO_KPH:
+      plan_send.plan.targetSpeedCamera = self.target_speed_map
+    elif self.target_speed_map > 29 and self.target_speed_map_dist >= 6.5*v_ego*CV.MS_TO_KPH and self.target_speed_map_block:
       plan_send.plan.targetSpeedCamera = self.target_speed_map
     else:
       plan_send.plan.targetSpeedCamera = 0
