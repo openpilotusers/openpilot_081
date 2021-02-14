@@ -311,7 +311,7 @@ class Planner():
         mapspeed = int(float(mapspeed.rstrip('\n')))
         mapspeeddist = int(float(mapspeeddist.rstrip('\n')))
         if mapspeed > 29:
-          self.target_speed_map = mapspeed
+          self.target_speed_map = (mapspeed/3.6) + round((mapspeed/3.6)*0.01*self.tartget_speed_offset)
           self.target_speed_map_dist = mapspeeddist
           self.target_speed_map_counter1 = 80
           self.map_enable = True
