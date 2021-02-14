@@ -135,6 +135,7 @@ class Planner():
     self.target_speed_map_counter2 = 0
     self.target_speed_map_counter3 = 0
     self.target_speed_map_dist = 0
+    self.target_speed_map_block = False
     self.tartget_speed_offset = int(self.params.get("OpkrSpeedLimitOffset", encoding="utf8"))
 
     self.SC = SpdController()
@@ -313,6 +314,8 @@ class Planner():
         if mapspeed > 29:
           self.target_speed_map = mapspeed
           self.target_speed_map_dist = mapspeeddist
+          if self.target_speed_map_dist > 1001:
+            self.target_speed_map_block = True
           self.target_speed_map_counter1 = 80
           self.map_enable = True
           os.system("echo -n 1 > /data/params/d/OpkrSafetyCamera &")
@@ -320,12 +323,14 @@ class Planner():
         else:
           self.target_speed_map = 0
           self.target_speed_map_dist = 0
+          self.target_speed_map_block = False
           self.map_enable = False
       elif mapspeed is None and mapspeeddist is None and self.target_speed_map_counter2 < 2:
         self.target_speed_map_counter2 += 1
         self.target_speed_map_counter = 51
         self.target_speed_map = 0
         self.target_speed_map_dist = 0
+        self.target_speed_map_block = False
         self.target_speed_map_counter_check = True
         self.map_enable = False
       else:
@@ -334,6 +339,7 @@ class Planner():
         self.map_enable = False
         self.target_speed_map = 0
         self.target_speed_map_dist = 0
+        self.target_speed_map_block = False
         self.target_speed_map_counter_check = False
         if self.params.get("OpkrSafetyCamera", encoding="utf8") == "1":
           os.system("echo -n 0 > /data/params/d/OpkrSafetyCamera &")
@@ -406,6 +412,8 @@ class Planner():
       elif self.osm_camera and self.osm_curv and self.osm:
         v_cruise_setpoint = min([v_cruise_setpoint, v_speedlimit_ahead, v_curvature_map, v_speedlimit])
       elif self.map_enable and self.target_speed_map_dist < 5.5*v_ego*CV.MS_TO_KPH:
+        v_cruise_setpoint = min([v_cruise_setpoint, self.target_speed_map])
+      elif self.map_enable and self.target_speed_map_dist >= 5.5*v_ego*CV.MS_TO_KPH and self.target_speed_map_block:
         v_cruise_setpoint = min([v_cruise_setpoint, self.target_speed_map])
       elif self.lat_mode == 1:
         v_cruise_setpoint = min([v_cruise_setpoint, self.curv_speed])
