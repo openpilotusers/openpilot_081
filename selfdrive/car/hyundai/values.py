@@ -576,7 +576,7 @@ FEATURES = {
   "use_elect_ems": {CAR.SONATA_HEV, CAR.SONATA19_HEV, CAR.KONA_EV, CAR.KONA_HEV, CAR.IONIQ_EV, CAR.IONIQ_HEV, CAR.GRANDEUR_HEV, CAR.NEXO,
                     CAR.OPTIMA_HEV, CAR.CADENZA_HEV, CAR.NIRO_EV, CAR.NIRO_HEV}, # 전기차 or 하이브리드 차량 넣어주세요.(가속페달관련)
   # send LFA MFA message for new HKG models
-  "send_lfa_mfa": {CAR.KONA_HEV}, #차량의 LFA아이콘(핸들모양 아이콘)을 켜지게 하려면 여기다가 본인 차종을 넣으세요.
+  "send_lfahda_mfa": {CAR.KONA_HEV}, #차량의 LFA, HDA아이콘이 켜지게 하려면 여기다가 본인 차종을 넣으세요.
   "has_scc13": set([]),
   "has_scc14": set([]),
   # these cars use the FCA11 message for the AEB and FCW signals, all others use SCC12
