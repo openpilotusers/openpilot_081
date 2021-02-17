@@ -103,6 +103,7 @@ keys = {
   b"PidKf": [TxType.PERSISTENT],
   b"CameraOffsetAdj": [TxType.PERSISTENT],
   b"SteerRatioAdj": [TxType.PERSISTENT],
+  b"SteerRatioMaxAdj": [TxType.PERSISTENT],
   b"SteerActuatorDelayAdj": [TxType.PERSISTENT],
   b"SteerRateCostAdj": [TxType.PERSISTENT],
   b"SteerLimitTimerAdj": [TxType.PERSISTENT],
