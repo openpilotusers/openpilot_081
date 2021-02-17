@@ -312,7 +312,7 @@ class Planner():
         mapspeed = int(float(mapspeed.rstrip('\n')))
         mapspeeddist = int(float(mapspeeddist.rstrip('\n')))
         if mapspeed > 29:
-          self.target_speed_map = round((mapspeed/3.6) + ((mapspeed/3.6)*0.01*self.tartget_speed_offset))
+          self.target_speed_map = (mapspeed*CV.KPH_TO_MS) + ((mapspeed*CV.KPH_TO_MS)*0.01*self.tartget_speed_offset)
           self.target_speed_map_dist = mapspeeddist
           if self.target_speed_map_dist > 1001:
             self.target_speed_map_block = True
@@ -516,7 +516,7 @@ class Planner():
     plan_send.plan.yRel2 = lead_2.yRel
     plan_send.plan.vRel2 = lead_2.vRel
     plan_send.plan.status2 = lead_2.status
-    plan_send.plan.targetSpeedCamera = self.target_speed_map*3.6
+    plan_send.plan.targetSpeedCamera = self.target_speed_map*CV.MS_TO_KPH
     if v_cruise_setpoint is not None:
       plan_send.plan.vCruiseSetPoint = float(v_cruise_setpoint*CV.MS_TO_KPH)
     else:
