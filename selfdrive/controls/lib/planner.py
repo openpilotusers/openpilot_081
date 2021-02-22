@@ -402,7 +402,7 @@ class Planner():
       variable_set_speed = variable_set_speed*CV.KPH_TO_MS if variable_set_speed > 0 else v_cruise_setpoint
 
       cam_distance_calc = 0
-      cam_distance_calc = interp(v_ego*CV.MS_TO_KPH, [30,60,100,160], [3.5,5.25,6,7])
+      cam_distance_calc = interp(v_ego*CV.MS_TO_KPH, [30,60,100,160], [3.75,5.5,6,7])
       if (v_speedlimit_ahead*CV.MS_TO_KPH) >= 30 and self.osm_camera and not self.osm_curv and not self.osm:
         v_cruise_setpoint = min([v_cruise_setpoint, v_speedlimit_ahead])
       elif self.osm_curv and not self.osm_camera and not self.osm:
