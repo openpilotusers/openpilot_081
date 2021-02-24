@@ -170,6 +170,7 @@ typedef struct UIScene {
   float v_ego;
   float vSetDis;
   bool cruiseAccEnabled;
+  bool cruiseAccStatus; 
 
   cereal::HealthData::HwType hwType;
   int satelliteCount;

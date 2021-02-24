@@ -242,6 +242,8 @@ class CarState(CarStateBase):
       self.mdps11_strang = cp_mdps.vl["MDPS11"]["CR_Mdps_StrAng"]
       self.mdps11_stat = cp_mdps.vl["MDPS11"]["CF_Mdps_Stat"]
 
+    ret.cruiseAccStatus = cp_scc.vl["SCC12"]['ACCMode'] == 1
+
     return ret
 
   def update_blinker(self, cp):

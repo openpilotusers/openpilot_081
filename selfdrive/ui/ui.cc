@@ -325,6 +325,7 @@ void update_sockets(UIState *s) {
     scene.radarDistance = data.getRadarDistance();
     scene.standStill = data.getStandStill();
     scene.vSetDis = data.getVSetDis();
+    scene.cruiseAccStatus = data.getCruiseAccStatus();
     scene.cruiseAccEnabled = data.getCruiseState().getEnabled();
   }
 

@@ -200,23 +200,31 @@ static void update_track_data(UIState *s, const cereal::ModelDataV2::XYZTData::R
 
 static void ui_draw_track(UIState *s, bool is_mpc, track_vertices_data *pvd) {
   NVGpaint track_bg;
+  int torque_scale = 0;
+  int red_lvl = 0;
+  int blue_lvl = 0;
   if (is_mpc) {
     // Draw colored MPC track Kegman's
     if (s->scene.steerOverride) {
       track_bg = nvgLinearGradient(s->vg, s->fb_w, s->fb_h, s->fb_w, s->fb_h*.4,
-        COLOR_BLACK_ALPHA(200), COLOR_BLACK_ALPHA(20)); //nvgRGBA(0, 191, 255, 255), nvgRGBA(0, 95, 128, 50));
+                                  COLOR_BLACK_ALPHA(200), COLOR_BLACK_ALPHA(150)); 
     } else {
-      int torque_scale = (int)fabs(255*(float)s->scene.output_scale);
-      int red_lvl = fmin(255, torque_scale);
-      int green_lvl = fmin(255, 255-torque_scale);
-      track_bg = nvgLinearGradient(s->vg, s->fb_w, s->fb_h, s->fb_w, s->fb_h*.4,
-        nvgRGBA(          red_lvl,            green_lvl,  0, 255),
-        nvgRGBA((int)(0.7*red_lvl), (int)(0.7*green_lvl), 0, 50));
+        if (fabs(s->scene.output_scale) > 0.8) {
+          torque_scale = (int)fabs(160*(float)s->scene.output_scale);
+          red_lvl = fmin(255, (torque_scale - 128) * 8);
+          blue_lvl = fmin(255, (160-torque_scale) * 8 );
+        } else {
+          red_lvl = 0;
+          blue_lvl = 255;
+        }
+        track_bg = nvgLinearGradient(s->vg, s->fb_w, s->fb_h, s->fb_w, s->fb_h*.4,
+                  nvgRGBA(          red_lvl,  100,             blue_lvl, 255),
+                  nvgRGBA((int)(0.9*red_lvl), 100, (int)(0.9* blue_lvl), 150));                  
     }
   } else {
     // Draw white vision track
-    track_bg = nvgLinearGradient(s->vg, s->fb_w, s->fb_h, s->fb_w, s->fb_h*.4,
-      nvgRGBA(255, 255, 255, 200), nvgRGBA(255, 255, 255, 50));
+    track_bg = nvgLinearGradient(s->vg, s->fb_w, s->fb_h, s->fb_w, s->fb_h*.1,
+      nvgRGBA(255, 255, 255, 200), nvgRGBA(255, 255, 255, 150));
   }
   ui_draw_line(s, &pvd->v[0], pvd->cnt, nullptr, &track_bg);
 }
@@ -408,30 +416,30 @@ static void ui_draw_tpms(UIState *s) {
   if (s->scene.tpmsPressureFl < 34) {
     ui_draw_text(s->vg, pos_x-55, pos_y+50, tpmsFl, 60, COLOR_RED, s->font_sans_bold);
   } else if (s->scene.tpmsPressureFl > 50) {
-    ui_draw_text(s->vg, pos_x-55, pos_y+50, "N/A", 60, COLOR_WHITE_ALPHA(200), s->font_sans_semibold);
+    ui_draw_text(s->vg, pos_x-55, pos_y+50, "N/A", 60, COLOR_WHITE_ALPHA(150), s->font_sans_semibold);
   } else {
-    ui_draw_text(s->vg, pos_x-55, pos_y+50, tpmsFl, 60, COLOR_WHITE_ALPHA(200), s->font_sans_semibold);
+    ui_draw_text(s->vg, pos_x-55, pos_y+50, tpmsFl, 60, COLOR_WHITE_ALPHA(150), s->font_sans_semibold);
   }
   if (s->scene.tpmsPressureFr < 34) {
     ui_draw_text(s->vg, pos_x+55, pos_y+50, tpmsFr, 60, COLOR_RED, s->font_sans_bold);
   } else if (s->scene.tpmsPressureFr > 50) {
-    ui_draw_text(s->vg, pos_x+55, pos_y+50, "N/A", 60, COLOR_WHITE_ALPHA(200), s->font_sans_semibold);
+    ui_draw_text(s->vg, pos_x+55, pos_y+50, "N/A", 60, COLOR_WHITE_ALPHA(150), s->font_sans_semibold);
   } else {
-    ui_draw_text(s->vg, pos_x+55, pos_y+50, tpmsFr, 60, COLOR_WHITE_ALPHA(200), s->font_sans_semibold);
+    ui_draw_text(s->vg, pos_x+55, pos_y+50, tpmsFr, 60, COLOR_WHITE_ALPHA(150), s->font_sans_semibold);
   }
   if (s->scene.tpmsPressureRl < 34) {
     ui_draw_text(s->vg, pos_x-55, pos_y+100, tpmsRl, 60, COLOR_RED, s->font_sans_bold);
   } else if (s->scene.tpmsPressureRl > 50) {
-    ui_draw_text(s->vg, pos_x-55, pos_y+100, "N/A", 60, COLOR_WHITE_ALPHA(200), s->font_sans_semibold);
+    ui_draw_text(s->vg, pos_x-55, pos_y+100, "N/A", 60, COLOR_WHITE_ALPHA(150), s->font_sans_semibold);
   } else {
-    ui_draw_text(s->vg, pos_x-55, pos_y+100, tpmsRl, 60, COLOR_WHITE_ALPHA(200), s->font_sans_semibold);
+    ui_draw_text(s->vg, pos_x-55, pos_y+100, tpmsRl, 60, COLOR_WHITE_ALPHA(150), s->font_sans_semibold);
   }
   if (s->scene.tpmsPressureRr < 34) {
     ui_draw_text(s->vg, pos_x+55, pos_y+100, tpmsRr, 60, COLOR_RED, s->font_sans_bold);
   } else if (s->scene.tpmsPressureRr > 50) {
-    ui_draw_text(s->vg, pos_x+55, pos_y+100, "N/A", 60, COLOR_WHITE_ALPHA(200), s->font_sans_semibold);
+    ui_draw_text(s->vg, pos_x+55, pos_y+100, "N/A", 60, COLOR_WHITE_ALPHA(150), s->font_sans_semibold);
   } else {
-    ui_draw_text(s->vg, pos_x+55, pos_y+100, tpmsRr, 60, COLOR_WHITE_ALPHA(200), s->font_sans_semibold);
+    ui_draw_text(s->vg, pos_x+55, pos_y+100, tpmsRr, 60, COLOR_WHITE_ALPHA(150), s->font_sans_semibold);
   }
 }
 
@@ -568,14 +576,14 @@ static void ui_draw_vision_maxspeed(UIState *s) {
 
   // Draw Background
   ui_draw_rect(s->vg, viz_maxspeed_x, viz_maxspeed_y, viz_maxspeed_w, viz_maxspeed_h,
-    is_set_over_limit ? nvgRGBA(218, 111, 37, 180) : COLOR_BLACK_ALPHA(100), 30);
+    is_set_over_limit ? COLOR_OCHRE_ALPHA(200) : COLOR_BLACK_ALPHA(100), 30);
 
   // Draw Border
   NVGcolor color = COLOR_WHITE_ALPHA(100);
   if (is_set_over_limit) {
     color = COLOR_OCHRE;
   } else if (is_speedlim_valid) {
-    color = s->is_ego_over_limit ? COLOR_WHITE_ALPHA(20) : COLOR_WHITE;
+    color = s->is_ego_over_limit ? COLOR_OCHRE_ALPHA(50) : COLOR_WHITE;
   }
   ui_draw_rect(s->vg, viz_maxspeed_x, viz_maxspeed_y, viz_maxspeed_w, viz_maxspeed_h, color, 20, 10);
 
@@ -631,17 +639,29 @@ static void ui_draw_vision_speedlimit(UIState *s) {
   // Draw Background
   NVGcolor color = COLOR_WHITE_ALPHA(100);
   if (is_speedlim_valid && s->is_ego_over_limit) {
-    color = nvgRGBA(218, 111, 37, 180);
-  } else if (is_speedlim_valid) {
-    color = COLOR_WHITE;
+    color = COLOR_OCHRE_ALPHA(200);
+  } else if (s->scene.limitSpeedCamera > 29 && !s->is_ego_over_limit) {
+    color = nvgRGBA(0, 120, 0, 200);  
+  } else if (s->scene.cruiseAccStatus){
+    color = nvgRGBA(0, 100, 200, 200);
+  } else if (!s->scene.controls_state.getEnabled()) {
+  	color = COLOR_OCHRE_ALPHA(200);
   }
   ui_draw_rect(s->vg, viz_speedlim_x, viz_speedlim_y, viz_speedlim_w, viz_speedlim_h, color, is_speedlim_valid ? 30 : 15);
 
   // Draw Border
-  if (is_speedlim_valid) {
-    ui_draw_rect(s->vg, viz_speedlim_x, viz_speedlim_y, viz_speedlim_w, viz_speedlim_h,
-                 s->is_ego_over_limit ? COLOR_OCHRE : COLOR_WHITE, 20, 10);
+  color = COLOR_WHITE_ALPHA(50);
+  if (is_speedlim_valid && s->is_ego_over_limit) {
+    color = COLOR_OCHRE_ALPHA(50);
+  } else if (s->scene.limitSpeedCamera > 29 && !s->is_ego_over_limit) {
+    color = nvgRGBA(0, 120, 0, 50);  
+  } else if (s->scene.cruiseAccStatus){
+    color = nvgRGBA(0, 100, 200, 50);
+  } else if (!s->scene.controls_state.getEnabled()) {
+  	color = COLOR_WHITE_ALPHA(80);
   }
+  ui_draw_rect(s->vg, viz_speedlim_x, viz_speedlim_y, viz_speedlim_w, viz_speedlim_h, color, 20, 10);
+
   float text_x = viz_speedlim_x + viz_speedlim_w / 2;
   float text_y = viz_speedlim_y + 65;
   if (!is_speedlim_valid) {
@@ -651,14 +671,22 @@ static void ui_draw_vision_speedlimit(UIState *s) {
   //const float text_y = viz_speedlim_y + (is_speedlim_valid ? 50 : 45);
   // Draw "Speed Limit" Text
   nvgTextAlign(s->vg, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE);
-  color = is_speedlim_valid && s->is_ego_over_limit ? COLOR_WHITE : COLOR_BLACK;
+  if (!s->scene.controls_state.getEnabled()) {
+  	color = COLOR_BLACK_ALPHA(200);
+  } else {
+    color = is_speedlim_valid && s->is_ego_over_limit ? COLOR_YELLOW_ALPHA(200) : COLOR_WHITE_ALPHA(200);
+  }
   if (s->enable_osm == 1 || s->scene.limitSpeedCamera > 29) {
     ui_draw_text(s->vg, text_x, text_y, "제한속도", 26 * 2.2, color, s->font_sans_regular);
   } else {
     ui_draw_text(s->vg, text_x, text_y, "크루즈", 26 * 2.2, color, s->font_sans_regular);
   }
   // Draw Speed Text
-  color = s->is_ego_over_limit ? COLOR_WHITE : COLOR_BLACK;
+  if (!s->scene.controls_state.getEnabled()) {
+  	color = COLOR_BLACK_ALPHA(200);
+  } else {
+    color = is_speedlim_valid && s->is_ego_over_limit ? COLOR_YELLOW_ALPHA(200) : COLOR_WHITE_ALPHA(200);
+  }
   if (is_speedlim_valid) {
     if ((s->enable_osm == 1) || (s->scene.cruiseAccEnabled)) {
       snprintf(speedlim_str, sizeof(speedlim_str), "%d", speedlim_calc);
