@@ -110,6 +110,7 @@ class Planner():
     self.target_speed_map_counter3 = 0
     self.target_speed_map_dist = 0
     self.target_speed_map_block = False
+    self.target_speed_map_sign = False
     self.tartget_speed_offset = int(self.params.get("OpkrSpeedLimitOffset", encoding="utf8"))
 
     self.osm_enable_map = int(self.params.get("OpkrEnableMap", encoding='utf8')) == 1
@@ -254,6 +255,7 @@ class Planner():
         self.target_speed_map_dist = 0
         self.target_speed_map_counter_check = True
         self.target_speed_map_block = False
+        self.target_speed_map_sign = False
       else:
         self.target_speed_map_counter = 49
         self.target_speed_map_counter2 = 0
@@ -261,6 +263,7 @@ class Planner():
         self.target_speed_map_dist = 0
         self.target_speed_map_counter_check = False
         self.target_speed_map_block = False
+        self.target_speed_map_sign = False
         if self.params.get("OpkrSafetyCamera", encoding="utf8") == "1":
           os.system("echo -n 0 > /data/params/d/OpkrSafetyCamera &")
 
@@ -403,7 +406,11 @@ class Planner():
       plan_send.plan.targetSpeedCamera = self.v_speedlimit_ahead * CV.MS_TO_KPH
     elif self.target_speed_map > 29 and self.target_speed_map_dist < cam_distance_calc*v_ego*CV.MS_TO_KPH:
       plan_send.plan.targetSpeedCamera = self.target_speed_map
+      self.target_speed_map_sign = True
     elif self.target_speed_map > 29 and self.target_speed_map_dist >= cam_distance_calc*v_ego*CV.MS_TO_KPH and self.target_speed_map_block:
+      plan_send.plan.targetSpeedCamera = self.target_speed_map
+      self.target_speed_map_sign = True
+    elif self.target_speed_map > 29 and self.target_speed_map_sign:
       plan_send.plan.targetSpeedCamera = self.target_speed_map
     else:
       plan_send.plan.targetSpeedCamera = 0
