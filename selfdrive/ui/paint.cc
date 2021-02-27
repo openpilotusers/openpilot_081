@@ -200,31 +200,23 @@ static void update_track_data(UIState *s, const cereal::ModelDataV2::XYZTData::R
 
 static void ui_draw_track(UIState *s, bool is_mpc, track_vertices_data *pvd) {
   NVGpaint track_bg;
-  int torque_scale = 0;
-  int red_lvl = 0;
-  int blue_lvl = 0;
   if (is_mpc) {
     // Draw colored MPC track Kegman's
     if (s->scene.steerOverride) {
       track_bg = nvgLinearGradient(s->vg, s->fb_w, s->fb_h, s->fb_w, s->fb_h*.4,
-                                  COLOR_BLACK_ALPHA(200), COLOR_BLACK_ALPHA(150)); 
+                                  COLOR_BLACK_ALPHA(200), COLOR_BLACK_ALPHA(20)); 
     } else {
-        if (fabs(s->scene.output_scale) > 0.8) {
-          torque_scale = (int)fabs(160*(float)s->scene.output_scale);
-          red_lvl = fmin(255, (torque_scale - 128) * 8);
-          blue_lvl = fmin(255, (160-torque_scale) * 8 );
-        } else {
-          red_lvl = 0;
-          blue_lvl = 255;
-        }
-        track_bg = nvgLinearGradient(s->vg, s->fb_w, s->fb_h, s->fb_w, s->fb_h*.4,
-                  nvgRGBA(          red_lvl,  100,             blue_lvl, 255),
-                  nvgRGBA((int)(0.9*red_lvl), 100, (int)(0.9* blue_lvl), 150));                  
+      int torque_scale = (int)fabs(255*(float)s->scene.output_scale);
+      int red_lvl = fmin(255, torque_scale);
+      int green_lvl = fmin(255, 255-torque_scale);
+      track_bg = nvgLinearGradient(s->vg, s->fb_w, s->fb_h, s->fb_w, s->fb_h*.4,
+        nvgRGBA(          red_lvl,            green_lvl,  0, 255),
+        nvgRGBA((int)(0.7*red_lvl), (int)(0.7*green_lvl), 0, 50));
     }
   } else {
     // Draw white vision track
-    track_bg = nvgLinearGradient(s->vg, s->fb_w, s->fb_h, s->fb_w, s->fb_h*.1,
-      nvgRGBA(255, 255, 255, 200), nvgRGBA(255, 255, 255, 150));
+    track_bg = nvgLinearGradient(s->vg, s->fb_w, s->fb_h, s->fb_w, s->fb_h*.4,
+      nvgRGBA(255, 255, 255, 200), nvgRGBA(255, 255, 255, 50));
   }
   ui_draw_line(s, &pvd->v[0], pvd->cnt, nullptr, &track_bg);
 }
@@ -645,7 +637,7 @@ static void ui_draw_vision_speedlimit(UIState *s) {
   } else if (s->scene.cruiseAccStatus){
     color = nvgRGBA(0, 100, 200, 200);
   } else if (!s->scene.controls_state.getEnabled()) {
-  	color = COLOR_OCHRE_ALPHA(200);
+  	color = COLOR_WHITE_ALPHA(100);
   }
   ui_draw_rect(s->vg, viz_speedlim_x, viz_speedlim_y, viz_speedlim_w, viz_speedlim_h, color, is_speedlim_valid ? 30 : 15);
 
