@@ -402,12 +402,13 @@ class Planner():
     plan_send.plan.targetSpeed = v_cruise_setpoint * CV.MS_TO_KPH
     cam_distance_calc = 0
     cam_distance_calc = interp(v_ego*CV.MS_TO_KPH, [30,60,100,160], [3.75,5.5,6,7])
+    consider_speed = interp((v_ego*CV.MS_TO_KPH - self.target_speed_map), [10, 30], [1, 1.3])
     if self.osm_enable_map:
       plan_send.plan.targetSpeedCamera = self.v_speedlimit_ahead * CV.MS_TO_KPH
-    elif self.target_speed_map > 29 and self.target_speed_map_dist < cam_distance_calc*v_ego*CV.MS_TO_KPH:
+    elif self.target_speed_map > 29 and self.target_speed_map_dist < cam_distance_calc*consider_speed*v_ego*CV.MS_TO_KPH:
       plan_send.plan.targetSpeedCamera = self.target_speed_map
       self.target_speed_map_sign = True
-    elif self.target_speed_map > 29 and self.target_speed_map_dist >= cam_distance_calc*v_ego*CV.MS_TO_KPH and self.target_speed_map_block:
+    elif self.target_speed_map > 29 and self.target_speed_map_dist >= cam_distance_calc*consider_speed*v_ego*CV.MS_TO_KPH and self.target_speed_map_block:
       plan_send.plan.targetSpeedCamera = self.target_speed_map
       self.target_speed_map_sign = True
     elif self.target_speed_map > 29 and self.target_speed_map_sign:
