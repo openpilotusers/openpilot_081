@@ -406,6 +406,7 @@ class Planner():
 
       cam_distance_calc = 0
       cam_distance_calc = interp(v_ego*CV.MS_TO_KPH, [30,60,100,160], [3.75,5.5,6,7])
+      consider_speed = interp((v_ego*CV.MS_TO_KPH - self.target_speed_map), [10, 30], [1, 1.3])
       if (v_speedlimit_ahead*CV.MS_TO_KPH) >= 30 and self.osm_camera and not self.osm_curv and not self.osm:
         v_cruise_setpoint = min([v_cruise_setpoint, v_speedlimit_ahead])
       elif self.osm_curv and not self.osm_camera and not self.osm:
@@ -420,10 +421,10 @@ class Planner():
         v_cruise_setpoint = min([v_cruise_setpoint, v_curvature_map, v_speedlimit])
       elif self.osm_camera and self.osm_curv and self.osm:
         v_cruise_setpoint = min([v_cruise_setpoint, v_speedlimit_ahead, v_curvature_map, v_speedlimit])
-      elif self.map_enable and self.target_speed_map_dist < cam_distance_calc*v_ego*CV.MS_TO_KPH:
+      elif self.map_enable and self.target_speed_map_dist < cam_distance_calc*consider_speed*v_ego*CV.MS_TO_KPH:
         v_cruise_setpoint = min([v_cruise_setpoint, self.target_speed_map])
         self.target_speed_map_sign = True
-      elif self.map_enable and self.target_speed_map_dist >= cam_distance_calc*v_ego*CV.MS_TO_KPH and self.target_speed_map_block:
+      elif self.map_enable and self.target_speed_map_dist >= cam_distance_calc*v_ego*consider_speed*CV.MS_TO_KPH and self.target_speed_map_block:
         v_cruise_setpoint = min([v_cruise_setpoint, self.target_speed_map])
         self.target_speed_map_sign = True
       elif self.lat_mode == 1:
