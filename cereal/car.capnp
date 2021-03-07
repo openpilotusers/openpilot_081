@@ -206,6 +206,7 @@ struct CarState {
   vSetDis @44 :Float32;
   cruiseButtons @45 :Float32;
   cruiseAccStatus @46 :Bool;
+  driverAcc @47 :Bool;
 
   struct WheelSpeeds {
     # optional wheel speeds

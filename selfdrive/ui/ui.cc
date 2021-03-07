@@ -154,6 +154,7 @@ void update_sockets(UIState *s) {
     s->scene.alertTextMsg2 = scene.controls_state.getAlertTextMsg2(); //debug2
 
     s->scene.limitSpeedCamera = scene.controls_state.getLimitSpeedCamera();
+    s->scene.limitSpeedCameraDist = scene.controls_state.getLimitSpeedCameraDist();
 
     // TODO: the alert stuff shouldn't be handled here
     auto alert_sound = scene.controls_state.getAlertSound();
@@ -309,7 +310,7 @@ void update_sockets(UIState *s) {
   if (sm.updated("carState")) {
     auto data = sm["carState"].getCarState();
     if(scene.leftBlinker!=data.getLeftBlinker() || scene.rightBlinker!=data.getRightBlinker()){
-      scene.blinker_blinkingrate = 50;
+      scene.blinker_blinkingrate = 120;
     }
     scene.brakePress = data.getBrakePressed();
     scene.brakeLights = data.getBrakeLights();

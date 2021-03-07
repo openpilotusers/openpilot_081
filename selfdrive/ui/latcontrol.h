@@ -51,7 +51,7 @@ bool latcontrol( UIState *s, int touch_x, int touch_y ) {
 
   draw_control_button1(s, touch_x, touch_y);
 
-  if ((control_button_clicked1(touch_x,touch_y)) && (s->status != STATUS_OFFROAD) && (s->limit_set_speed == 0)) {
+  if ((control_button_clicked1(touch_x,touch_y)) && (s->status != STATUS_OFFROAD) && (s->scene.uilayout_sidebarcollapsed == true) && (s->limit_set_speed == 0)) {
     Params().write_db_value("LimitSetSpeed", "1", 1);
     //system("su -c 'am start -n com.gmd.hidesoftkeys/com.gmd.hidesoftkeys.MainActivity'");
     system("su -c 'am start --activity-task-on-home com.skt.tmap.ku/com.skt.tmap.activity.TmapNaviActivity'");

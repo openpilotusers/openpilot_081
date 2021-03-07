@@ -407,14 +407,18 @@ class Planner():
       plan_send.plan.targetSpeedCamera = self.v_speedlimit_ahead * CV.MS_TO_KPH
     elif self.target_speed_map > 29 and self.target_speed_map_dist < cam_distance_calc*consider_speed*v_ego*CV.MS_TO_KPH:
       plan_send.plan.targetSpeedCamera = self.target_speed_map
+      plan_send.plan.targetSpeedCameraDist = self.target_speed_map_dist
       self.target_speed_map_sign = True
     elif self.target_speed_map > 29 and self.target_speed_map_dist >= cam_distance_calc*consider_speed*v_ego*CV.MS_TO_KPH and self.target_speed_map_block:
       plan_send.plan.targetSpeedCamera = self.target_speed_map
+      plan_send.plan.targetSpeedCameraDist = self.target_speed_map_dist
       self.target_speed_map_sign = True
     elif self.target_speed_map > 29 and self.target_speed_map_sign:
       plan_send.plan.targetSpeedCamera = self.target_speed_map
+      plan_send.plan.targetSpeedCameraDist = self.target_speed_map_dist
     else:
       plan_send.plan.targetSpeedCamera = 0
+      plan_send.plan.targetSpeedCameraDist = 0
 
     pm.send('plan', plan_send)
 

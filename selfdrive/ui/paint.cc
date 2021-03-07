@@ -361,30 +361,14 @@ static void ui_draw_tpms(UIState *s) {
   float maxv = 0;
   float minv = 300;
 
-  if (maxv < s->scene.tpmsPressureFl) {
-    maxv = s->scene.tpmsPressureFl;
-  }
-  if (maxv < s->scene.tpmsPressureFr) {
-    maxv = s->scene.tpmsPressureFr;
-  }
-  if (maxv < s->scene.tpmsPressureRl) {
-    maxv = s->scene.tpmsPressureRl;
-  }
-  if (maxv < s->scene.tpmsPressureRr) {
-    maxv = s->scene.tpmsPressureRr;
-  }
-  if (minv > s->scene.tpmsPressureFl) {
-    minv = s->scene.tpmsPressureFl;
-  }
-  if (minv > s->scene.tpmsPressureFr) {
-    minv = s->scene.tpmsPressureFr;
-  }
-  if (minv > s->scene.tpmsPressureRl) {
-    minv = s->scene.tpmsPressureRl;
-  }
-  if (minv > s->scene.tpmsPressureRr) {
-    minv = s->scene.tpmsPressureRr;
-  }
+  if (maxv < s->scene.tpmsPressureFl) {maxv = s->scene.tpmsPressureFl;}
+  if (maxv < s->scene.tpmsPressureFr) {maxv = s->scene.tpmsPressureFr;}
+  if (maxv < s->scene.tpmsPressureRl) {maxv = s->scene.tpmsPressureRl;}
+  if (maxv < s->scene.tpmsPressureRr) {maxv = s->scene.tpmsPressureRr;}
+  if (minv > s->scene.tpmsPressureFl) {minv = s->scene.tpmsPressureFl;}
+  if (minv > s->scene.tpmsPressureFr) {minv = s->scene.tpmsPressureFr;}
+  if (minv > s->scene.tpmsPressureRl) {minv = s->scene.tpmsPressureRl;}
+  if (minv > s->scene.tpmsPressureRr) {minv = s->scene.tpmsPressureRr;}
 
   // Draw Background
   if ((maxv - minv) > 3) {
@@ -629,15 +613,15 @@ static void ui_draw_vision_speedlimit(UIState *s) {
     viz_speedlim_y += 5;
   }
   // Draw Background
-  NVGcolor color = COLOR_WHITE_ALPHA(100);
+  NVGcolor color = COLOR_GREY;
   if (is_speedlim_valid && s->is_ego_over_limit) {
     color = COLOR_OCHRE_ALPHA(200);
   } else if (s->scene.limitSpeedCamera > 29 && !s->is_ego_over_limit) {
-    color = nvgRGBA(0, 120, 0, 200);  
-  } else if (s->scene.cruiseAccStatus){
+    color = nvgRGBA(0, 120, 0, 200);
+  } else if (s->scene.cruiseAccStatus) {
     color = nvgRGBA(0, 100, 200, 200);
-  } else if (!s->scene.controls_state.getEnabled()) {
-  	color = COLOR_WHITE_ALPHA(100);
+  } else if (s->scene.controls_state.getEnabled()) {
+  	color = COLOR_WHITE_ALPHA(75);
   }
   ui_draw_rect(s->vg, viz_speedlim_x, viz_speedlim_y, viz_speedlim_w, viz_speedlim_h, color, is_speedlim_valid ? 30 : 15);
 
@@ -649,8 +633,8 @@ static void ui_draw_vision_speedlimit(UIState *s) {
     color = nvgRGBA(0, 120, 0, 50);  
   } else if (s->scene.cruiseAccStatus){
     color = nvgRGBA(0, 100, 200, 50);
-  } else if (!s->scene.controls_state.getEnabled()) {
-  	color = COLOR_WHITE_ALPHA(80);
+  } else if (s->scene.controls_state.getEnabled()) {
+  	color = COLOR_WHITE_ALPHA(75);
   }
   ui_draw_rect(s->vg, viz_speedlim_x, viz_speedlim_y, viz_speedlim_w, viz_speedlim_h, color, 20, 10);
 
@@ -699,31 +683,64 @@ static void ui_draw_vision_speed(UIState *s) {
   if (s->is_metric){
     speed = v_ego * 3.6 + 0.5;
   }
-  const int viz_speed_w = 280;
+  const int viz_speed_w = 260;
   const int viz_speed_x = viz_rect.centerX() - viz_speed_w/2;
   char speed_str[32];
+  const int header_h2 = 400;
 
   // turning blinker from kegman
   if(scene->leftBlinker) {
     nvgBeginPath(s->vg);
-    nvgMoveTo(s->vg, viz_speed_x, viz_rect.y + header_h/4);
-    nvgLineTo(s->vg, viz_speed_x - viz_speed_w/2, viz_rect.y + header_h/4 + header_h/4);
-    nvgLineTo(s->vg, viz_speed_x, viz_rect.y + header_h/2 + header_h/4);
+    nvgMoveTo(s->vg, viz_speed_x, viz_rect.y + header_h2/4);
+    nvgLineTo(s->vg, viz_speed_x - viz_speed_w/2, viz_rect.y + header_h2/4 + header_h2/4);
+    nvgLineTo(s->vg, viz_speed_x, viz_rect.y + header_h2/2 + header_h2/4);
     nvgClosePath(s->vg);
-    nvgFillColor(s->vg, nvgRGBA(23,134,68,scene->blinker_blinkingrate>=50?210:60));
+    nvgFillColor(s->vg, nvgRGBA(255,230,70,(scene->blinker_blinkingrate<=120 && scene->blinker_blinkingrate>=50)?70:0));
+    nvgFill(s->vg);
+
+    nvgBeginPath(s->vg);
+    nvgMoveTo(s->vg, viz_speed_x-145, viz_rect.y + header_h2/4);
+    nvgLineTo(s->vg, viz_speed_x-145 - viz_speed_w/2, viz_rect.y + header_h2/4 + header_h2/4);
+    nvgLineTo(s->vg, viz_speed_x-145, viz_rect.y + header_h2/2 + header_h2/4);
+    nvgClosePath(s->vg);
+    nvgFillColor(s->vg, nvgRGBA(255,230,70,(scene->blinker_blinkingrate<=100 && scene->blinker_blinkingrate>=50)?140:0));
+    nvgFill(s->vg);
+
+    nvgBeginPath(s->vg);
+    nvgMoveTo(s->vg, viz_speed_x-290, viz_rect.y + header_h2/4);
+    nvgLineTo(s->vg, viz_speed_x-290 - viz_speed_w/2, viz_rect.y + header_h2/4 + header_h2/4);
+    nvgLineTo(s->vg, viz_speed_x-290, viz_rect.y + header_h2/2 + header_h2/4);
+    nvgClosePath(s->vg);
+    nvgFillColor(s->vg, nvgRGBA(255,230,70,(scene->blinker_blinkingrate<=80 && scene->blinker_blinkingrate>=50)?210:0));
     nvgFill(s->vg);
   }
   if(scene->rightBlinker) {
     nvgBeginPath(s->vg);
-    nvgMoveTo(s->vg, viz_speed_x+viz_speed_w, viz_rect.y + header_h/4);
-    nvgLineTo(s->vg, viz_speed_x+viz_speed_w + viz_speed_w/2, viz_rect.y + header_h/4 + header_h/4);
-    nvgLineTo(s->vg, viz_speed_x+viz_speed_w, viz_rect.y + header_h/2 + header_h/4);
+    nvgMoveTo(s->vg, viz_speed_x+viz_speed_w, viz_rect.y + header_h2/4);
+    nvgLineTo(s->vg, viz_speed_x+viz_speed_w + viz_speed_w/2, viz_rect.y + header_h2/4 + header_h2/4);
+    nvgLineTo(s->vg, viz_speed_x+viz_speed_w, viz_rect.y + header_h2/2 + header_h2/4);
     nvgClosePath(s->vg);
-    nvgFillColor(s->vg, nvgRGBA(23,134,68,scene->blinker_blinkingrate>=50?210:60));
+    nvgFillColor(s->vg, nvgRGBA(255,230,70,(scene->blinker_blinkingrate<=120 && scene->blinker_blinkingrate>=50)?70:0));
+    nvgFill(s->vg);
+
+    nvgBeginPath(s->vg);
+    nvgMoveTo(s->vg, viz_speed_x+viz_speed_w+145, viz_rect.y + header_h2/4);
+    nvgLineTo(s->vg, viz_speed_x+viz_speed_w+145 + viz_speed_w/2, viz_rect.y + header_h2/4 + header_h2/4);
+    nvgLineTo(s->vg, viz_speed_x+viz_speed_w+145, viz_rect.y + header_h2/2 + header_h2/4);
+    nvgClosePath(s->vg);
+    nvgFillColor(s->vg, nvgRGBA(255,230,70,(scene->blinker_blinkingrate<=100 && scene->blinker_blinkingrate>=50)?140:0));
+    nvgFill(s->vg);
+
+    nvgBeginPath(s->vg);
+    nvgMoveTo(s->vg, viz_speed_x+viz_speed_w+290, viz_rect.y + header_h2/4);
+    nvgLineTo(s->vg, viz_speed_x+viz_speed_w+290 + viz_speed_w/2, viz_rect.y + header_h2/4 + header_h2/4);
+    nvgLineTo(s->vg, viz_speed_x+viz_speed_w+290, viz_rect.y + header_h2/2 + header_h2/4);
+    nvgClosePath(s->vg);
+    nvgFillColor(s->vg, nvgRGBA(255,230,70,(scene->blinker_blinkingrate<=80 && scene->blinker_blinkingrate>=50)?210:0));
     nvgFill(s->vg);
     }
   if(scene->leftBlinker || scene->rightBlinker) {
-    s->scene.blinker_blinkingrate -= 5.5;
+    s->scene.blinker_blinkingrate -= 5;
     if(scene->blinker_blinkingrate<0) s->scene.blinker_blinkingrate = 120;
   }
 
@@ -788,38 +805,33 @@ static void ui_draw_vision_event(UIState *s) {
     }
 
     if (s->scene.limitSpeedCamera > 29) {
-      const int img_x_size = 172*1.5;
-      const int img_y_size = 271*1.5;
-      const int img_x = s->scene.viz_rect.x + bdr_s + 390;
-      const int img_y = viz_event_y;
-      float img_turn_alpha = 0.7f;
-      nvgBeginPath(s->vg);
-      NVGpaint imgPaint = nvgImagePattern(s->vg, img_x, img_y, img_x_size, img_y_size, 0, s->img_safetycam, img_turn_alpha);
-      nvgRect(s->vg, img_x, img_y, img_x_size, img_y_size);
-      nvgFillPaint(s->vg, imgPaint);
-      nvgFill(s->vg);
-    }
-
-    //if (s->scene.controls_state.getEngageable()){
-    if (s->scene.limitSpeedCamera > 29) {
-      const int img_turn_size = 180;
-      const int img_turn_x = viz_event_x-(img_turn_size/4)+85;
-      const int img_turn_y = viz_event_y;
-      float img_turn_alpha = 0.7f;
+      int img_speedlimit_growing_size_init = 0;
+      int img_speedlimit_growing_size = 0;
+      int img_speedlimit_size = 0;
+      int img_speedlimit_x = 0;
+      int img_speedlimit_y = 0;
+      img_speedlimit_growing_size_init = (s->scene.limitSpeedCameraDist>600?600:s->scene.limitSpeedCameraDist);
+      img_speedlimit_growing_size = 601 - img_speedlimit_growing_size_init;
+      if (s->scene.limitSpeedCameraDist > 600) {img_speedlimit_growing_size = 300;}
+      img_speedlimit_size = img_speedlimit_growing_size;
+      img_speedlimit_x = s->scene.viz_rect.centerX() - img_speedlimit_size/2;
+      img_speedlimit_y = s->scene.viz_rect.centerY() - img_speedlimit_size/2;
+      float img_speedlimit_alpha = 0.35f;
+      if(s->scene.controls_state.getVEgo()*3.6 < 1 || s->scene.limitSpeedCameraDist > 600) {img_speedlimit_alpha = 0.1f;}
       int speed_img;
-      if ((29 < s->scene.limitSpeedCamera) && (s->scene.limitSpeedCamera < 40)) {speed_img = s->img_speed_30;}
-      else if ((39 < s->scene.limitSpeedCamera) && (s->scene.limitSpeedCamera < 50)) {speed_img = s->img_speed_40;}
-      else if ((49 < s->scene.limitSpeedCamera) && (s->scene.limitSpeedCamera < 60)) {speed_img = s->img_speed_50;}
-      else if ((59 < s->scene.limitSpeedCamera) && (s->scene.limitSpeedCamera < 70)) {speed_img = s->img_speed_60;}
-      else if ((69 < s->scene.limitSpeedCamera) && (s->scene.limitSpeedCamera < 80)) {speed_img = s->img_speed_70;}
-      else if ((79 < s->scene.limitSpeedCamera) && (s->scene.limitSpeedCamera < 90)) {speed_img = s->img_speed_80;}
-      else if ((89 < s->scene.limitSpeedCamera) && (s->scene.limitSpeedCamera < 100)) {speed_img = s->img_speed_90;}
-      else if ((99 < s->scene.limitSpeedCamera) && (s->scene.limitSpeedCamera < 110)) {speed_img = s->img_speed_100;}
-      else if ((109 < s->scene.limitSpeedCamera) && (s->scene.limitSpeedCamera < 120)) {speed_img = s->img_speed_110;}
+      if (s->scene.limitSpeedCamera < 40) {speed_img = s->img_speed_30;}
+      else if (s->scene.limitSpeedCamera < 50) {speed_img = s->img_speed_40;}
+      else if (s->scene.limitSpeedCamera < 60) {speed_img = s->img_speed_50;}
+      else if (s->scene.limitSpeedCamera < 70) {speed_img = s->img_speed_60;}
+      else if (s->scene.limitSpeedCamera < 80) {speed_img = s->img_speed_70;}
+      else if (s->scene.limitSpeedCamera < 90) {speed_img = s->img_speed_80;}
+      else if (s->scene.limitSpeedCamera < 100) {speed_img = s->img_speed_90;}
+      else if (s->scene.limitSpeedCamera < 110) {speed_img = s->img_speed_100;}
+      else if (s->scene.limitSpeedCamera < 120) {speed_img = s->img_speed_110;}
       nvgBeginPath(s->vg);
-      NVGpaint imgPaint = nvgImagePattern(s->vg, img_turn_x, img_turn_y,
-        img_turn_size, img_turn_size, 0, speed_img, img_turn_alpha);
-      nvgRect(s->vg, img_turn_x, img_turn_y, img_turn_size, img_turn_size);
+      NVGpaint imgPaint = nvgImagePattern(s->vg, img_speedlimit_x, img_speedlimit_y,
+        img_speedlimit_size, img_speedlimit_size, 0, speed_img, img_speedlimit_alpha);
+      nvgRect(s->vg, img_speedlimit_x, img_speedlimit_y, img_speedlimit_size, img_speedlimit_size);
       nvgFillPaint(s->vg, imgPaint);
       nvgFill(s->vg);
     } else if (s->scene.controls_state.getEnabled()){
@@ -949,7 +961,7 @@ static void bb_ui_draw_measures_left(UIState *s, int bb_x, int bb_y, int bb_w ) 
   int uom_fontSize = 15*0.8;
   int bb_uom_dx =  (int)(bb_w /2 - uom_fontSize*2.5) ;
   //CPU TEMP
-    if (true) {
+  if (true) {
     char val_str[16];
     char uom_str[6];
     NVGcolor val_color = COLOR_WHITE_ALPHA(200);
@@ -986,7 +998,7 @@ static void bb_ui_draw_measures_left(UIState *s, int bb_x, int bb_y, int bb_w ) 
   }
 
   //BAT LEVEL
-    if(true) {
+  if(true) {
     char val_str[16];
     char uom_str[6];
     NVGcolor val_color = COLOR_WHITE_ALPHA(200);
@@ -1216,10 +1228,10 @@ static void bb_ui_draw_measures_right(UIState *s, int bb_x, int bb_y, int bb_w )
   //finally draw the frame
   bb_h += 20;
   nvgBeginPath(s->vg);
-    nvgRoundedRect(s->vg, bb_x, bb_y, bb_w, bb_h, 20);
-    nvgStrokeColor(s->vg, COLOR_WHITE_ALPHA(80));
-    nvgStrokeWidth(s->vg, 6);
-    nvgStroke(s->vg);
+  nvgRoundedRect(s->vg, bb_x, bb_y, bb_w, bb_h, 20);
+  nvgStrokeColor(s->vg, COLOR_WHITE_ALPHA(80));
+  nvgStrokeWidth(s->vg, 6);
+  nvgStroke(s->vg);
 }
 
 //BB END: functions added for the display of various items
@@ -1538,8 +1550,6 @@ void ui_nvg_init(UIState *s) {
   assert(s->img_map != 0);
   s->img_speed = nvgCreateImage(s->vg, "../assets/img_trafficSign_speedahead.png", 1);
   assert(s->img_speed != 0);
-  s->img_safetycam = nvgCreateImage(s->vg, "../assets/img_safetycam.png", 1);
-  assert(s->img_safetycam != 0);
   s->img_speed_30 = nvgCreateImage(s->vg, "../assets/img_30_speedahead.png", 1);
   assert(s->img_speed_30 != 0);
   s->img_speed_40 = nvgCreateImage(s->vg, "../assets/img_40_speedahead.png", 1);
