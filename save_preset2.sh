@@ -13,7 +13,7 @@ fi
 
 /data/data/com.termux/files/usr/bin/cat param_init_value | while read line
 do
-ParamName=$(/data/data/com.termux/files/usr/bin/echo $line | /data/data/com.termux/files/usr/bin/applets/awk -F ':' '{print $1}')
+ParamName=$(/data/data/com.termux/files/usr/bin/echo -n $line | /data/data/com.termux/files/usr/bin/applets/awk -F ':' '{print $1}')
 ParamValue=$(/data/data/com.termux/files/usr/bin/cat /data/params/d/${ParamName})
 /data/data/com.termux/files/usr/bin/echo "$ParamName:$ParamValue" >> /data/preset2
 done
